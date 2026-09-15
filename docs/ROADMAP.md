@@ -1,0 +1,63 @@
+# Roadmap
+
+## Phase 0 — Data validation
+
+- Capture live OGN receiver/status data for PWMalham.
+- Establish compliant connection/login/filter behaviour.
+- Determine heartbeat interval.
+- Catalogue actual fields and units.
+- Repeat against representative ATOM stations/software versions.
+- Investigate complete station-registry bootstrap source.
+
+**Exit criterion:** we can reliably turn real receiver/status packets into a canonical station observation without retaining aircraft data.
+
+## Phase 1 — Collector prototype
+
+- Python collector.
+- APRS reconnect/backoff.
+- Receiver/status parser with fixture tests.
+- ATOM classification.
+- In-memory/latest station registry.
+- Simple diagnostic output for PWMalham.
+
+## Phase 2 — Persistent server
+
+- FastAPI REST service.
+- PostgreSQL schema/migrations.
+- Persistent station registry.
+- Latest health and history.
+- Derived health evaluator.
+- `/api/v1/stations`, detail, history and service-health endpoints.
+- Dockerfile and Docker Compose for Synology.
+- Operational diagnostics documentation.
+
+## Phase 3 — iPhone MVP
+
+- SwiftUI project.
+- API models/client.
+- MapKit map of all stations.
+- Health markers and clustering.
+- Search by station name.
+- Selection summary card.
+- Station detail view.
+- Adaptive layouts for iPhone sizes.
+
+## Phase 4 — History and polish
+
+- Swift Charts health history.
+- 24h/7d/30d ranges.
+- Better map clustering semantics.
+- Dark mode/Dynamic Type/accessibility.
+- Caching/offline last-known station map.
+- Favourites.
+
+## Phase 5 — Optional monitoring
+
+- Favourite-station notifications.
+- Server-side debouncing/hysteresis.
+- Distinguish individual station silence from upstream OGN/server outage.
+- PilotAware supplementary metadata if a stable appropriate source is validated.
+
+## Immediate next task
+
+Build a minimal diagnostic OGN APRS collector whose only purpose is to find and print receiver/status messages for `PWMalham`, while explicitly discarding aircraft traffic. Use captured examples to define parser tests before designing the production schema around guessed packet formats.

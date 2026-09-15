@@ -2,23 +2,17 @@
 
 ## Home screen
 
-ATOM Monitor opens directly to the station map.
-
-```text
-+--------------------------------------+
-| ATOM Monitor                   Search|
-|                                      |
-|       green          green           |
-|                           amber      |
-|   green                              |
-|              green                   |
-|                         red          |
-|                                      |
-| Healthy  Warning  No heartbeat       |
-+--------------------------------------+
-```
+ATOM Monitor opens directly to the station map. The map is the application canvas and should use essentially all available display area rather than being placed inside a fixed-size panel.
 
 Markers represent ground stations only.
+
+## Full-screen and adaptive layout policy
+
+The map expands to the complete available iPhone display and may extend beneath the navigation chrome/safe-area edges where appropriate. Interactive controls and station information remain safe-area aware.
+
+No view should assume a particular iPhone width or height. Layout adapts using available geometry, SwiftUI size classes and `ViewThatFits`. Compact phones use tighter card padding and allow health/name content to stack; larger phones use the extra width without artificially constraining the map. The station card has a sensible maximum readable width on very wide displays while the map remains edge-to-edge.
+
+Dynamic Type, landscape orientation, display zoom and current small/standard/Max iPhone sizes must remain usable. Fixed-width rows should be avoided.
 
 ## Annotation state
 
@@ -29,29 +23,17 @@ Initial visual mapping:
 - red — No recent heartbeat;
 - grey — Unknown.
 
-Marker design should remain legible in light/dark appearance and should not rely solely on colour for accessibility. A glyph/border/state label can supplement colour.
+Marker design should remain legible in light/dark appearance and should not rely solely on colour for accessibility. A glyph/border/state label supplements colour.
 
 ## Selection flow
 
-A single tap selects the station and presents a compact summary card/sheet while retaining map context:
-
-```text
-PWMalham                         Healthy
-54.002 N, 2.142 W                147 m
-Last heartbeat                 32 sec ago
-Software                      v20260707
-                         View Details >
-```
+A single tap selects the station and presents a compact material summary card while retaining maximum map context. The card adapts to the available width and sits above the bottom safe area/tab bar.
 
 `View Details` navigates to the full station-health view.
 
 ## Search
 
-Search supports full and partial station names. Selecting a result:
-
-1. centres/zooms the map appropriately;
-2. selects the annotation;
-3. opens the station summary.
+Search supports full and partial station names. The search interface is navigation chrome rather than permanent map-consuming content. A later iteration will make selecting a search result centre/zoom the map, select the annotation and open its summary.
 
 ## Clustering
 
@@ -69,10 +51,6 @@ Sections:
 6. History — links/charts for supported telemetry.
 
 Only fields supported by real source data are displayed. Unknown fields are `Not reported` rather than synthetic values.
-
-## iPhone adaptability
-
-Use SwiftUI adaptive layout, Dynamic Type and safe-area-aware presentation. Avoid fixed-width rows that only fit large iPhones. The map should consume the available screen while controls use compact overlays/toolbars.
 
 ## Device location
 

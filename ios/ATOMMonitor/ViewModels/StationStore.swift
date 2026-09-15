@@ -29,4 +29,8 @@ final class StationStore: ObservableObject {
             errorMessage = error.localizedDescription
         }
     }
+
+    func clearError() {
+        errorMessage = nil
+    }
 }

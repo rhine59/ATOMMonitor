@@ -17,32 +17,36 @@ struct StationMapView: View {
             ZStack(alignment: .bottom) {
                 Map(position: $position, selection: $store.selectedStation) {
                     ForEach(store.filteredStations) { station in
-                        Marker(
-                            station.name,
-                            systemImage: station.health.symbol,
-                            coordinate: station.coordinate
-                        )
-                        .tint(tint(for: station.health))
-                        .tag(station)
+                        Marker(station.name, systemImage: station.health.symbol, coordinate: station.coordinate)
+                            .tint(tint(for: station.health))
+                            .tag(station)
                     }
                 }
                 .mapControls {
                     MapCompass()
                     MapScaleView()
                 }
-                .frame(width: geometry.size.width, height: geometry.size.height)
-                .ignoresSafeArea(.container, edges: [.top, .horizontal])
+                .ignoresSafeArea()
 
-                if let station = store.selectedStation {
-                    StationSummaryCard(station: station, availableWidth: geometry.size.width)
+                VStack(spacing: 0) {
+                    compactHeader
                         .padding(.horizontal, horizontalPadding(for: geometry.size.width))
-                        .padding(.bottom, 8)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .padding(.top, max(geometry.safeAreaInsets.top, 8))
+
+                    Spacer(minLength: 0)
+
+                    if let station = store.selectedStation {
+                        StationSummaryCard(station: station, availableWidth: geometry.size.width)
+                            .padding(.horizontal, horizontalPadding(for: geometry.size.width))
+                            .padding(.bottom, 8)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
                 }
+                .ignoresSafeArea(edges: .top)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .searchable(text: $store.searchText, prompt: "Find an ATOM station")
+        .ignoresSafeArea(edges: [.top, .horizontal])
         .overlay {
             if store.isLoading {
                 ProgressView("Loading stations…")
@@ -56,6 +60,37 @@ struct StationMapView: View {
             Text(store.errorMessage ?? "Unknown error")
         }
         .animation(.easeInOut(duration: 0.2), value: store.selectedStation)
+    }
+
+    private var compactHeader: some View {
+        VStack(spacing: 8) {
+            HStack {
+                Label("ATOM Monitor", systemImage: "antenna.radiowaves.left.and.right")
+                    .font(.headline)
+                Spacer()
+            }
+
+            HStack(spacing: 10) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
+                TextField("Find an ATOM station", text: $store.searchText)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                if !store.searchText.isEmpty {
+                    Button {
+                        store.searchText = ""
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 12)
+            .frame(minHeight: 42)
+            .background(.regularMaterial, in: Capsule())
+        }
+        .padding(.vertical, 8)
     }
 
     private var errorPresented: Binding<Bool> {
@@ -93,19 +128,14 @@ private struct StationSummaryCard: View {
         VStack(alignment: .leading, spacing: compact ? 5 : 8) {
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .firstTextBaseline) {
-                    Text(station.name)
-                        .font(.headline)
-                        .lineLimit(1)
+                    Text(station.name).font(.headline).lineLimit(1)
                     Spacer(minLength: 8)
                     Label(station.health.title, systemImage: station.health.symbol)
-                        .font(.caption)
-                        .lineLimit(1)
+                        .font(.caption).lineLimit(1)
                 }
-
                 VStack(alignment: .leading, spacing: 3) {
                     Text(station.name).font(.headline)
-                    Label(station.health.title, systemImage: station.health.symbol)
-                        .font(.caption)
+                    Label(station.health.title, systemImage: station.health.symbol).font(.caption)
                 }
             }
 

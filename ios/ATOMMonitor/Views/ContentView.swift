@@ -11,8 +11,7 @@ struct ContentView: View {
         TabView {
             NavigationStack {
                 StationMapView(store: store)
-                    .navigationTitle("ATOM Monitor")
-                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar(.hidden, for: .navigationBar)
             }
             .tabItem { Label("Map", systemImage: "map.fill") }
 
@@ -21,6 +20,7 @@ struct ContentView: View {
             }
             .tabItem { Label("Stations", systemImage: "list.bullet") }
         }
+        .ignoresSafeArea(.container, edges: [.top, .horizontal])
         .task { await store.load() }
     }
 }

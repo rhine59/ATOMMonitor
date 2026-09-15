@@ -1,0 +1,21 @@
+name: ATOMMonitor
+options:
+  bundleIdPrefix: uk.co.rhine59
+settings:
+  base:
+    IPHONEOS_DEPLOYMENT_TARGET: 17.0
+    SWIFT_VERSION: 5.0
+targets:
+  ATOMMonitor:
+    type: application
+    platform: iOS
+    sources:
+      - path: ATOMMonitor
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: uk.co.rhine59.ATOMMonitor
+        TARGETED_DEVICE_FAMILY: 1
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: ATOM Monitor
+    scheme:
+      gatherCoverageData: false

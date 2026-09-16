@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var store: StationStore
+    @AppStorage("homeStationID") private var homeStationID = ""
 
     init(repository: any StationRepository) {
         _store = StateObject(wrappedValue: StationStore(repository: repository))
@@ -10,7 +11,7 @@ struct ContentView: View {
     var body: some View {
         TabView {
             NavigationStack {
-                StationMapView(store: store)
+                StationMapView(store: store, homeStationID: homeStationID)
                     .navigationTitle("ATOM Stations")
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbarBackground(.visible, for: .navigationBar)
@@ -25,6 +26,13 @@ struct ContentView: View {
             .tabItem { Label("Stations", systemImage: "list.bullet") }
 
             NavigationStack {
+                SettingsView(store: store, homeStationID: $homeStationID)
+                    .navigationTitle("ATOM Stations")
+                    .navigationBarTitleDisplayMode(.inline)
+            }
+            .tabItem { Label("Settings", systemImage: "gearshape.fill") }
+
+            NavigationStack {
                 HelpView()
                     .navigationTitle("ATOM Stations")
                     .navigationBarTitleDisplayMode(.inline)
@@ -32,6 +40,28 @@ struct ContentView: View {
             .tabItem { Label("Help", systemImage: "questionmark.circle.fill") }
         }
         .task { await store.load() }
+    }
+}
+
+private struct SettingsView: View {
+    @ObservedObject var store: StationStore
+    @Binding var homeStationID: String
+
+    var body: some View {
+        Form {
+            Section("Map") {
+                Picker("Home station", selection: $homeStationID) {
+                    Text("Default UK view").tag("")
+                    ForEach(store.stations.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }) { station in
+                        Text(station.name).tag(station.id)
+                    }
+                }
+
+                Text("The Map tab opens centred and zoomed around the selected home station. The setting is stored on this iPhone.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
     }
 }
 

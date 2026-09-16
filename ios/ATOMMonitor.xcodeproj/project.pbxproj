@@ -18,6 +18,7 @@
 		B6AA95EF0AF011D0DE25F6F2 /* StationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C751216009317AF14EBEA163 /* StationDetailView.swift */; };
 		C22BCA391C0221A73594297B /* ATOMStation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F5B30B432A417C920C561C /* ATOMStation.swift */; };
 		CCD9EC815421A99D843A9C35 /* StationMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9006BDD5E2600681DE897495 /* StationMapView.swift */; };
+		F20A82B850A985BBF565BB47 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE541CDDD8D91AE2A881E8E7 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +44,7 @@
 		B035EFFFAC5B806B55340289 /* StationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationStore.swift; sourceTree = "<group>"; };
 		B1C32FED4738C4BCAFBFE88F /* ATOMMonitorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ATOMMonitorApp.swift; sourceTree = "<group>"; };
 		C751216009317AF14EBEA163 /* StationDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationDetailView.swift; sourceTree = "<group>"; };
+		CE541CDDD8D91AE2A881E8E7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EEEBCC28FFD208BCF1A5D10B /* demo-stations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "demo-stations.json"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -59,6 +61,7 @@
 		26D7ABDC2F739084AE63DB97 /* ATOMMonitor */ = {
 			isa = PBXGroup;
 			children = (
+				CE541CDDD8D91AE2A881E8E7 /* Assets.xcassets */,
 				B1C32FED4738C4BCAFBFE88F /* ATOMMonitorApp.swift */,
 				C236238B1D5528644DAE8F6E /* Models */,
 				08021AF23FB88C220CA616E6 /* Resources */,
@@ -208,6 +211,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F20A82B850A985BBF565BB47 /* Assets.xcassets in Resources */,
 				5455E39A3DC50938F3BE2C95 /* demo-stations.json in Resources */,
 				6EEA4C97A69E72783ED709AA /* stations.json in Resources */,
 			);

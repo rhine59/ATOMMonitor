@@ -29,3 +29,7 @@ __pycache__/
 
 # Never track raw Simulator recordings, including numbered Finder copies
 artifacts/*-raw*.mp4
+
+# macOS Finder metadata
+.DS_Store
+**/.DS_Store

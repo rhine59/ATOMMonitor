@@ -3,7 +3,6 @@ import MapKit
 
 struct StationMapView: View {
     @ObservedObject var store: StationStore
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     @State private var position: MapCameraPosition = .region(
         MKCoordinateRegion(
@@ -13,40 +12,30 @@ struct StationMapView: View {
     )
 
     var body: some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .bottom) {
-                Map(position: $position, selection: $store.selectedStation) {
-                    ForEach(store.filteredStations) { station in
-                        Marker(station.name, systemImage: station.health.symbol, coordinate: station.coordinate)
-                            .tint(tint(for: station.health))
-                            .tag(station)
-                    }
-                }
-                .mapControls {
-                    MapCompass()
-                    MapScaleView()
-                }
-                .ignoresSafeArea()
-
-                VStack(spacing: 0) {
-                    compactHeader
-                        .padding(.horizontal, horizontalPadding(for: geometry.size.width))
-                        .padding(.top, max(geometry.safeAreaInsets.top, 8))
-
-                    Spacer(minLength: 0)
-
-                    if let station = store.selectedStation {
-                        StationSummaryCard(station: station, availableWidth: geometry.size.width)
-                            .padding(.horizontal, horizontalPadding(for: geometry.size.width))
-                            .padding(.bottom, 8)
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
-                }
-                .ignoresSafeArea(edges: .top)
+        Map(position: $position, selection: $store.selectedStation) {
+            ForEach(store.filteredStations) { station in
+                Marker(station.name, systemImage: station.health.symbol, coordinate: station.coordinate)
+                    .tint(tint(for: station.health))
+                    .tag(station)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .ignoresSafeArea(edges: [.top, .horizontal])
+        .mapControls {
+            MapCompass()
+            MapScaleView()
+        }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            searchBar
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(.ultraThinMaterial)
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if let station = store.selectedStation {
+                StationSummaryCard(station: station)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+            }
+        }
         .overlay {
             if store.isLoading {
                 ProgressView("Loading stations…")
@@ -62,35 +51,26 @@ struct StationMapView: View {
         .animation(.easeInOut(duration: 0.2), value: store.selectedStation)
     }
 
-    private var compactHeader: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Label("ATOM Monitor", systemImage: "antenna.radiowaves.left.and.right")
-                    .font(.headline)
-                Spacer()
-            }
-
-            HStack(spacing: 10) {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.secondary)
-                TextField("Find an ATOM station", text: $store.searchText)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                if !store.searchText.isEmpty {
-                    Button {
-                        store.searchText = ""
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.secondary)
-                    }
-                    .buttonStyle(.plain)
+    private var searchBar: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "magnifyingglass")
+                .foregroundStyle(.secondary)
+            TextField("Find an ATOM station", text: $store.searchText)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+            if !store.searchText.isEmpty {
+                Button {
+                    store.searchText = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.secondary)
                 }
+                .buttonStyle(.plain)
             }
-            .padding(.horizontal, 12)
-            .frame(minHeight: 42)
-            .background(.regularMaterial, in: Capsule())
         }
-        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .frame(minHeight: 40)
+        .background(.regularMaterial, in: Capsule())
     }
 
     private var errorPresented: Binding<Bool> {
@@ -98,14 +78,6 @@ struct StationMapView: View {
             get: { store.errorMessage != nil },
             set: { if !$0 { store.clearError() } }
         )
-    }
-
-    private func horizontalPadding(for width: CGFloat) -> CGFloat {
-        switch width {
-        case ..<360: 8
-        case ..<430: 12
-        default: horizontalSizeClass == .compact ? 16 : 24
-        }
     }
 
     private func tint(for health: StationHealth) -> Color {
@@ -120,54 +92,29 @@ struct StationMapView: View {
 
 private struct StationSummaryCard: View {
     let station: ATOMStation
-    let availableWidth: CGFloat
-
-    private var compact: Bool { availableWidth < 375 }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: compact ? 5 : 8) {
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text(station.name).font(.headline).lineLimit(1)
-                    Spacer(minLength: 8)
-                    Label(station.health.title, systemImage: station.health.symbol)
-                        .font(.caption).lineLimit(1)
-                }
+        ViewThatFits(in: .vertical) {
+            HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(station.name).font(.headline)
-                    Label(station.health.title, systemImage: station.health.symbol).font(.caption)
-                }
-            }
-
-            HStack {
-                Text(String(format: "%.4f°, %.4f°", station.latitude, station.longitude))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-                Spacer()
-                if let altitude = station.altitudeMetres {
-                    Text("\(Int(altitude.rounded())) m")
+                    Text(station.name).font(.headline).lineLimit(1)
+                    Label(station.health.title, systemImage: station.health.symbol)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
-            }
-
-            NavigationLink {
-                StationDetailView(station: station)
-            } label: {
-                HStack {
-                    Spacer()
-                    Text("View Details")
-                    Image(systemName: "chevron.right")
+                Spacer(minLength: 8)
+                NavigationLink("Details") {
+                    StationDetailView(station: station)
                 }
-                .contentShape(Rectangle())
+                .font(.subheadline.weight(.semibold))
             }
-            .font(.subheadline.weight(.semibold))
+            VStack(alignment: .leading, spacing: 6) {
+                Text(station.name).font(.headline)
+                Label(station.health.title, systemImage: station.health.symbol).font(.caption)
+                NavigationLink("View Details") { StationDetailView(station: station) }
+            }
         }
-        .padding(compact ? 10 : 14)
-        .frame(maxWidth: min(availableWidth, 620), alignment: .leading)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: compact ? 14 : 18))
-        .shadow(radius: 3, y: 1)
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
 }

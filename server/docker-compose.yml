@@ -1,11 +1,4 @@
 services:
-  ogn-station-probe:
-    build:
-      context: ./diagnostic
-    container_name: atommonitor-ogn-probe
-    restart: unless-stopped
-    command: ["--prefix", "PW"]
-
   atom-api:
     build:
       context: .
@@ -18,3 +11,12 @@ services:
     environment:
       ATOM_DB: /data/atommonitor.sqlite3
       PORT: "8080"
+
+  ogn-station-probe:
+    build:
+      context: ./diagnostic
+    container_name: atommonitor-ogn-probe
+    restart: unless-stopped
+    depends_on:
+      - atom-api
+    command: ["--prefix", "PW", "--api-url", "http://atom-api:8080/api/v1/observations"]

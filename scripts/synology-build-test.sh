@@ -12,6 +12,10 @@ echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 echo "Git: $(git -C "$ROOT" rev-parse --short HEAD)"
 echo "API host port: $HOST_PORT"
 
+echo '\n--- Persistent storage ---'
+mkdir -p "$ROOT/server/data"
+echo "SQLite data directory: $ROOT/server/data"
+
 echo '\n--- Python collector unit tests ---'
 cd diagnostic
 python3 -m unittest -v

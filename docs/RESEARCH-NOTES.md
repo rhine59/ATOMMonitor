@@ -20,11 +20,11 @@ Observed candidate stations included `PWNesclif`, `PWEDRPACP`, `PWRankins`, `PWF
 
 Three useful packet types/patterns were observed:
 
-1. `OGNSDR` position packets, for example a `PW...>OGNSDR` packet containing APRS latitude/longitude and `/A=` altitude.
+1. `OGNSDR` position packets containing APRS latitude/longitude and `/A=` altitude.
 2. `OGNSDR` technical-health packets containing fields such as receiver software version, CPU load, RAM usage, NTP offset/correction, temperature, EGM96 offset and RF metrics.
 3. A separate `APRS` status/heartbeat packet with a body of the form `v20260707 OGN-R/PilotAware`.
 
-The third form is particularly important: `OGN-R/PilotAware` is direct evidence in the live packet body that the source is running the PilotAware OGN-R software. This is a substantially stronger ATOM classification signal than the `PW` prefix alone. The `PW` prefix remains useful as a server-side discovery filter, but application-level classification should use the PilotAware marker where available.
+`OGN-R/PilotAware` is direct evidence in the live packet body that the source is running PilotAware OGN-R software. This is a substantially stronger ATOM classification signal than the `PW` prefix alone. The `PW` prefix remains useful as a server-side discovery filter, but application-level classification should use the PilotAware marker where available.
 
 The live sample also shows that a station can emit a PilotAware heartbeat via destination `APRS` while its lower-level OGN receiver telemetry is sent separately via destination `OGNSDR`. The production model should therefore merge observations by station/source callsign rather than expect one packet to contain all health data.
 
@@ -34,9 +34,21 @@ A live `PWEDRPACP` OGNSDR status observation contained software `v0.3.2.ARM`, CP
 
 Aircraft-count fragments such as `Acfts[1h]` may occur inside receiver-health packets. ATOM Monitor does not need aircraft identity, position or movement data; these aggregate receiver-health fragments are not used to build aircraft tracking functionality.
 
+## 2026-09-16 — PWFirefly cadence measurement
+
+A dedicated `b/PWFirefly` APRS server filter was observed continuously for more than eleven minutes. It produced a highly regular pair of station reports.
+
+The `OGNSDR` position packet timestamps were `11:30:15`, `11:35:15` and `11:40:15` UTC: exactly **300 seconds (5 minutes)** apart in this sample.
+
+The PilotAware heartbeat timestamps were `11:31:58`, `11:36:49` and `11:41:40` UTC: exactly **291 seconds (4 minutes 51 seconds)** apart in both measured intervals. Each heartbeat contained `v20260707 OGN-R/PilotAware`.
+
+PWFirefly's observed position was `50°47.70 N, 003°11.98 W` with `/A=000525` (525 ft). No detailed CPU/RAM/NTP/RF technical-status packet was seen from PWFirefly during this observation window, so absence of those fields must not by itself imply a station fault.
+
+This measurement is strong evidence that a healthy ATOM can have an approximately five-minute reporting cadence. It is still only one station/sample, so final health thresholds should be validated against several ATOM stations before being frozen. A threshold below five minutes would clearly risk false warnings for stations behaving like PWFirefly.
+
 ## PWMalham
 
-`PWMalham` remains the initial reference station. Research via OGN/KTrax-associated data showed it as a ground receiver and demonstrated the type of station-level metadata/history we want to reproduce from underlying sources rather than depending on a third-party UI.
+`PWMalham` remains an earlier reference station. Research via OGN/KTrax-associated data showed it as a ground receiver and demonstrated the type of station-level metadata/history we want to reproduce from underlying sources rather than depending on a third-party UI.
 
 Do not treat previously observed PWMalham numeric values as permanent station facts; they were time-specific observations.
 
@@ -51,15 +63,15 @@ Finding a reliable complete bootstrap source remains a high-priority research ta
 
 ## Questions still open
 
-- What packets does `PWMalham` currently emit when it is active?
-- What is the normal `OGN-R/PilotAware` heartbeat interval? The live sample suggests frequent reports, but a longer observation is needed before setting thresholds.
+- Is the approximately five-minute reporting cadence seen at PWFirefly representative across current ATOM stations?
 - Does every current PilotAware ATOM emit the exact `OGN-R/PilotAware` marker?
 - Does every PilotAware ATOM use a `PW...` station identifier? The prefix must not yet be treated as authoritative.
 - How consistent are OGNSDR health fields across ATOM hardware/software versions?
+- How often are detailed CPU/RAM/NTP/RF status packets emitted, and do all ATOM stations emit them?
 - Is there a PilotAware-published complete station list/map data endpoint suitable for registry bootstrap?
 - Can an OGN receiver-list endpoint provide inactive receivers for registry bootstrap?
 - What is the best production server-side filter while retaining all ATOM stations and excluding unnecessary traffic?
-- Which health thresholds are meaningful after observing real heartbeat cadence?
+- Which health thresholds are meaningful after observing several real stations?
 
 ## Research discipline
 

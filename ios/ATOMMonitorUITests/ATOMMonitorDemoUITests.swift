@@ -6,15 +6,35 @@ final class ATOMMonitorDemoUITests: XCTestCase {
         app.launchArguments += ["--demo-mode", "--reset-demo-preferences"]
         app.launch()
 
-        step("Map: edge-to-edge station health map loaded from the station snapshot")
+        step("Map: edge-to-edge station health map, last-updated time and manual refresh")
         XCTAssertTrue(app.tabBars.buttons["Map"].waitForExistence(timeout: 8))
         sleep(3)
+        let mapRefresh = app.buttons["Refresh stations"].firstMatch
+        if mapRefresh.waitForExistence(timeout: 2) {
+            mapRefresh.tap()
+            sleep(3)
+        }
 
-        step("Stations: searchable station registry")
+        step("Stations: searchable station registry and manual refresh")
         app.tabBars.buttons["Stations"].tap()
         XCTAssertTrue(app.navigationBars["ATOM Stations"].waitForExistence(timeout: 3))
         sleep(2)
+        let listRefresh = app.buttons["Refresh stations"].firstMatch
+        if listRefresh.waitForExistence(timeout: 2) {
+            listRefresh.tap()
+            sleep(3)
+        }
 
+        step("Stations: pull-to-refresh gesture")
+        let list = app.tables.firstMatch
+        if list.waitForExistence(timeout: 2) {
+            let start = list.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.2))
+            let end = list.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75))
+            start.press(forDuration: 0.1, thenDragTo: end)
+            sleep(3)
+        }
+
+        step("Stations: search and add a favourite")
         let search = app.searchFields.firstMatch
         if search.waitForExistence(timeout: 2) {
             search.tap()
@@ -38,7 +58,6 @@ final class ATOMMonitorDemoUITests: XCTestCase {
 
         step("Settings: server connection, refresh interval, home station and favourites")
         app.tabBars.buttons["Settings"].tap(); sleep(3)
-
         let server = app.textFields.firstMatch
         if server.waitForExistence(timeout: 2) {
             server.tap()
@@ -62,7 +81,7 @@ final class ATOMMonitorDemoUITests: XCTestCase {
         step("Help: project purpose and user guide")
         app.tabBars.buttons["Help"].tap(); sleep(3)
 
-        step("Map: cached snapshot remains available between automatic refresh cycles")
+        step("Map: cached snapshot remains available and last-updated records the successful refresh")
         app.tabBars.buttons["Map"].tap(); sleep(4)
     }
 

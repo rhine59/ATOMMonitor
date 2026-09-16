@@ -1,81 +1,88 @@
 # Requirements
 
+Checkpoint: 16 September 2026.
+
 ## Functional requirements
 
 ### Map
 
-- The application opens to a MapKit map.
-- All known ATOM stations with usable coordinates are represented.
-- Stations remain represented after they stop reporting.
-- Markers visually communicate current health state.
-- Dense areas should use clustering where practical.
-- The user can pan, zoom and select markers using standard MapKit interactions.
-- A selected marker presents a compact station summary without immediately leaving the map.
-- The user can navigate from the summary to the full station-detail view.
+- The application opens directly to a full-screen adaptive MapKit map.
+- All known ATOM stations with usable coordinates are represented; stations remain represented after they stop reporting.
+- Markers communicate Healthy, Warning, No recent heartbeat and Unknown states and dense areas cluster.
+- The user can pan, zoom and tap a station to open full station detail directly.
+- Search uses the compact `Find` field and accepts full or partial station names.
+- Apple map presentation is selectable between Standard, Satellite + Labels and Satellite, with the selection remembered locally.
+- A Home button returns to the ground station selected as Home in Settings. If none is configured, the exact message is `No home station set`.
+- A manual refresh button requests a fresh snapshot.
+- A plain status line below the title/buttons and above Find displays `Last updated: HH:MM` after success. If the current server request fails it displays `No Network`; cached station data remains visible.
+- Device location permission is not required for normal use or Home station behaviour.
 
-### Search and navigation
+### Stations and favourites
 
-- Search by full or partial station name.
-- Selecting a search result centres/selects the station on the map.
-- A future favourites facility should provide fast access to important stations.
-- Device location may optionally centre the map or support nearest-station display, but location permission must not be required for basic use.
+- Stations presents the persistent registry and opens full station detail.
+- Favourites provides local quick access to selected stations and is stored on the iPhone.
+- Favourites do not alter server collection or registry state.
 
 ### Station details
 
-Display when available:
+Display when available: station name/identifier, latitude/longitude, altitude, latest observation/heartbeat timestamps, software/version/platform, CPU load and temperature, RAM usage/total, uptime, NTP offset/correction, RF/frequency correction/quality/gain, voltage and useful provenance.
 
-- station name/identifier;
-- latitude and longitude;
-- altitude/elevation;
-- last heartbeat/status timestamp;
-- age of latest status;
-- software/version/platform;
-- CPU load;
-- RAM usage/total;
-- CPU/system temperature;
-- uptime;
-- NTP offset and frequency correction;
-- RF/frequency correction and other receiver-health fields;
-- data-source/provenance information where useful.
-
-Missing fields must be represented as `Not reported`.
+Missing fields must be represented as `Not reported`; absence of optional telemetry alone must not create an unhealthy state.
 
 ### Health
 
-Initial states:
+Initial derived states are Healthy, Warning, No recent heartbeat and Unknown. Current provisional server heartbeat thresholds are <=420 seconds Healthy, <=900 seconds Warning, >900 seconds No recent heartbeat, and absent/invalid heartbeat Unknown. These remain subject to multi-station cadence validation. The UI must not claim a station is physically Offline merely because a heartbeat has not been observed.
 
-- Healthy
-- Warning
-- No recent heartbeat
-- Unknown
+### Refresh and offline behaviour
 
-Thresholds must be configurable in server configuration and should be validated against observed real reporting intervals before being considered stable.
+- Fetch once at application startup, then automatically while active.
+- User-configurable whole-minute interval from 1 to 10 minutes; default **5 minutes**.
+- Remember the selected interval on the iPhone.
+- Preserve the last successful station snapshot in a local cache and display it during server/network failure.
+- Manual refresh is available from Map and Stations.
+- Avoid overlapping refresh operations as the implementation is hardened.
 
-### History
+### Settings
 
-- Persist station health/status observations.
-- Support at least 24-hour, 7-day and 30-day views eventually.
-- Candidate graph series: temperature, CPU, memory, NTP offset/correction and RF correction/quality.
+- Server URL is configurable.
+- Settings provides Test Connection.
+- Home station, favourites, map layer and refresh interval persist locally.
+- Normal remote operation should use an HTTPS DNS endpoint.
+
+### Help
+
+- The normal User Guide must be available locally inside ATOM Monitor as native app content.
+- Opening the User Guide must not require Safari, GitHub or an Internet connection.
+- User-facing changes must be reflected in both repository documentation and the in-app guide.
 
 ### Data collection
 
 - Maintain one long-lived OGN APRS connection on the server rather than one per iPhone.
-- Parse receiver/status messages relevant to ground-station health.
-- Do not persist aircraft positions, tracks or identities.
-- Maintain a persistent ATOM station registry independent of current live status.
+- Parse receiver/status messages relevant to ATOM ground-station health.
+- Maintain a persistent station registry independent of current live status.
+- Do not persist or expose aircraft positions, tracks, identities or movement history.
+- Prevent stale incoming packets from overwriting newer corresponding telemetry as server persistence is hardened.
 
 ## Non-functional requirements
 
-- Native SwiftUI iPhone application.
-- Adaptive layouts across supported iPhone screen sizes.
-- MapKit for mapping.
-- Server deployable in Docker/Compose on a Synology NAS.
-- HTTPS/JSON interface between server and app.
-- Reconnection/backoff for OGN feed interruption.
-- Database migrations/versioning once implementation begins.
+- Native SwiftUI iPhone application, iOS 17+.
+- Adaptive layout across supported iPhone screen sizes.
+- MapKit mapping and no third-party iOS runtime dependency requirement.
+- Server deployable with Docker Compose on Synology.
+- HTTPS/JSON target interface between public server and app; do not expose host port 8088 directly to the Internet.
+- Public observation-ingestion/write surfaces must be restricted or authenticated before Internet exposure.
+- Reconnection/backoff for OGN interruption.
 - Clearly distinguish observed telemetry from derived health state.
-- Avoid presenting ATOM Monitor as a certified, safety-critical, or authoritative aviation operational-status service.
+- ATOM Monitor is not a certified, safety-critical or authoritative aviation operational-status service.
+
+## Build and source-control requirements
+
+- Xcode project is generated from `ios/project.yml` with XcodeGen.
+- Build/test procedures and meaningful milestone/failure evidence are tracked in Git.
+- On the development Mac, command-line Simulator builds use DerivedData outside `~/Documents` to avoid File Provider signing metadata.
+- Finished `.mp4` and `.log` evidence may be tracked; raw `*-raw*.mp4`, DerivedData, runtime SQLite and `.DS_Store` are not repository artefacts.
+- Material implementation changes require synchronized documentation and a Git commit.
 
 ## Data-source requirements
 
-The system must be designed so data providers can be replaced or supplemented. OGN APRS is currently the preferred live receiver-status source; PilotAware Playback/other PilotAware endpoints are candidates for supplementary metadata. No undocumented source should be treated as permanently guaranteed.
+The provider design must remain replaceable/supplementable. OGN APRS receiver/status traffic is the current live source. `OGN-R/PilotAware` is a strong live PilotAware/ATOM classifier; `PW` prefix filtering is useful for discovery but is not by itself an authoritative complete registry rule. No undocumented source is assumed permanently guaranteed.

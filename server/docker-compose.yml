@@ -5,3 +5,16 @@ services:
     container_name: atommonitor-ogn-probe
     restart: unless-stopped
     command: ["--prefix", "PW"]
+
+  atom-api:
+    build:
+      context: .
+    container_name: atommonitor-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/data
+    environment:
+      ATOM_DB: /data/atommonitor.sqlite3
+      PORT: "8080"

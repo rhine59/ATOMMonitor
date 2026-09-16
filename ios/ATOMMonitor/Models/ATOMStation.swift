@@ -28,6 +28,22 @@ struct ATOMStation: Identifiable, Codable, Hashable {
 
 enum StationHealth: String, Codable, CaseIterable {
     case healthy, warning, noRecentHeartbeat, unknown
-    var title: String { switch self { case .healthy: "Healthy"; case .warning: "Warning"; case .noRecentHeartbeat: "No recent heartbeat"; case .unknown: "Unknown" } }
-    var symbol: String { switch self { case .healthy: "checkmark.circle.fill"; case .warning: "exclamationmark.triangle.fill"; case .noRecentHeartbeat: "xmark.circle.fill"; case .unknown: "questionmark.circle.fill" } }
+
+    var title: String {
+        switch self {
+        case .healthy: return "Healthy"
+        case .warning: return "Warning"
+        case .noRecentHeartbeat: return "No recent heartbeat"
+        case .unknown: return "Unknown"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .healthy: return "checkmark.circle.fill"
+        case .warning: return "exclamationmark.triangle.fill"
+        case .noRecentHeartbeat: return "xmark.circle.fill"
+        case .unknown: return "questionmark.circle.fill"
+        }
+    }
 }

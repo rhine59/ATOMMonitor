@@ -1,79 +1,25 @@
 # ATOM Monitor automated simulator demonstration and recorder
 
 ## Purpose
+ATOM Monitor includes a repeatable XCUITest-driven Simulator demonstration that records an MP4 while exercising the app. Demo mode is deterministic and independent of the live OGN/Synology service.
 
-ATOM Monitor includes a repeatable demonstration/test harness for exercising the iPhone user interface in the iOS Simulator and recording the result as an MP4. The design deliberately separates live production data from demonstration data so recordings are repeatable and do not depend on the state of the OGN network or Synology server.
+## Scope
+The recording contains ATOM ground-station health/status only: no aircraft identities, positions, tracks, speeds or movements.
 
-The same deterministic data and, ultimately, the same XCUITest workflows are intended to provide regression testing as the application evolves.
-
-## Scope and data safety
-
-ATOM Monitor monitors PilotAware ATOM **ground-station health and technical status only**. Demo mode follows exactly the same scope. It contains no aircraft identities, aircraft positions, aircraft tracks, packet histories, speeds or movements.
-
-## Architecture
-
-The demonstration system has four layers:
-
-1. **Deterministic station simulator** — `ios/ATOMMonitor/Resources/demo-stations.json`.
-2. **Demo launch mode** — application argument `--demo-mode` selects the fixture repository rather than the production REST API.
-3. **Simulator recorder** — `scripts/record-demo.sh` builds, installs, launches and records the app.
-4. **UI driver / regression layer** — the recorder will invoke `scripts/run-demo-ui.sh` when present. The production implementation should use XCUITest accessibility identifiers rather than screen coordinates.
-
-Normal application launches are unaffected: without `--demo-mode`, the app uses the configured production API (currently the Synology REST service).
-
-## Deterministic station fixture
-
-`demo-stations.json` deliberately contains examples that exercise the important display paths:
-
-- Healthy station with complete technical telemetry.
-- Warning station.
-- No recent heartbeat station.
-- Unknown station.
-- Missing optional telemetry so the UI must display `Not reported`.
-- Station with no coordinates so list/detail behaviour can be tested independently of Map display.
-
-The fixture includes ground-station fields such as position, altitude, heartbeat/status timestamps, PilotAware and receiver versions, CPU load and temperature, RAM, NTP values, RF corrections/quality, voltage and uptime.
+## Components
+- `ios/ATOMMonitor/Resources/demo-stations.json` — deterministic Healthy, Warning, No recent heartbeat, Unknown, missing-telemetry and missing-position examples.
+- `--demo-mode` — selects fixture data instead of the production API.
+- `ios/ATOMMonitorUITests/ATOMMonitorDemoUITests.swift` — XCUITest feature tour.
+- `scripts/record-demo.sh` — XcodeGen, Simulator selection/boot, XCUITest execution, screen recording, logging and MP4 post-processing.
+- `artifacts/` — ignored generated video, test log and DerivedData.
 
 ## Requirements
+Xcode/Xcode command-line tools, XcodeGen and at least one installed iPhone Simulator are required. FFmpeg is optional for MP4 annotation/post-processing:
 
-The Mac needs:
+    brew install xcodegen
+    brew install ffmpeg
 
-- Xcode and Xcode command-line tools.
-- At least one installed iPhone Simulator runtime/device.
-- XcodeGen (`brew install xcodegen`) if it is not already installed.
-- FFmpeg (`brew install ffmpeg`) for annotation rendering. Recording itself can proceed without FFmpeg.
-
-Check available iPhone simulators with:
-
-    xcrun simctl list devices available | grep "iPhone"
-
-## Automatic simulator selection
-
-The first recorder version assumed an `iPhone 16 Pro`. On the development Mac this failed because that simulator was not installed. The installed Xcode 26 simulator set included iPhone 17 Pro, iPhone 17 Pro Max, iPhone Air, iPhone 17, iPhone 16e and iPhone 17e devices, with some models appearing in more than one installed runtime.
-
-`record-demo.sh` was therefore changed to discover the installed Simulator devices dynamically. If `DEVICE` is not supplied it currently prefers, in order:
-
-1. iPhone 17 Pro
-2. iPhone 17
-3. iPhone 16e
-4. iPhone Air
-5. iPhone 17 Pro Max
-6. otherwise the first available iPhone Simulator
-
-It matches a device name exactly and uses the first available UDID for that name, which makes duplicate models across installed runtimes harmless.
-
-The script prints the selected model and UDID before continuing, for example:
-
-    Using Simulator: iPhone 17 Pro (973A79C9-079E-4B0C-ADEF-00D6D6CB32CA)
-
-A particular simulator can still be requested explicitly:
-
-    DEVICE="iPhone 17 Pro Max" ./scripts/record-demo.sh
-
-If that named simulator is unavailable, the script prints the available iPhones and exits instead of silently using a different model.
-
-## Running the demonstration recorder
-
+## Run
 From the repository root:
 
     cd ~/Documents/Xcode/ATOMMonitor
@@ -81,100 +27,44 @@ From the repository root:
     chmod +x scripts/record-demo.sh
     ./scripts/record-demo.sh
 
-The script performs the following sequence:
+The script regenerates the Xcode project, selects an available modern iPhone (preferring iPhone 17 Pro), boots it and waits for readiness, starts `simctl recordVideo`, then runs only `ATOMMonitorDemoUITests.testRecordedFeatureTour` with `xcodebuild test`. The recording is stopped even on test failure and is retained for diagnosis.
 
-1. Creates `artifacts/` if necessary.
-2. Regenerates `ios/ATOMMonitor.xcodeproj` using XcodeGen.
-3. Discovers/selects an available iPhone Simulator.
-4. Boots the selected simulator.
-5. Opens Simulator.app and waits for boot completion with `simctl bootstatus`.
-6. Builds ATOM Monitor for that exact simulator using `xcodebuild`.
-7. Locates and installs the generated `ATOMMonitor.app`.
-8. Terminates an existing instance if necessary.
-9. Starts H.264 screen capture using `xcrun simctl io ... recordVideo`.
-10. Launches `uk.co.rhine59.ATOMMonitor` with `--demo-mode`.
-11. Invokes `scripts/run-demo-ui.sh` if an executable driver exists; until that driver is implemented, it records a deterministic 20-second demo-mode launch.
-12. Stops the recording cleanly.
-13. If FFmpeg is installed, renders an annotated H.264 MP4; otherwise it preserves/copies the raw recording.
+Force another installed device with:
 
-The script also installs a shell trap while recording so an interrupted run is less likely to leave `recordVideo` running.
+    DEVICE="iPhone 17 Pro Max" ./scripts/record-demo.sh
 
-## Output files
-
-Generated files are written below `artifacts/`:
-
-    artifacts/
-      ATOMMonitor-Demo-raw.mp4
-      ATOMMonitor-Demo.mp4
-      DerivedData/
-
-`ATOMMonitor-Demo-raw.mp4` is the direct Simulator capture. `ATOMMonitor-Demo.mp4` is the post-processed H.264 output. At the current development stage the annotation layer adds a demonstration title; timed explanatory annotations will be expanded alongside the UI driver.
-
-The complete `artifacts/` directory is intentionally ignored by Git. Generated video and Xcode build products should not bloat the source repository. The scripts, fixtures, tests, annotation definitions and documentation **are** version controlled.
-
-## Intended complete automated tour
-
-The completed XCUITest/UI driver should exercise the user-visible application in a repeatable order: Map launch/loading and clustering; cluster zoom; `Find` search; direct selection of a healthy station; full station telemetry; Warning and No recent heartbeat states; missing fields displayed as `Not reported`; Stations list; adding and viewing Favourites; Settings and home-station selection; Help; and return to Map.
-
-Each phase should have a timed annotation explaining what the viewer is seeing. UI interaction must be driven through accessibility identifiers/XCUITest rather than hard-coded screen coordinates so the demonstration remains reliable on different iPhone screen sizes.
-
-## Relationship to production testing
-
-Demo mode is not a replacement for the live integration tests against the Synology/OGN collector. It tests deterministic iPhone presentation and interaction. The project therefore has complementary test layers:
-
-- server/parser/unit tests for data handling;
-- Synology live integration tests for the OGN-to-registry/API pipeline;
-- deterministic Simulator/XCUITest for iPhone behaviour;
-- physical-iPhone testing for real device networking, layout and permissions.
-
-A successful demo-mode recording does not prove that the production API or OGN feed is reachable; likewise a healthy production API does not prove every iPhone UI path works.
-
-## Troubleshooting
-
-### `Simulator 'iPhone 16 Pro' not found`
-
-This was the failure produced by the original recorder on the Xcode 26 development Mac. Pull the current script: it no longer assumes iPhone 16 Pro.
-
-    cd ~/Documents/Xcode/ATOMMonitor
-    git pull
-    ./scripts/record-demo.sh
-
-### No simulator is found
-
-Run:
+List devices with:
 
     xcrun simctl list devices available | grep "iPhone"
 
-If no iPhones are shown, install an iOS Simulator runtime/device through Xcode.
+## Automated tour
+The current UI test demonstrates Map, Stations/search, adding a favourite, full station health/technical detail, Favourites, Settings, editable server address and Test Connection, Help, and return to Map. Each major phase emits an `ATOM_DEMO_STEP` activity into the test log. The server test deliberately uses a documentation-only HTTPS hostname in demo mode; a failed connection is a valid demonstration of connection diagnostics and does not affect deterministic station data.
 
-### Force a known device
+The test launches with `--demo-mode` so it never depends on the production Synology API. The production app continues to use the saved/configured server URL.
 
-    DEVICE="iPhone 17 Pro" ./scripts/record-demo.sh
+## Outputs
 
-### XcodeGen is missing
+    artifacts/ATOMMonitor-Demo-raw.mp4
+    artifacts/ATOMMonitor-Demo.mp4
+    artifacts/ATOMMonitor-Demo-test.log
+    artifacts/DerivedData/
 
-    brew install xcodegen
+The raw file is the direct Simulator capture. When FFmpeg is installed, the final MP4 receives the automated-demo title overlay and H.264 web-compatible encoding. The test log captures the Xcode/XCUITest result and named feature-tour activities.
 
-### FFmpeg is missing
+## Failure handling
+A UI-test failure returns a non-zero exit code but the video and log are retained. This is intentional: the recording can show exactly where the interaction stopped. Inspect:
 
-    brew install ffmpeg
+    tail -100 artifacts/ATOMMonitor-Demo-test.log
 
-Without FFmpeg, the raw recording is still retained but the full annotation/post-processing stage is not available.
+and search steps with:
 
-### Recording is static after launch
+    grep 'ATOM_DEMO_STEP' artifacts/ATOMMonitor-Demo-test.log
 
-At the current milestone this is expected if `scripts/run-demo-ui.sh` has not yet been implemented. The recorder intentionally detects that condition and records a 20-second deterministic launch. The next milestone is the XCUITest/accessibility-driven UI exerciser.
+## Simulator selection history
+The original recorder assumed `iPhone 16 Pro`, which was not installed on the Xcode 26 development Mac. The script now discovers available devices dynamically, preferring iPhone 17 Pro, iPhone 17, iPhone 16e, iPhone Air and iPhone 17 Pro Max before falling back to the first available iPhone. Duplicate model names across installed runtimes are handled by selecting the first matching UDID.
 
-## Version-control policy
+## Test layers
+The demo/XCUITest complements rather than replaces server parser/unit tests, Synology live OGN/API integration tests and physical-iPhone testing. In particular, successful demo mode does not prove production DNS/HTTPS reachability, while successful production API tests do not prove all UI interactions.
 
-All meaningful changes to this facility are committed with the rest of ATOM Monitor. In particular, keep the following in Git:
-
-- demo fixtures;
-- demo-mode application code;
-- recorder and UI-driver scripts;
-- XCUITest code and accessibility identifiers;
-- annotation definitions/timelines;
-- build/test instructions;
-- meaningful failure diagnoses and design decisions.
-
-Do not commit generated MP4s, DerivedData, or other disposable build products.
+## Version control
+Commit fixtures, UI tests, scripts, annotation definitions, build/test instructions and meaningful failure diagnoses. Do not commit generated MP4s, DerivedData or other disposable build products. The `artifacts/` directory remains ignored.

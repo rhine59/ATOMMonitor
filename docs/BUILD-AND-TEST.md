@@ -75,18 +75,51 @@ open ATOMMonitor.xcodeproj
 
 Build in Xcode and install on the iPhone. The default API endpoint is `http://192.168.1.99:8088/`. The app has a local-network usage description and local-network HTTP allowance for this LAN service.
 
+### Automated Simulator feature tour
+
+From the repository root:
+
+```sh
+cd ~/Documents/Xcode/ATOMMonitor
+git pull
+./scripts/record-demo.sh
+```
+
+The script generates the Xcode project, selects an available iPhone Simulator, runs `ATOMMonitorDemoUITests/testRecordedFeatureTour`, records the Simulator and retains the UI-test log under `artifacts/`.
+
+**DerivedData must not be written beneath this repository's `~/Documents` path on the current Mac.** During the 16 September 2026 regression run, an app built under `artifacts/DerivedData` acquired `com.apple.FinderInfo` and `com.apple.fileprovider.fpfs#P` metadata on the generated `ATOMMonitor.app` directory. Xcode then failed CodeSign with `resource fork, Finder information, or similar detritus not allowed`. The source resources themselves had no extended attributes.
+
+The diagnosis was confirmed by rebuilding the same project with DerivedData at `/tmp/ATOMMonitor-DerivedData`: Xcode reported `** BUILD SUCCEEDED **`, `xattr -lr` on the generated app returned no extended attributes, and `codesign --verify --verbose=4` reported `valid on disk` and `satisfies its Designated Requirement`.
+
+`record-demo.sh` therefore defaults to:
+
+```text
+/tmp/ATOMMonitor-DerivedData
+```
+
+and removes that directory before each automated tour. This keeps generated app bundles outside File Provider-managed `Documents` storage. To use another clean location, set `ATOM_DERIVED_DATA`, for example:
+
+```sh
+ATOM_DERIVED_DATA="$HOME/Library/Developer/Xcode/DerivedData/ATOMMonitor-Demo" ./scripts/record-demo.sh
+```
+
+Do not revert the recorder to `artifacts/DerivedData` unless the filesystem metadata issue has been independently shown to be resolved.
+
 ### iPhone acceptance test
 
 1. Confirm the phone is on a network that can reach `192.168.1.99:8088`.
 2. Launch ATOM Monitor and permit local-network access if iOS asks.
 3. Confirm Stations loads server-provided stations rather than fixture data.
 4. Confirm stations with coordinates appear on Map and clustering works.
-5. Add a station to Favourites from Map and from Stations.
-6. Disconnect the Synology/network temporarily and relaunch/refresh; the last station cache should remain available.
-7. Confirm favourite records remain available from the durable local favourites cache after a successful server refresh.
-8. Restore connectivity and verify fresh server data replaces the general cache.
-9. Remove a favourite in Settings and verify the preference is retained.
-10. Confirm no aircraft movement/identity UI or data appears anywhere.
+5. Confirm Map manual refresh works and Last updated advances only after a successful snapshot.
+6. Exercise Standard, Satellite + Labels and Satellite map layers.
+7. With no home station configured, tap Home and confirm `No home station set`; then configure a home station and confirm Home returns the map to it.
+8. Add a station to Favourites from Map and from Stations.
+9. Disconnect the Synology/network temporarily and relaunch/refresh; the last station cache should remain available.
+10. Confirm favourite records remain available from the durable local favourites cache after a successful server refresh.
+11. Restore connectivity and verify fresh server data replaces the general cache.
+12. Remove a favourite in Settings and verify the preference is retained.
+13. Confirm no aircraft movement/identity UI or data appears anywhere.
 
 ## What constitutes an end-to-end pass
 

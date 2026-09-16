@@ -1,0 +1,157 @@
+=== ATOM Monitor Synology build/test ===
+UTC: 2026-09-16T12:23:32Z
+Git: d67639c
+API host port: 8088
+\n--- Persistent storage ---
+SQLite data directory: /volume1/docker/ATOMMonitor/server/data
+\n--- Python collector unit tests ---
+test_aircraft_packet_is_discarded (test_ogn_station_probe.ReceiverPacketTests) ... ok
+test_generic_aprs_status_is_not_atom (test_ogn_station_probe.ReceiverPacketTests) ... ok
+test_ognsdr_health (test_ogn_station_probe.ReceiverPacketTests) ... ok
+test_ognsdr_position (test_ogn_station_probe.ReceiverPacketTests) ... ok
+test_pilotaware_heartbeat (test_ogn_station_probe.ReceiverPacketTests) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.002s
+
+OK
+\n--- Docker rebuild ---
+ Container atommonitor-ogn-probe  Stopping
+ Container atommonitor-ogn-probe  Stopped
+ Container atommonitor-ogn-probe  Removing
+ Container atommonitor-ogn-probe  Removed
+ Container atommonitor-api  Stopping
+ Container atommonitor-api  Stopped
+ Container atommonitor-api  Removing
+ Container atommonitor-api  Removed
+ Network server_default  Removing
+ Network server_default  Removed
+#1 [atom-api internal] load build definition from Dockerfile
+#1 transferring dockerfile:
+#1 transferring dockerfile: 183B done
+#1 DONE 0.4s
+
+#2 [atom-api internal] load .dockerignore
+#2 transferring context: 2B done
+#2 DONE 0.5s
+
+#3 [atom-api internal] load metadata for docker.io/library/python:3.12-slim
+#3 DONE 1.2s
+
+#4 [atom-api 1/4] FROM docker.io/library/python:3.12-slim@sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1ac9b536e184ea
+#4 DONE 0.0s
+
+#5 [atom-api internal] load build context
+#5 ...
+
+#6 [atom-api 2/4] WORKDIR /app
+#6 CACHED
+
+#5 [atom-api internal] load build context
+#5 transferring context: 28B done
+#5 DONE 0.6s
+
+#7 [atom-api 3/4] RUN pip install --no-cache-dir flask==3.1.2
+#7 7.307 Collecting flask==3.1.2
+#7 7.391   Downloading flask-3.1.2-py3-none-any.whl.metadata (3.2 kB)
+#7 7.425 Collecting blinker>=1.9.0 (from flask==3.1.2)
+#7 7.439   Downloading blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+#7 7.499 Collecting click>=8.1.3 (from flask==3.1.2)
+#7 7.513   Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+#7 7.544 Collecting itsdangerous>=2.2.0 (from flask==3.1.2)
+#7 7.558   Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+#7 7.604 Collecting jinja2>=3.1.2 (from flask==3.1.2)
+#7 7.622   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+#7 7.794 Collecting markupsafe>=2.1.1 (from flask==3.1.2)
+#7 7.809   Downloading markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+#7 7.886 Collecting werkzeug>=3.1.0 (from flask==3.1.2)
+#7 7.901   Downloading werkzeug-3.1.8-py3-none-any.whl.metadata (4.0 kB)
+#7 7.944 Downloading flask-3.1.2-py3-none-any.whl (103 kB)
+#7 7.970 Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
+#7 7.984 Downloading click-8.5.0-py3-none-any.whl (125 kB)
+#7 8.002 Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+#7 8.016 Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+#7 8.035 Downloading markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+#7 8.050 Downloading werkzeug-3.1.8-py3-none-any.whl (226 kB)
+#7 8.142 Installing collected packages: markupsafe, itsdangerous, click, blinker, werkzeug, jinja2, flask
+#7 9.708 Successfully installed blinker-1.9.0 click-8.5.0 flask-3.1.2 itsdangerous-2.2.0 jinja2-3.1.6 markupsafe-3.0.3 werkzeug-3.1.8
+#7 9.709 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#7 9.938 
+#7 9.938 [notice] A new release of pip is available: 25.0.1 -> 26.2.1
+#7 9.938 [notice] To update, run: pip install --upgrade pip
+#7 DONE 10.3s
+
+#8 [atom-api 4/4] COPY app.py /app/app.py
+#8 DONE 1.4s
+
+#9 [atom-api] exporting to image
+#9 exporting layers
+#9 exporting layers 2.4s done
+#9 writing image sha256:fd2be33d8c8020fd67174d1f6cee00129811d60745292e19b43d2006f24049cf 0.0s done
+#9 naming to docker.io/library/server-atom-api
+#9 naming to docker.io/library/server-atom-api 0.1s done
+#9 DONE 2.5s
+
+#10 [ogn-station-probe internal] load build definition from Dockerfile
+#10 transferring dockerfile: 183B 0.0s done
+#10 ...
+
+#11 [ogn-station-probe internal] load .dockerignore
+#11 transferring context: 2B done
+#11 DONE 0.7s
+
+#10 [ogn-station-probe internal] load build definition from Dockerfile
+#10 DONE 0.9s
+
+#3 [ogn-station-probe internal] load metadata for docker.io/library/python:3.12-slim
+#3 DONE 2.0s
+
+#4 [ogn-station-probe 1/3] FROM docker.io/library/python:3.12-slim@sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1ac9b536e184ea
+#4 DONE 0.0s
+
+#6 [ogn-station-probe 2/3] WORKDIR /app
+#6 CACHED
+
+#12 [ogn-station-probe internal] load build context
+#12 transferring context: 42B done
+#12 DONE 0.1s
+
+#13 [ogn-station-probe 3/3] COPY ogn_station_probe.py /app/ogn_station_probe.py
+#13 DONE 0.8s
+
+#14 [ogn-station-probe] exporting to image
+#14 exporting layers 1.1s done
+#14 writing image sha256:1257a9c4872dc28593d37785632e66bf31a27e142138bbbcd2d602822293fa31 0.0s done
+#14 naming to docker.io/library/server-ogn-station-probe 0.1s done
+#14 DONE 1.2s
+ Network server_default  Creating
+ Network server_default  Created
+ Container atommonitor-api  Creating
+ Container atommonitor-api  Created
+ Container atommonitor-ogn-probe  Creating
+ Container atommonitor-ogn-probe  Created
+ Container atommonitor-api  Starting
+ Container atommonitor-api  Started
+ Container atommonitor-ogn-probe  Starting
+ Container atommonitor-ogn-probe  Started
+\n--- Container state ---
+NAME                    IMAGE                      COMMAND                  SERVICE             CREATED             STATUS                  PORTS
+atommonitor-api         server-atom-api            "python /app/app.py"     atom-api            4 seconds ago       Up 2 seconds            0.0.0.0:8088->8080/tcp, :::8088->8080/tcp
+atommonitor-ogn-probe   server-ogn-station-probe   "python -u /app/ogn_…"   ogn-station-probe   4 seconds ago       Up Less than a second   
+\n--- API health ---
+curl: (56) Recv failure: Connection reset by peer
+{"confirmedStations":0,"status":"ok"}
+
+\n--- Station API sample/count ---
+station_count= 0
+\n--- Recent container logs ---
+atommonitor-api  |  * Serving Flask app 'app'
+atommonitor-api  |  * Debug mode: off
+atommonitor-api  | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+atommonitor-api  |  * Running on all addresses (0.0.0.0)
+atommonitor-api  |  * Running on http://127.0.0.1:8080
+atommonitor-api  |  * Running on http://172.22.0.2:8080
+atommonitor-api  | [33mPress CTRL+C to quit[0m
+atommonitor-api  | 172.22.0.1 - - [16/Sep/2026 12:24:02] "GET /health HTTP/1.1" 200 -
+atommonitor-api  | 172.22.0.1 - - [16/Sep/2026 12:24:02] "GET /api/v1/stations HTTP/1.1" 200 -
+\nPASS: unit tests, Docker build/start and local REST API checks completed.

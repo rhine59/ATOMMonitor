@@ -15,7 +15,28 @@ xcodebuild test -project ATOMMonitor.xcodeproj -scheme "$SCHEME" -destination "i
 TEST_STATUS=${PIPESTATUS[0]}
 set -e
 kill -INT "$REC" 2>/dev/null || true; wait "$REC" 2>/dev/null || true; trap - EXIT
-if command -v ffmpeg >/dev/null; then ffmpeg -y -i "$RAW" -vf "drawbox=x=20:y=20:w=iw-40:h=74:color=black@0.55:t=fill,drawtext=text='ATOM Monitor - automated feature tour':x=40:y=42:fontsize=28:fontcolor=white" -c:v libx264 -pix_fmt yuv420p -movflags +faststart "$FINAL"; else cp "$RAW" "$FINAL"; echo "ffmpeg not installed; raw recording copied to $FINAL."; fi
+
+# Homebrew FFmpeg builds can omit the optional drawtext/libfreetype filter.
+# Never let presentation post-processing destroy an otherwise valid recording.
+if command -v ffmpeg >/dev/null; then
+  if ffmpeg -hide_banner -filters 2>/dev/null | grep -Eq '[[:space:]]drawtext[[:space:]]'; then
+    echo "FFmpeg drawtext available; adding demo title overlay..."
+    if ! ffmpeg -y -i "$RAW" -vf "drawbox=x=20:y=20:w=iw-40:h=74:color=black@0.55:t=fill,drawtext=text='ATOM Monitor - automated feature tour':x=40:y=42:fontsize=28:fontcolor=white" -c:v libx264 -pix_fmt yuv420p -movflags +faststart "$FINAL"; then
+      echo "WARNING: annotated transcode failed; preserving usable unannotated MP4."
+      cp "$RAW" "$FINAL"
+    fi
+  else
+    echo "FFmpeg is installed without drawtext; creating web-compatible MP4 without text overlay."
+    if ! ffmpeg -y -i "$RAW" -c:v libx264 -pix_fmt yuv420p -movflags +faststart "$FINAL"; then
+      echo "WARNING: FFmpeg transcode failed; preserving raw recording as final MP4."
+      cp "$RAW" "$FINAL"
+    fi
+  fi
+else
+  echo "FFmpeg not installed; preserving raw recording as final MP4."
+  cp "$RAW" "$FINAL"
+fi
+
 echo "Raw MP4: $RAW"; echo "Demo MP4: $FINAL"; echo "UI test log: $LOG"
 if [ "$TEST_STATUS" -ne 0 ]; then echo "UI test failed; recording retained for diagnosis."; exit "$TEST_STATUS"; fi
 echo "PASS: automated ATOM Monitor feature tour completed."

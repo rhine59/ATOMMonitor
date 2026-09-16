@@ -8,19 +8,32 @@ It is a ground-station monitor only. It does **not** display, record or retain a
 
 ## Main screen
 
-The application uses three buttons/tabs at the bottom of the iPhone screen:
+The application uses four buttons/tabs at the bottom of the iPhone screen:
 
 - **Map** — displays ATOM stations geographically and provides station search.
 - **Stations** — displays the available ATOM stations as a list and provides access to station details.
-- **Help** — displays application help and a link to this User Guide.
+- **Settings** — selects the home ATOM station used for the initial map position.
+- **Help** — displays application help and a hyperlink to this User Guide.
 
 The navigation title is **ATOM Stations**.
 
 ## Map
 
-The map is designed to use the available iPhone display area between the navigation title and bottom tab bar, adapting to different iPhone screen sizes and orientations.
+The map uses the available iPhone display area between the navigation title and bottom tab bar and adapts to different iPhone screen sizes and orientations.
 
-Use the search field to filter stations by name. Selecting a station marker displays a compact summary and a link to the station's detail screen.
+Use the search field to filter stations by name. Selecting an individual station marker displays a compact summary and a link to the station detail screen.
+
+### Station clustering
+
+When multiple stations would overlap at the current map scale, ATOM Monitor combines them into a single circular cluster marker showing the number of stations in that area. The clustering grid scales with the visible map region, so clusters break into smaller clusters and then individual station markers as the map is zoomed in.
+
+Tap a numbered cluster marker to zoom further into that group. Normal pinch-to-zoom and pan gestures can also be used. Zooming out causes nearby station markers to combine again.
+
+### Home station
+
+The Map tab initially centres and zooms around the **Home station** selected in Settings. The selection is stored locally on the iPhone. If no home station is selected, the application uses its default wider UK map view.
+
+Changing the home station causes the map to move to the newly selected station when the Map view applies the setting.
 
 Station marker colour represents the derived health state:
 
@@ -37,20 +50,19 @@ The Stations tab provides a non-map view of the station registry. Selecting a st
 
 The production registry is intended to retain known ATOM stations even when they stop reporting. A failed or silent station must therefore remain visible rather than disappearing merely because no live packet is being received.
 
+## Settings
+
+Open **Settings** from the bottom tab bar and choose **Home station**. The picker lists the stations currently available to the app. Choose **Default UK view** to remove the home-station preference.
+
+The home-station preference is an iPhone display setting; it does not alter the ATOM station itself or the server data.
+
+## Help
+
+The Help tab gives a short description of ATOM Monitor and an **Open User Guide** hyperlink to this maintained project guide.
+
 ## Station details
 
-Depending on what a station reports, details may include:
-
-- station name;
-- latitude, longitude and altitude;
-- most recent position/status report;
-- most recent PilotAware heartbeat;
-- PilotAware/receiver software version;
-- CPU load and temperature;
-- RAM usage;
-- NTP timing information;
-- RF frequency correction and signal-quality information;
-- uptime or supply voltage when supplied by the station.
+Depending on what a station reports, details may include station name; latitude, longitude and altitude; most recent position/status report; most recent PilotAware heartbeat; software version; CPU load and temperature; RAM usage; NTP timing; RF frequency correction and signal-quality information; and uptime or supply voltage when supplied by the station.
 
 A field that the station does not provide should be shown as **Not reported** rather than as zero.
 
@@ -74,7 +86,7 @@ The iPhone application currently contains development/fixture station data while
 
 ## Troubleshooting
 
-If no live station observations appear on the Synology diagnostic collector, first confirm that the APRS connection reports a successful connection and the expected server filter. The safe discovery command currently used for PilotAware investigation is:
+The safe discovery command currently used for PilotAware investigation is:
 
 ```bash
 cd /volume1/docker/ATOMMonitor/server/diagnostic

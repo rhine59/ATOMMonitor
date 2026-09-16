@@ -6,11 +6,13 @@ ATOM Monitor is an iPhone application and supporting Synology-hosted service for
 
 ## Current checkpoint — 16 September 2026
 
-The project now has a working server and native SwiftUI iPhone application using live ATOM station data rather than fixture-only data.
+The project has a working Synology Docker server and native SwiftUI iPhone application using live ATOM station data.
 
 ### Server
 
-The Synology Docker deployment maintains a persistent ground-station registry from OGN/APRS receiver/status traffic and exposes the station data through a REST API. The current LAN service is published on host port `8088`. Runtime station state is stored in SQLite. Aircraft messages are discarded and aircraft movement data is not part of the database or API.
+The Synology Docker deployment maintains a persistent ground-station registry from OGN/APRS receiver/status traffic and exposes station data through a REST API. The internal/LAN service is host port `8088`; runtime station state is stored in SQLite. Aircraft messages are discarded and aircraft movement data is not part of the database or API.
+
+Public access is through DSM Reverse Proxy at `https://granvillehouse.synology.me:8445/`, terminating valid HTTPS and forwarding internally to `http://localhost:8088`. Port 8088 is diagnostic/internal and must not be directly Internet-forwarded. The complete rebuild/deployment procedure is in `docs/SYNOLOGY-HOSTING-RUNBOOK.md`.
 
 Current health states are **Healthy**, **Warning**, **No recent heartbeat** and **Unknown**. Missing optional telemetry is displayed as `Not reported` and does not by itself make a station unhealthy.
 
@@ -18,7 +20,9 @@ Current health states are **Healthy**, **Warning**, **No recent heartbeat** and 
 
 The iOS application targets iOS 17+ and is generated with XcodeGen. Its main tabs are **Map**, **Stations**, **Favourites**, **Settings** and **Help**.
 
-The Map is full-screen and adaptive across iPhone sizes. It supports station clustering, direct station-detail selection, search (`Find`), Standard/Satellite map layers, a configurable Home station, and manual refresh. The status line sits below the `ATOM Stations` title/button row and above `Find`: it shows `Last updated: HH:MM` after a successful server refresh and `No Network` when the current server request fails. Cached station data remains visible during a connection failure.
+The Map is full-screen and adaptive across iPhone sizes. It supports station clustering, direct station-detail selection, search (`Find`), Standard/Satellite map layers, a configurable Home station and manual refresh. The status line below the title/button row and above `Find` shows `Last updated: HH:MM` after a successful server refresh and `No Network` when the current server request fails. Cached station data remains visible during a connection failure.
+
+Station detail now displays **Record date & time** as the absolute local date/time of the station's latest `lastSeen` record. Last heartbeat, Last seen, Last position and Last technical status remain relative-age indicators.
 
 Station data is fetched at startup and then automatically at a configurable 1–10 minute interval; the default is **5 minutes**. The latest successful station snapshot is cached locally. Favourites, Home station, map layer and refresh preference are stored on the iPhone.
 
@@ -49,7 +53,7 @@ xcodebuild build \
 
 The current icon-enabled configuration has been verified with `** BUILD SUCCEEDED **`.
 
-## Production direction
+## Production topology
 
 ```text
 OGN APRS receiver/status traffic only
@@ -58,23 +62,25 @@ OGN APRS receiver/status traffic only
        Synology Docker
   collector / classifier
   persistent station registry
-  SQLite / REST API
+  SQLite / REST API :8088 internal
               |
-       HTTPS/JSON target
+              v
+       DSM Reverse Proxy
+https://granvillehouse.synology.me:8445
               |
               v
        iPhone / SwiftUI
 ```
 
-Remote deployment should use an HTTPS DNS name through the Synology reverse proxy rather than expose port 8088 directly. Before public exposure, observation ingestion must not be left as an unauthenticated public write surface.
+Before the Internet-facing deployment is treated as fully hardened, observation ingestion must not remain an unauthenticated public write surface; public access should be restricted to intended read functionality wherever practical.
 
 ## Known follow-up work
 
-Important engineering work still includes protecting the public ingestion path, making server switching/cache ownership robust, preventing overlapping refreshes, separating cache-write errors from successful network refreshes, hardening UI-test preference reset, correcting server upserts so older packets cannot overwrite newer telemetry, and continuing validation of health thresholds against multiple live stations.
+Important engineering work includes making the verified public HTTPS endpoint the compiled app default, making server switching/cache ownership robust, protecting the public ingestion path, preventing overlapping refreshes, separating cache-write errors from successful network refreshes, hardening UI-test preference reset, correcting server upserts so older packets cannot overwrite newer telemetry, and continuing validation of health thresholds against multiple live stations.
 
 ## Documentation
 
-`docs/` is part of the implementation. It contains architecture, requirements, API/data-model design, OGN/APRS and data-source research, build/test and demo procedures, live-integration evidence, map/UI behaviour, public-server setup, design decisions and the maintained user guide. User-facing changes must also be reflected in the local in-app User Guide.
+`docs/` is part of the implementation. It contains architecture, requirements, API/data-model design, OGN/APRS and data-source research, build/test and demo procedures, live-integration evidence, map/UI behaviour, public-server setup, the complete Synology hosting runbook, design decisions, checkpoints and the maintained user guide. User-facing changes must also be reflected in the local in-app User Guide.
 
 ## Terminology
 

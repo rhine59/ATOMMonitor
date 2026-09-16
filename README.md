@@ -1,12 +1,12 @@
 # ATOM Monitor
 
-ATOM Monitor is an iPhone application and supporting Synology-hosted service for monitoring the operational health and technical status of PilotAware ATOM ground stations.
+ATOM Monitor is a cross-platform mobile application and supporting Synology-hosted service for monitoring the operational health and technical status of PilotAware ATOM ground stations.
 
 > **Scope:** ATOM Monitor does not display, record or retain aircraft movements, tracks or aircraft identities.
 
 ## Current checkpoint — 16 September 2026
 
-The project has a working Synology Docker server and native SwiftUI iPhone application using live ATOM station data.
+The project has a working Synology Docker server, native SwiftUI iPhone application and an initial native Kotlin/Jetpack Compose Android application using the same ATOM station REST API.
 
 ### Server
 
@@ -18,21 +18,19 @@ Current health states are **Healthy**, **Warning**, **No recent heartbeat** and 
 
 ### iPhone application
 
-The iOS application targets iOS 17+ and is generated with XcodeGen. Its main tabs are **Map**, **Stations**, **Favourites**, **Settings** and **Help**.
+The iOS application targets iOS 17+ and is generated with XcodeGen. Its main tabs are **Map**, **Stations**, **Favourites**, **Settings** and **Help**. The Map is full-screen/adaptive, supports clustering, Find, selectable Apple map layers, Home station and manual refresh. Station detail displays **Record date & time** as the absolute local date/time of `lastSeen`, alongside relative observation ages. The latest station snapshot is cached locally and refresh defaults to five minutes.
 
-The Map is full-screen and adaptive across iPhone sizes. It supports station clustering, direct station-detail selection, search (`Find`), Standard/Satellite map layers, a configurable Home station and manual refresh. The status line below the title/button row and above `Find` shows `Last updated: HH:MM` after a successful server refresh and `No Network` when the current server request fails. Cached station data remains visible during a connection failure.
+### Android application
 
-Station detail now displays **Record date & time** as the absolute local date/time of the station's latest `lastSeen` record. Last heartbeat, Last seen, Last position and Last technical status remain relative-age indicators.
+The `android/` directory contains a native Kotlin/Jetpack Compose counterpart targeting Android API 26+. It uses the same five main areas — **Map, Stations, Favourites, Settings and Help** — and the same `/api/v1/stations` data model and health terminology.
 
-Station data is fetched at startup and then automatically at a configurable 1–10 minute interval; the default is **5 minutes**. The latest successful station snapshot is cached locally. Favourites, Home station, map layer and refresh preference are stored on the iPhone.
+The initial Android implementation includes station mapping/search, station and favourite lists, complete technical detail, absolute Record date & time plus relative observation ages, public-server configuration, 1–10 minute foreground refresh, manual refresh, Home-station preference, persistent preferences and a local latest-snapshot cache. It defaults to `https://granvillehouse.synology.me:8445/`.
 
-The Help tab contains a **native local User Guide**. Normal user help does not require GitHub, Safari or an Internet connection.
-
-The app icon is the ATOM atom graphic in `ios/ATOMMonitor/Assets.xcassets/AppIcon.appiconset/`, selected by `ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon` in `ios/project.yml`.
+Android mapping currently uses osmdroid/OpenStreetMap so it requires no Google Maps API key. Android-equivalent selectable map layers, marker clustering/health artwork, explicit `/health` Test Connection, stronger refresh lifecycle handling, Android automated tests and the approved app icon remain parity work. See `android/README.md`.
 
 ## Build
 
-Generate the project:
+### iOS
 
 ```bash
 cd ios
@@ -40,18 +38,11 @@ xcodegen generate
 open ATOMMonitor.xcodeproj
 ```
 
-For command-line Simulator builds on the development Mac, use DerivedData outside `~/Documents` because File Provider metadata there has previously caused code-signing failures:
+For command-line Simulator builds on the development Mac, keep DerivedData outside `~/Documents` because File Provider metadata there has previously caused code-signing failures.
 
-```bash
-rm -rf /tmp/ATOMMonitor-DerivedData
-xcodebuild build \
-  -project ATOMMonitor.xcodeproj \
-  -scheme ATOMMonitor \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
-  -derivedDataPath /tmp/ATOMMonitor-DerivedData
-```
+### Android
 
-The current icon-enabled configuration has been verified with `** BUILD SUCCEEDED **`.
+Open the repository's `android` directory in Android Studio and allow Gradle to sync, then run the `app` configuration on an emulator or physical Android phone. The project uses Kotlin, Jetpack Compose/Material 3 and osmdroid. See `android/README.md` for the build and parity checklist.
 
 ## Production topology
 
@@ -67,21 +58,21 @@ OGN APRS receiver/status traffic only
               v
        DSM Reverse Proxy
 https://granvillehouse.synology.me:8445
-              |
-              v
-       iPhone / SwiftUI
+          /          \
+         v            v
+ iPhone / SwiftUI   Android / Compose
 ```
 
 Before the Internet-facing deployment is treated as fully hardened, observation ingestion must not remain an unauthenticated public write surface; public access should be restricted to intended read functionality wherever practical.
 
 ## Known follow-up work
 
-Important engineering work includes making the verified public HTTPS endpoint the compiled app default, making server switching/cache ownership robust, protecting the public ingestion path, preventing overlapping refreshes, separating cache-write errors from successful network refreshes, hardening UI-test preference reset, correcting server upserts so older packets cannot overwrite newer telemetry, and continuing validation of health thresholds against multiple live stations.
+Shared engineering work includes server/cache ownership robustness, protecting the public ingestion path, preventing overlapping refreshes, separating cache-write errors from successful network refreshes, correcting server upserts so older packets cannot overwrite newer telemetry, and continuing health-threshold validation. Android-specific parity work is tracked in `android/README.md`; the broader engineering sequence is in `docs/IMPROVEMENT-ROADMAP.md`.
 
 ## Documentation
 
-`docs/` is part of the implementation. It contains architecture, requirements, API/data-model design, OGN/APRS and data-source research, build/test and demo procedures, live-integration evidence, map/UI behaviour, public-server setup, the complete Synology hosting runbook, design decisions, checkpoints and the maintained user guide. User-facing changes must also be reflected in the local in-app User Guide.
+`docs/` is part of the implementation. It contains architecture, requirements, API/data-model design, OGN/APRS and data-source research, build/test/demo procedures, live-integration evidence, UI behaviour, public-server/Synology hosting, design decisions, checkpoints and the maintained user guide. Platform-specific Android setup and parity status is maintained in `android/README.md`. User-facing changes should be synchronized across platform-local help where applicable.
 
 ## Terminology
 
-A missing heartbeat means no recent status report has been observed. It is not proof that the physical installation is powered off, so the application deliberately says **No recent heartbeat** rather than **Offline**.
+A missing heartbeat means no recent status report has been observed. It is not proof that the physical installation is powered off, so the applications deliberately say **No recent heartbeat** rather than **Offline**.

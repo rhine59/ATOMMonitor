@@ -24,7 +24,6 @@ struct StationMapView: View {
             }}}
             .mapStyle(mapLayer.style).frame(width:geometry.size.width,height:geometry.size.height).ignoresSafeArea(.container,edges:.all).onMapCameraChange(frequency:.onEnd){visibleRegion=$0.region}.onAppear{applyHomeIfNeeded()}.onChange(of:store.stations){_,_ in applyHomeIfNeeded()}.onChange(of:homeStationID){_,_ in hasAppliedInitialHome=false;applyHomeIfNeeded()}.mapControls{MapCompass();MapScaleView()}
             mapChrome(topInset:geometry.safeAreaInsets.top,width:geometry.size.width)
-            lastUpdatedStatus(bottomInset:geometry.safeAreaInsets.bottom)
         }.frame(width:geometry.size.width,height:geometry.size.height)}
         .ignoresSafeArea(.container,edges:.all)
         .overlay{if store.isLoading{ProgressView("Loading stations…").padding().background(.regularMaterial,in:RoundedRectangle(cornerRadius:14))}}
@@ -34,7 +33,7 @@ struct StationMapView: View {
     }
 
     private func mapChrome(topInset:CGFloat,width:CGFloat)->some View{
-        VStack(alignment:.leading,spacing:8){
+        VStack(alignment:.leading,spacing:6){
             HStack(alignment:.center){
                 Text("ATOM Stations").font(.title2.bold()).foregroundStyle(.primary).lineLimit(1).minimumScaleFactor(0.75)
                 Spacer(minLength:4)
@@ -42,30 +41,24 @@ struct StationMapView: View {
                 chromeButton(systemName:"house.fill",accessibilityLabel:"Go to home station",disabled:false){goHome()}
                 Button{Task{await store.load()}}label:{if store.isLoading{ProgressView().controlSize(.small).frame(width:28,height:28)}else{Image(systemName:"arrow.clockwise").font(.subheadline.weight(.semibold)).frame(width:28,height:28)}}.buttonStyle(.bordered).buttonBorderShape(.circle).disabled(store.isLoading).accessibilityLabel("Refresh stations")
             }.padding(.horizontal,2)
+            connectionStatus
             searchBar
         }.padding(.horizontal,adaptiveHorizontalPadding(for:width)).padding(.top,max(topInset,50)+6)
     }
 
-    private func lastUpdatedStatus(bottomInset:CGFloat)->some View{
-        VStack{
-            Spacer()
-            Group{
-                if let updated=store.lastSuccessfulRefresh{
-                    Text("Last updated: \(updated.formatted(date:.omitted,time:.shortened))").accessibilityLabel("Last updated \(updated.formatted(date:.abbreviated,time:.shortened))")
-                }else{
-                    Text("Last updated: —")
-                }
+    private var connectionStatus:some View{
+        Group{
+            if store.errorMessage != nil {
+                Text("No Network").foregroundStyle(.red).accessibilityLabel("No Network")
+            } else if let updated=store.lastSuccessfulRefresh {
+                Text("Last updated: \(updated.formatted(date:.omitted,time:.shortened))").foregroundStyle(.secondary).accessibilityLabel("Last updated \(updated.formatted(date:.abbreviated,time:.shortened))")
+            } else {
+                Text("Last updated: —").foregroundStyle(.secondary)
             }
-            .font(.caption2)
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-            .padding(.horizontal,10)
-            .padding(.vertical,5)
-            .background(.regularMaterial,in:Capsule())
-            .padding(.bottom,max(bottomInset,50)+8)
         }
-        .frame(maxWidth:.infinity,maxHeight:.infinity)
-        .allowsHitTesting(false)
+        .font(.caption)
+        .lineLimit(1)
+        .padding(.horizontal,2)
     }
 
     private var mapLayerMenu:some View{

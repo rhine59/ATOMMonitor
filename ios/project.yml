@@ -19,5 +19,8 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: ATOM Monitor
         INFOPLIST_KEY_NSLocalNetworkUsageDescription: ATOM Monitor connects to your Synology server to retrieve ATOM ground-station health information.
         INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIRequiresFullScreen: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
     scheme:
       gatherCoverageData: false

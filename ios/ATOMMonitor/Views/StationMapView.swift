@@ -10,35 +10,18 @@ struct StationMapView: View {
     @State private var hasAppliedInitialHome = false
     @State private var detailStation: ATOMStation?
 
-    private static let defaultRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 54.2, longitude: -2.5), span: MKCoordinateSpan(latitudeDelta: 7.5, longitudeDelta: 7.5))
-    private var positionedStations: [ATOMStation] { store.filteredStations.filter { $0.coordinate != nil } }
+    private static let defaultRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude:54.2,longitude:-2.5),span:MKCoordinateSpan(latitudeDelta:7.5,longitudeDelta:7.5))
+    private var positionedStations:[ATOMStation]{store.filteredStations.filter{$0.coordinate != nil}}
 
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .top) {
-                Map(position: $position) {
-                    ForEach(mapItems) { item in
-                        switch item {
-                        case .station(let station):
-                            if let coordinate = station.coordinate {
-                                Annotation(station.name, coordinate: coordinate) {
-                                    Button { detailStation = station } label: {
-                                        Image(systemName: station.health.symbol).font(.title2.weight(.bold)).foregroundStyle(.white).frame(width:42,height:42).background(tint(for:station.health),in:Circle()).overlay(Circle().stroke(.white,lineWidth:3))
-                                    }.buttonStyle(.plain)
-                                }
-                            }
-                        case .cluster(let cluster):
-                            Annotation("stations", coordinate: cluster.coordinate) {
-                                Button { zoomInto(cluster) } label: { Text(String(cluster.stations.count)).font(.headline.bold()).foregroundStyle(.white).frame(width:48,height:48).background(.blue,in:Circle()) }.buttonStyle(.plain)
-                            }
-                        }
-                    }
-                }
-                .mapStyle(.standard(elevation:.realistic)).frame(width:geometry.size.width,height:geometry.size.height).ignoresSafeArea(.container,edges:.all)
-                .onMapCameraChange(frequency:.onEnd){visibleRegion=$0.region}.onAppear{applyHomeIfNeeded()}.onChange(of:store.stations){_,_ in applyHomeIfNeeded()}.onChange(of:homeStationID){_,_ in hasAppliedInitialHome=false;applyHomeIfNeeded()}.mapControls{MapCompass();MapScaleView()}
-                mapChrome(topInset:geometry.safeAreaInsets.top,width:geometry.size.width)
-            }.frame(width:geometry.size.width,height:geometry.size.height)
-        }
+    var body:some View{
+        GeometryReader{geometry in ZStack(alignment:.top){
+            Map(position:$position){ForEach(mapItems){item in switch item{
+            case .station(let station): if let coordinate=station.coordinate{Annotation(station.name,coordinate:coordinate){Button{detailStation=station}label:{Image(systemName:station.health.symbol).font(.title2.weight(.bold)).foregroundStyle(.white).frame(width:42,height:42).background(tint(for:station.health),in:Circle()).overlay(Circle().stroke(.white,lineWidth:3))}.buttonStyle(.plain)}}
+            case .cluster(let cluster):Annotation("stations",coordinate:cluster.coordinate){Button{zoomInto(cluster)}label:{Text(String(cluster.stations.count)).font(.headline.bold()).foregroundStyle(.white).frame(width:48,height:48).background(.blue,in:Circle())}.buttonStyle(.plain)}
+            }}}
+            .mapStyle(.standard(elevation:.realistic)).frame(width:geometry.size.width,height:geometry.size.height).ignoresSafeArea(.container,edges:.all).onMapCameraChange(frequency:.onEnd){visibleRegion=$0.region}.onAppear{applyHomeIfNeeded()}.onChange(of:store.stations){_,_ in applyHomeIfNeeded()}.onChange(of:homeStationID){_,_ in hasAppliedInitialHome=false;applyHomeIfNeeded()}.mapControls{MapCompass();MapScaleView()}
+            mapChrome(topInset:geometry.safeAreaInsets.top,width:geometry.size.width)
+        }.frame(width:geometry.size.width,height:geometry.size.height)}
         .ignoresSafeArea(.container,edges:.all)
         .overlay{if store.isLoading{ProgressView("Loading stations…").padding().background(.regularMaterial,in:RoundedRectangle(cornerRadius:14))}}
         .sheet(item:$detailStation){station in NavigationStack{StationDetailView(station:station).toolbar{ToolbarItem(placement:.topBarTrailing){Button("Done"){detailStation=nil}}}}.presentationDetents([.medium,.large]).presentationDragIndicator(.visible)}
@@ -47,18 +30,14 @@ struct StationMapView: View {
 
     private func mapChrome(topInset:CGFloat,width:CGFloat)->some View{
         VStack(alignment:.leading,spacing:8){
-            HStack(alignment:.firstTextBaseline){
+            HStack(alignment:.center){
                 Text("ATOM Stations").font(.title2.bold()).foregroundStyle(.primary).lineLimit(1).minimumScaleFactor(0.85)
-                Spacer(minLength:8)
-                if let updated=store.lastSuccessfulRefresh {
-                    Text("Last updated: \(updated.formatted(date:.omitted,time:.shortened))").font(.caption).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.75).accessibilityLabel("Last updated \(updated.formatted(date:.abbreviated,time:.shortened))")
-                } else {
-                    Text("Last updated: —").font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                }
+                Spacer(minLength:6)
+                VStack(alignment:.trailing,spacing:1){if let updated=store.lastSuccessfulRefresh{Text("Last updated: \(updated.formatted(date:.omitted,time:.shortened))").accessibilityLabel("Last updated \(updated.formatted(date:.abbreviated,time:.shortened))")}else{Text("Last updated: —")}}.font(.caption).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.75)
+                Button{Task{await store.load()}}label:{if store.isLoading{ProgressView().controlSize(.small).frame(width:30,height:30)}else{Image(systemName:"arrow.clockwise").font(.headline).frame(width:30,height:30)}}.buttonStyle(.bordered).buttonBorderShape(.circle).disabled(store.isLoading).accessibilityLabel("Refresh stations")
             }.padding(.horizontal,4)
             searchBar
-        }
-        .padding(.horizontal,adaptiveHorizontalPadding(for:width)).padding(.top,max(topInset,50)+6)
+        }.padding(.horizontal,adaptiveHorizontalPadding(for:width)).padding(.top,max(topInset,50)+6)
     }
 
     private func adaptiveHorizontalPadding(for width:CGFloat)->CGFloat{width<390 ? 12:16}

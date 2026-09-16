@@ -27,6 +27,8 @@ Checkpoint: 16 September 2026.
 
 Display when available: station name/identifier, latitude/longitude, altitude, latest observation/heartbeat timestamps, software/version/platform, CPU load and temperature, RAM usage/total, uptime, NTP offset/correction, RF/frequency correction/quality/gain, voltage and useful provenance.
 
+The Health section must display **Record date & time** as an absolute local date/time derived from the station's latest `lastSeen` timestamp. Last heartbeat, Last seen, Last position and Last technical status remain relative-age indicators. This provides both an exact timestamp for the latest station record and an immediate indication of the age of individual observations.
+
 Missing fields must be represented as `Not reported`; absence of optional telemetry alone must not create an unhealthy state.
 
 ### Health
@@ -47,7 +49,8 @@ Initial derived states are Healthy, Warning, No recent heartbeat and Unknown. Cu
 - Server URL is configurable.
 - Settings provides Test Connection.
 - Home station, favourites, map layer and refresh interval persist locally.
-- Normal remote operation should use an HTTPS DNS endpoint.
+- Normal remote operation uses HTTPS DNS; the established endpoint is `https://granvillehouse.synology.me:8445/`.
+- Port 8088 is internal/LAN diagnostic access and must not be directly Internet-forwarded.
 
 ### Help
 
@@ -69,8 +72,8 @@ Initial derived states are Healthy, Warning, No recent heartbeat and Unknown. Cu
 - Adaptive layout across supported iPhone screen sizes.
 - MapKit mapping and no third-party iOS runtime dependency requirement.
 - Server deployable with Docker Compose on Synology.
-- HTTPS/JSON target interface between public server and app; do not expose host port 8088 directly to the Internet.
-- Public observation-ingestion/write surfaces must be restricted or authenticated before Internet exposure.
+- HTTPS/JSON interface between public server and app through DSM Reverse Proxy.
+- Public observation-ingestion/write surfaces must be restricted or authenticated before Internet exposure is considered hardened.
 - Reconnection/backoff for OGN interruption.
 - Clearly distinguish observed telemetry from derived health state.
 - ATOM Monitor is not a certified, safety-critical or authoritative aviation operational-status service.
@@ -82,6 +85,7 @@ Initial derived states are Healthy, Warning, No recent heartbeat and Unknown. Cu
 - On the development Mac, command-line Simulator builds use DerivedData outside `~/Documents` to avoid File Provider signing metadata.
 - Finished `.mp4` and `.log` evidence may be tracked; raw `*-raw*.mp4`, DerivedData, runtime SQLite and `.DS_Store` are not repository artefacts.
 - Material implementation changes require synchronized documentation and a Git commit.
+- Synology rebuild/deployment/recovery procedure is maintained in `docs/SYNOLOGY-HOSTING-RUNBOOK.md`.
 
 ## Data-source requirements
 

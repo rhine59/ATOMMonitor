@@ -1,0 +1,7 @@
+services:
+  ogn-station-probe:
+    build:
+      context: ./diagnostic
+    container_name: atommonitor-ogn-probe
+    restart: unless-stopped
+    command: ["--prefix", "PW"]

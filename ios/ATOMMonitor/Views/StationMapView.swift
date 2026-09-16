@@ -33,15 +33,22 @@ struct StationMapView: View {
     }
 
     private func mapChrome(topInset:CGFloat,width:CGFloat)->some View{
-        VStack(alignment:.leading,spacing:8){
+        VStack(alignment:.leading,spacing:6){
             HStack(alignment:.center){
                 Text("ATOM Stations").font(.title2.bold()).foregroundStyle(.primary).lineLimit(1).minimumScaleFactor(0.75)
                 Spacer(minLength:4)
-                VStack(alignment:.trailing,spacing:1){if let updated=store.lastSuccessfulRefresh{Text("Last updated: \(updated.formatted(date:.omitted,time:.shortened))").accessibilityLabel("Last updated \(updated.formatted(date:.abbreviated,time:.shortened))")}else{Text("Last updated: —")}}.font(.caption2).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.65)
                 mapLayerMenu
                 chromeButton(systemName:"house.fill",accessibilityLabel:"Go to home station",disabled:false){goHome()}
                 Button{Task{await store.load()}}label:{if store.isLoading{ProgressView().controlSize(.small).frame(width:28,height:28)}else{Image(systemName:"arrow.clockwise").font(.subheadline.weight(.semibold)).frame(width:28,height:28)}}.buttonStyle(.bordered).buttonBorderShape(.circle).disabled(store.isLoading).accessibilityLabel("Refresh stations")
             }.padding(.horizontal,2)
+            HStack{
+                Spacer()
+                if let updated=store.lastSuccessfulRefresh{
+                    Text("Last updated: \(updated.formatted(date:.omitted,time:.shortened))").accessibilityLabel("Last updated \(updated.formatted(date:.abbreviated,time:.shortened))")
+                }else{
+                    Text("Last updated: —")
+                }
+            }.font(.caption2).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.65).padding(.horizontal,2)
             searchBar
         }.padding(.horizontal,adaptiveHorizontalPadding(for:width)).padding(.top,max(topInset,50)+6)
     }

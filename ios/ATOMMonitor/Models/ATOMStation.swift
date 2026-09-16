@@ -8,7 +8,10 @@ struct ATOMStation: Identifiable, Codable, Hashable {
     let longitude: Double?
     let altitudeMetres: Double?
     let health: StationHealth
+    let lastPosition: Date?
     let lastHeartbeat: Date?
+    let lastTechnicalStatus: Date?
+    let pilotAwareVersion: String?
     let softwareVersion: String?
     let cpuLoadPercent: Double?
     let ramUsedMB: Double?
@@ -19,6 +22,9 @@ struct ATOMStation: Identifiable, Codable, Hashable {
     let frequencyCorrectionKHz: Double?
     let rfCorrectionPPM: Double?
     let signalQualityDB: Double?
+    let voltageV: Double?
+    let uptimeMinutes: Int?
+    let lastSeen: Date?
 
     var coordinate: CLLocationCoordinate2D? {
         guard let latitude, let longitude else { return nil }

@@ -7,36 +7,41 @@ ATOM Monitor includes a repeatable XCUITest-driven Simulator demonstration that 
 The recording contains ATOM ground-station health/status only: no aircraft identities, positions, tracks, speeds or movements.
 
 ## Components
-- `ios/ATOMMonitor/Resources/demo-stations.json` — deterministic Healthy, Warning, No recent heartbeat, Unknown, missing-telemetry and missing-position examples.
+- `ios/ATOMMonitor/Resources/demo-stations.json` — deterministic station examples.
 - `--demo-mode` — selects fixture data instead of the production API.
 - `ios/ATOMMonitorUITests/ATOMMonitorDemoUITests.swift` — XCUITest feature tour.
-- `scripts/record-demo.sh` — XcodeGen, Simulator selection/boot, XCUITest execution, screen recording, logging and MP4 post-processing.
-- `artifacts/` — ignored generated video, test log and DerivedData.
+- `ios/project.yml` — defines both app/UI-test targets **and the shared ATOMMonitor scheme test action**.
+- `scripts/record-demo.sh` — XcodeGen, Simulator boot, XCUITest, screen recording, logging and MP4 processing.
+- `artifacts/` — ignored generated outputs.
 
 ## Requirements
-Xcode/Xcode command-line tools, XcodeGen and at least one installed iPhone Simulator are required. FFmpeg is optional for MP4 post-processing:
-
-    brew install xcodegen
-    brew install ffmpeg
-
-`drawtext` is an optional FFmpeg filter and is not present in every Homebrew/build configuration. The recorder now detects it rather than assuming it exists.
+Xcode/Xcode command-line tools, XcodeGen and at least one installed iPhone Simulator are required. FFmpeg is optional. `drawtext` is optional even when FFmpeg is installed; the recorder detects it and falls back safely.
 
 ## Run
-From the repository root:
 
     cd ~/Documents/Xcode/ATOMMonitor
     git pull
     chmod +x scripts/record-demo.sh
     ./scripts/record-demo.sh
 
-The script regenerates the Xcode project, selects an available modern iPhone (preferring iPhone 17 Pro), boots it and waits for readiness, starts `simctl recordVideo`, then runs only `ATOMMonitorDemoUITests.testRecordedFeatureTour` with `xcodebuild test`. The recording is stopped even on test failure and is retained for diagnosis.
+The script regenerates the Xcode project, selects an available modern iPhone (preferring iPhone 17 Pro), boots it, starts `simctl recordVideo`, and runs `ATOMMonitorDemoUITests.testRecordedFeatureTour` with `xcodebuild test`.
 
-Force another installed device with:
+Force another device with:
 
     DEVICE="iPhone 17 Pro Max" ./scripts/record-demo.sh
 
+## XcodeGen scheme requirement
+Defining a `bundle.ui-testing` target is not sufficient by itself. The generated `ATOMMonitor` scheme must explicitly contain a test action. `project.yml` therefore has a top-level `schemes: ATOMMonitor:` declaration whose build action includes the app and UI-test bundle and whose test action names `ATOMMonitorUITests`.
+
+After `xcodegen generate`, this can be sanity-checked with:
+
+    cd ios
+    xcodebuild -project ATOMMonitor.xcodeproj -scheme ATOMMonitor -showdestinations
+
+and the recorder's `xcodebuild test` command must no longer report `Scheme ATOMMonitor is not currently configured for the test action`.
+
 ## Automated tour
-The current UI test demonstrates Map, Stations/search, adding a favourite, full station health/technical detail, Favourites, Settings, editable server address and Test Connection, Help, and return to Map. Each major phase emits an `ATOM_DEMO_STEP` activity into the test log. The server test deliberately uses a documentation-only HTTPS hostname in demo mode; a failed connection is a valid demonstration of connection diagnostics and does not affect deterministic station data.
+The UI test demonstrates Map, Stations/search, adding a favourite, full station telemetry, Favourites, Settings, editable server address/Test Connection, Help, and return to Map. Major phases emit `ATOM_DEMO_STEP` activities into the log. Demo data never depends on the production Synology service.
 
 ## Outputs
 
@@ -45,32 +50,30 @@ The current UI test demonstrates Map, Stations/search, adding a favourite, full 
     artifacts/ATOMMonitor-Demo-test.log
     artifacts/DerivedData/
 
-The raw file is direct Simulator capture. If FFmpeg includes `drawtext`, the final H.264 MP4 receives the automated-tour title overlay. If FFmpeg is installed without `drawtext`, the script creates the web-compatible H.264 MP4 without the text overlay. If FFmpeg transcoding itself fails, or FFmpeg is absent, the valid raw recording is copied to the final MP4 path. Presentation post-processing must never discard a successful Simulator recording.
+If FFmpeg has `drawtext`, the final H.264 MP4 receives a title overlay. Without it, a web-compatible H.264 MP4 is still generated. If post-processing fails, the raw recording is preserved/copied rather than discarded.
 
-## Recorded failure: FFmpeg `drawtext` unavailable
-On 16 September 2026 the first XCUITest recorder run produced a valid 1206×2622 H.264 Simulator recording but FFmpeg terminated with:
+## Recorded failures and fixes — 16 September 2026
+The first XCUITest recorder run produced a valid 1206×2622 H.264 recording of only 2.87 seconds. Two independent failures were identified.
 
-    No such filter: 'drawtext'
-    Error opening output file .../ATOMMonitor-Demo.mp4
+**FFmpeg:** `No such filter: 'drawtext'`. The recorder now probes the filter and falls back without text.
 
-The raw recording was only 2.87 seconds long, which also indicates that the UI test itself stopped very early; that is a separate issue to diagnose from `ATOMMonitor-Demo-test.log`. The recorder was hardened so missing `drawtext` can no longer mask the underlying UI-test result or prevent a final MP4 being preserved.
+**Xcode test launch:** the test log reported:
 
-## Diagnosing UI-test failures
-A UI-test failure returns a non-zero exit code but video and log remain. Inspect:
+    xcodebuild: error: Scheme ATOMMonitor is not currently configured for the test action.
 
-    tail -120 artifacts/ATOMMonitor-Demo-test.log
+The UI-test target existed, but the XcodeGen-generated app scheme had no test action. `ios/project.yml` now explicitly defines the `ATOMMonitor` scheme and includes `ATOMMonitorUITests` in its test action. This explains the 2.87-second recording: Xcode never launched the UI test.
 
-and:
+## Diagnosing later failures
+The recorder preserves the video/log and returns non-zero when XCUITest fails. Inspect:
 
-    grep -E 'ATOM_DEMO_STEP|error:|failed|Assertion' artifacts/ATOMMonitor-Demo-test.log
+    grep -E 'ATOM_DEMO_STEP|error:|failed|Assertion|Test Case' artifacts/ATOMMonitor-Demo-test.log | tail -100
 
-A recording of only a few seconds normally means XCUITest failed during launch or its first interaction; the FFmpeg stage happens after recording and cannot itself explain the short raw capture.
+or:
 
-## Simulator selection history
-The original recorder assumed `iPhone 16 Pro`, which was not installed on the Xcode 26 development Mac. The script now discovers available devices dynamically, preferring iPhone 17 Pro, iPhone 17, iPhone 16e, iPhone Air and iPhone 17 Pro Max before falling back to the first available iPhone.
+    tail -150 artifacts/ATOMMonitor-Demo-test.log
 
 ## Test layers
-Demo/XCUITest complements server parser/unit tests, Synology live OGN/API integration tests and physical-iPhone testing. Successful demo mode does not prove production DNS/HTTPS reachability, and successful production API tests do not prove every UI interaction.
+Demo/XCUITest complements server/parser tests, Synology live OGN/API integration and physical-iPhone testing. Successful demo mode does not prove production DNS/HTTPS reachability.
 
 ## Version control
-Commit fixtures, UI tests, scripts, annotation definitions, build/test instructions and meaningful failure diagnoses. Do not commit generated MP4s, DerivedData or disposable build products. `artifacts/` remains ignored.
+Commit fixtures, tests, scripts, annotation definitions, build/test instructions and meaningful failure diagnoses. Do not commit generated MP4s, DerivedData or disposable build products. `artifacts/` remains ignored.

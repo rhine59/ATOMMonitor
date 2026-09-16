@@ -9,7 +9,7 @@ The application has Map, Stations, Favourites, Settings and Help tabs.
 ## Map
 The map uses the complete available iPhone display dynamically and adapts to different screen sizes. Clusters separate as the map is zoomed. Tapping a station opens its complete detail directly. Marker colour represents derived health: green Healthy, amber Warning, red No recent heartbeat and grey Unknown.
 
-The initial map view centres on the Home station selected in Settings, or uses the default wider UK view.
+The initial map view centres on the Home station selected in Settings, or uses the default wider UK view. Immediately below the title/buttons and above Find, the status shows the last successful update time. If the current server request fails, this is replaced by **No Network** while cached station data remains visible.
 
 ## Stations
 Stations shows the complete persistent station registry rather than only transmitters heard at that instant. Selecting a station opens its detailed status.
@@ -25,7 +25,7 @@ The server address can be edited and saved in Settings. **Test Connection** chec
 ### Data refresh
 ATOM Monitor fetches the station registry **once immediately when the app starts**. It then automatically fetches fresh data at the configured interval.
 
-The default interval is **1 minute**. In **Settings → Data refresh**, use **Refresh interval** to choose any whole-minute value from **1 to 10 minutes**. The selected interval is stored on the iPhone and used on later launches.
+The default interval is **5 minutes**. In **Settings → Data refresh**, use **Refresh interval** to choose any whole-minute value from **1 to 10 minutes**. The selected interval is stored on the iPhone and used on later launches.
 
 Changing the interval restarts the refresh schedule and performs an immediate refresh. Automatic refresh is an in-app foreground mechanism; iOS may suspend execution while the app is backgrounded.
 
@@ -39,13 +39,15 @@ During normal refresh cycles the currently displayed snapshot remains in place u
 The cache is deliberately a latest-snapshot cache, not a history database. It does not accumulate old station observations between refreshes and it contains no aircraft data. Because it is stored in the iOS Caches directory, iOS is permitted to purge it when reclaiming storage; the authoritative persistent station registry remains on the server.
 
 ### Home station
-Choose **Home station** to define where the Map initially centres and zooms. Choose **Default UK view** to remove the preference.
+Choose **Home station** to define where the Map initially centres and zooms. Choose **Default UK view** to remove the preference. The Home button on the map returns to the configured station; if none is configured the app reports **No home station set**.
 
 ### Favourite stations
 Favourite stations are stored locally on the iPhone and can be removed in Settings after being added from Map or Stations.
 
-## Help
-Help contains an **Open User Guide** link to this maintained guide.
+## Help and local User Guide
+The Help tab contains the User Guide **inside ATOM Monitor itself**. Selecting **User Guide** opens a native SwiftUI guide within the app's NavigationStack. It does not open GitHub, Safari or another external web page and remains available without an Internet connection.
+
+This Markdown file remains the repository-maintained documentation source/reference. User-facing help required for normal operation should also be reflected in the local in-app guide when functionality changes.
 
 ## Station details
 Depending on source data, details may include station name, coordinates/altitude, observation and heartbeat times, software versions, CPU load/temperature, RAM, NTP timing, RF information, uptime and supply voltage. Unsupported data displays **Not reported** rather than a synthetic zero.

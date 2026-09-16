@@ -27,9 +27,16 @@ ATOM Monitor fetches the station registry **once immediately when the app starts
 
 The default interval is **1 minute**. In **Settings → Data refresh**, use **Refresh interval** to choose any whole-minute value from **1 to 10 minutes**. The selected interval is stored on the iPhone and used on later launches.
 
-Changing the interval restarts the refresh schedule and performs an immediate refresh, so the user does not have to wait for the previous timer to expire. A longer interval reduces network/API activity; a shorter interval provides more current station status. The permitted range deliberately prevents sub-minute polling.
+Changing the interval restarts the refresh schedule and performs an immediate refresh. Automatic refresh is an in-app foreground mechanism; iOS may suspend execution while the app is backgrounded.
 
-Automatic refresh is an in-app foreground refresh mechanism. iOS may suspend application execution while ATOM Monitor is in the background; the setting does not promise exact background polling every N minutes.
+## iPhone station cache
+Every successful server refresh is retained in memory for immediate use and also written atomically to a persistent JSON cache in the app's iOS Caches directory. The cache contains the complete decoded ATOM ground-station snapshot and the time of the last successful refresh.
+
+When ATOM Monitor starts, it loads the most recent cached snapshot immediately before attempting the startup server refresh. This means Map, Stations and Favourites can display the previous known data while a new request is in progress rather than starting with an empty interface.
+
+During normal refresh cycles the currently displayed snapshot remains in place until a complete new server response has been received and decoded. A successful response replaces the in-memory data and persistent cache as one snapshot. If the server, DNS, HTTPS connection or network is temporarily unavailable, the failed refresh reports the error but **does not erase the previous station data**.
+
+The cache is deliberately a latest-snapshot cache, not a history database. It does not accumulate old station observations between refreshes and it contains no aircraft data. Because it is stored in the iOS Caches directory, iOS is permitted to purge it when reclaiming storage; the authoritative persistent station registry remains on the server.
 
 ### Home station
 Choose **Home station** to define where the Map initially centres and zooms. Choose **Default UK view** to remove the preference.

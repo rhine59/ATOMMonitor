@@ -4,7 +4,7 @@ struct ContentView: View {
     @StateObject private var store: StationStore
     @AppStorage("homeStationID") private var homeStationID = ""
     @AppStorage("favouriteStationIDs") private var favouriteStationIDs = ""
-    @AppStorage("stationRefreshMinutes") private var stationRefreshMinutes = 1
+    @AppStorage("stationRefreshMinutes") private var stationRefreshMinutes = 5
 
     init(repository: any StationRepository) { _store = StateObject(wrappedValue: StationStore(repository: repository)) }
 
@@ -72,7 +72,7 @@ private struct SettingsView: View {
                 Stepper(value:$stationRefreshMinutes,in:1...10,step:1) {
                     HStack { Text("Refresh interval"); Spacer(); Text("\(stationRefreshMinutes) min").foregroundStyle(.secondary) }
                 }
-                Text("Station data is fetched once when ATOM Monitor starts, then automatically every \(stationRefreshMinutes) minute\(stationRefreshMinutes == 1 ? "" : "s"). The interval can be set from 1 to 10 minutes and is remembered on this iPhone.").font(.footnote).foregroundStyle(.secondary)
+                Text("Station data is fetched once when ATOM Monitor starts, then automatically every \(stationRefreshMinutes) minute\(stationRefreshMinutes == 1 ? "" : "s"). The default is 5 minutes; the interval can be set from 1 to 10 minutes and is remembered on this iPhone.").font(.footnote).foregroundStyle(.secondary)
             }
             Section("Map") { Picker("Home station",selection:$homeStationID){Text("Default UK view").tag("");ForEach(sortedStations.filter{$0.coordinate != nil}){Text($0.name).tag($0.id)}};Text("The Map tab opens centred and zoomed around the selected home station.").font(.footnote).foregroundStyle(.secondary) }
             Section("Favourite stations") { if favourites.isEmpty{Text("No favourites selected. Add them from Map or Stations.").foregroundStyle(.secondary)}else{ForEach(favourites){s in HStack{VStack(alignment:.leading){Text(s.name);Text(s.health.title).font(.caption).foregroundStyle(.secondary)};Spacer();Button(role:.destructive){remove(s.id)}label:{Image(systemName:"minus.circle.fill")}.buttonStyle(.borderless)}}};Text("Add favourites from Map or Stations. Remove them here in Settings.").font(.footnote).foregroundStyle(.secondary) }

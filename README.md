@@ -1,20 +1,34 @@
 # ATOM Monitor
 
-ATOM Monitor is an iPhone application and supporting server for monitoring the operational health and technical details of PilotAware ATOM ground stations.
+ATOM Monitor is an iPhone application and supporting Synology-hosted service for monitoring the operational health and technical status of PilotAware ATOM ground stations.
 
-## Project goal
+> **Scope:** ATOM Monitor does not display, record or retain aircraft movements, tracks or aircraft identities.
 
-The primary user experience is a map containing all known PilotAware ATOM stations. A user can pan, zoom, search for, and select a station, then open a detail view showing the station's current health and available technical information.
+## Current checkpoint — 16 September 2026
 
-The application is deliberately **not an aircraft tracker**. It will not display, persist, or analyse aircraft positions. Aircraft traffic received by an ATOM station is outside the scope of this project.
+The project now has a working server and native SwiftUI iPhone application using live ATOM station data rather than fixture-only data.
 
-## Prototype 0.1
+### Server
 
-A native SwiftUI/MapKit prototype now lives under `ios/`. It implements the map-first experience, station markers with textual/symbol health cues, station search, a station list, summary card, detailed health/location/system/time/RF views, loading/error states, and a replaceable `StationRepository` data layer.
+The Synology Docker deployment maintains a persistent ground-station registry from OGN/APRS receiver/status traffic and exposes the station data through a REST API. The current LAN service is published on host port `8088`. Runtime station state is stored in SQLite. Aircraft messages are discarded and aircraft movement data is not part of the database or API.
 
-The prototype currently uses bundled fixture JSON. PWMalham contains the limited reference data established during research; other fixture stations are deliberately `Unknown` where live health data has not been established. Fixture coordinates other than PWMalham are development placeholders and must not be treated as authoritative station-registry data.
+Current health states are **Healthy**, **Warning**, **No recent heartbeat** and **Unknown**. Missing optional telemetry is displayed as `Not reported` and does not by itself make a station unhealthy.
 
-Generate the Xcode project with XcodeGen:
+### iPhone application
+
+The iOS application targets iOS 17+ and is generated with XcodeGen. Its main tabs are **Map**, **Stations**, **Favourites**, **Settings** and **Help**.
+
+The Map is full-screen and adaptive across iPhone sizes. It supports station clustering, direct station-detail selection, search (`Find`), Standard/Satellite map layers, a configurable Home station, and manual refresh. The status line sits below the `ATOM Stations` title/button row and above `Find`: it shows `Last updated: HH:MM` after a successful server refresh and `No Network` when the current server request fails. Cached station data remains visible during a connection failure.
+
+Station data is fetched at startup and then automatically at a configurable 1–10 minute interval; the default is **5 minutes**. The latest successful station snapshot is cached locally. Favourites, Home station, map layer and refresh preference are stored on the iPhone.
+
+The Help tab contains a **native local User Guide**. Normal user help does not require GitHub, Safari or an Internet connection.
+
+The app icon is the ATOM atom graphic in `ios/ATOMMonitor/Assets.xcassets/AppIcon.appiconset/`, selected by `ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon` in `ios/project.yml`.
+
+## Build
+
+Generate the project:
 
 ```bash
 cd ios
@@ -22,52 +36,46 @@ xcodegen generate
 open ATOMMonitor.xcodeproj
 ```
 
-The deployment target is iOS 17.0. No third-party iOS runtime dependencies are required.
+For command-line Simulator builds on the development Mac, use DerivedData outside `~/Documents` because File Provider metadata there has previously caused code-signing failures:
 
-## Core behaviour
+```bash
+rm -rf /tmp/ATOMMonitor-DerivedData
+xcodebuild build \
+  -project ATOMMonitor.xcodeproj \
+  -scheme ATOMMonitor \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+  -derivedDataPath /tmp/ATOMMonitor-DerivedData
+```
 
-- Open directly to a map of known ATOM stations.
-- Keep stations on the map even when they stop reporting; an unhealthy station must not simply disappear.
-- Use clear health states: Healthy, Warning, No recent heartbeat, and Unknown.
-- Tap a map marker for a compact station summary, then navigate to full details.
-- Search for a station by name.
-- Show location, altitude, heartbeat/status age, software/system, timing/NTP, and RF information when reported.
-- Store historical station-health observations later so trends can be investigated.
-- Treat missing values as `Not reported`; never reinterpret absent telemetry as zero.
-- Use PWMalham as the initial reference station during development.
+The current icon-enabled configuration has been verified with `** BUILD SUCCEEDED **`.
 
-## Proposed production architecture
+## Production direction
 
 ```text
-OGN APRS receiver-status feed
-            |
-            v
-   Synology Docker host
-   +-------------------+
-   | OGN collector     |
-   | ATOM classifier   |
-   | health parser     |
-   | station registry  |
-   | history database  |
-   | REST API          |
-   +---------+---------+
-             |
-          HTTPS/JSON
-             |
-             v
+OGN APRS receiver/status traffic only
+              |
+              v
+       Synology Docker
+  collector / classifier
+  persistent station registry
+  SQLite / REST API
+              |
+       HTTPS/JSON target
+              |
+              v
        iPhone / SwiftUI
 ```
 
-The preferred candidate live source is the OGN APRS receiver/status stream. PilotAware sources may supplement PilotAware-specific metadata where appropriate. The server will maintain a persistent station registry so a station remains visible when its heartbeat disappears.
+Remote deployment should use an HTTPS DNS name through the Synology reverse proxy rather than expose port 8088 directly. Before public exposure, observation ingestion must not be left as an unauthenticated public write surface.
 
-## Repository documentation
+## Known follow-up work
 
-The `docs/` directory records project vision, requirements, architecture, data-source research, OGN/APRS work, station-health semantics, map UI, data model, API design, research notes, design decisions and roadmap. Documentation is part of the implementation and should be updated with material project changes.
+Important engineering work still includes protecting the public ingestion path, making server switching/cache ownership robust, preventing overlapping refreshes, separating cache-write errors from successful network refreshes, hardening UI-test preference reset, correcting server upserts so older packets cannot overwrite newer telemetry, and continuing validation of health thresholds against multiple live stations.
 
-## Current milestone
+## Documentation
 
-Prototype 0.1 establishes the iPhone architecture and interaction model. The next data milestone is to capture and parse real OGN receiver-status packets for PWMalham and representative ATOM stations, establish authoritative station coordinates/identity, and replace the fixture provider with the server REST provider.
+`docs/` is part of the implementation. It contains architecture, requirements, API/data-model design, OGN/APRS and data-source research, build/test and demo procedures, live-integration evidence, map/UI behaviour, public-server setup, design decisions and the maintained user guide. User-facing changes must also be reflected in the local in-app User Guide.
 
-## Important terminology
+## Terminology
 
-A missing heartbeat is evidence that no recent status report has been observed; it is not by itself proof that the physical ATOM installation is powered off. The UI therefore uses **No recent heartbeat** rather than claiming **Offline** unless a future authoritative source provides an explicit operational state.
+A missing heartbeat means no recent status report has been observed. It is not proof that the physical installation is powered off, so the application deliberately says **No recent heartbeat** rather than **Offline**.

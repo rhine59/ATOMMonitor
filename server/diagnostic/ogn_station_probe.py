@@ -59,15 +59,30 @@ def source_wanted(src,station,prefix):
     if prefix and not src.casefold().startswith(prefix.casefold()):return False
     return bool(station or prefix)
 def wanted(obs,station,prefix): return source_wanted(obs.station,station,prefix)
+def effective_filter(args):
+    if args.filter:return args.filter
+    if args.station:return f"b/{args.station}"
+    if args.prefix:return f"p/{args.prefix}"
+    return None
+
+def print_stats(args,started,last,total,comments,matched_sources,parsed,dests):
+    now=time.monotonic()
+    if args.discovery and now-last>=args.stats_interval:
+        top=', '.join(f'{k}:{v}' for k,v in dests.most_common(8)) or 'none'
+        print(f"STATS seconds={int(now-started)} packets={total} server_comments={comments} matching_sources={matched_sources} parsed_receiver_packets={parsed} top_destinations=[{top}]",file=sys.stderr,flush=True)
+        return now
+    return last
 
 def run(args):
     while True:
       try:
+        aprs_filter=effective_filter(args)
         print(f"Connecting to {args.host}:{args.port} …",file=sys.stderr,flush=True)
         with socket.create_connection((args.host,args.port),timeout=30) as sock:
-          sock.settimeout(None); login=f"user {args.user} pass -1 vers ATOMMonitor 0.2"
-          if args.filter:login+=f" filter {args.filter}"
+          sock.settimeout(None); login=f"user {args.user} pass -1 vers ATOMMonitor 0.3"
+          if aprs_filter:login+=f" filter {aprs_filter}"
           sock.sendall((login+'\n').encode('ascii')); print("Connected read-only; aircraft packets will be discarded.",file=sys.stderr,flush=True)
+          if aprs_filter:print(f"APRS server filter: {aprs_filter}",file=sys.stderr,flush=True)
           total=comments=matched_sources=parsed=0; dests=Counter(); started=time.monotonic(); last=started
           with sock.makefile('r',encoding='utf-8',errors='replace',newline='\n') as stream:
             for raw in stream:
@@ -76,6 +91,7 @@ def run(args):
               if line.startswith('#'):
                 comments+=1
                 if args.discovery: print(f"SERVER {line}",file=sys.stderr,flush=True)
+                last=print_stats(args,started,last,total,comments,matched_sources,parsed,dests)
                 continue
               total+=1; h=HEADER_RE.match(line)
               if h:
@@ -87,10 +103,7 @@ def run(args):
               if obs and wanted(obs,args.station,args.prefix):
                 parsed+=1
                 if not args.discovery: print(json.dumps(asdict(obs),separators=(',',':')),flush=True)
-              now=time.monotonic()
-              if args.discovery and now-last>=args.stats_interval:
-                top=', '.join(f'{k}:{v}' for k,v in dests.most_common(8)) or 'none'
-                print(f"STATS seconds={int(now-started)} packets={total} server_comments={comments} matching_sources={matched_sources} parsed_receiver_packets={parsed} top_destinations=[{top}]",file=sys.stderr,flush=True); last=now
+              last=print_stats(args,started,last,total,comments,matched_sources,parsed,dests)
       except KeyboardInterrupt:return
       except Exception as e:
         print(f"OGN connection error: {e}; retrying in {args.retry}s",file=sys.stderr,flush=True);time.sleep(args.retry)

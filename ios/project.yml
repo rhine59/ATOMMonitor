@@ -22,8 +22,6 @@ targets:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UIRequiresFullScreen: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
-    scheme:
-      gatherCoverageData: false
   ATOMMonitorUITests:
     type: bundle.ui-testing
     platform: iOS
@@ -35,3 +33,13 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: uk.co.rhine59.ATOMMonitorUITests
         TEST_TARGET_NAME: ATOMMonitor
+schemes:
+  ATOMMonitor:
+    build:
+      targets:
+        ATOMMonitor: all
+        ATOMMonitorUITests: [test]
+    test:
+      gatherCoverageData: false
+      targets:
+        - name: ATOMMonitorUITests

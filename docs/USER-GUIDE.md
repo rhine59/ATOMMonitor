@@ -52,6 +52,8 @@ This Markdown file remains the repository-maintained documentation source/refere
 ## Station details
 Depending on source data, details may include station name, coordinates/altitude, observation and heartbeat times, software versions, CPU load/temperature, RAM, NTP timing, RF information, uptime and supply voltage. Unsupported data displays **Not reported** rather than a synthetic zero.
 
+The Health section also shows **Record date & time**, using the station's latest `lastSeen` timestamp as an absolute local date and time. The existing Last heartbeat, Last seen, Last position and Last technical status entries remain relative-time indicators, so the detail screen provides both the exact timestamp of the latest station record and an immediate indication of how old each observation is.
+
 ## PilotAware identification
 Live OGN/APRS testing has shown PilotAware station heartbeats containing `OGN-R/PilotAware`. The `PW` prefix is useful for discovery but is not by itself the final authoritative classification.
 

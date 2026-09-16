@@ -10,13 +10,33 @@ Initial PilotAware Groundstation Playback example demonstrated a station-oriente
 
 The project considered conventional APRS/APRS.fi, then narrowed the focus to the Open Glider Network APRS infrastructure because OGN explicitly carries receiver status and OGN implementations parse receiver-status beacons.
 
-Current research indicates OGN software commonly uses TCP port 14580 and server-side APRS filtering. Existing OGN code demonstrates receiver-status fields including status/version/CPU/RF/temperature, with packet contents varying by receiver/software.
+OGN APRS uses TCP port 14580 with server-side APRS filtering. Receiver-status fields include status/version/CPU/RF/temperature, with packet contents varying by receiver/software.
 
-This makes OGN APRS a strong candidate for live ATOM health, subject to validation against real ATOM stations and current upstream rules/documentation.
+## 2026-09-16 — Live ATOM feed confirmed
+
+A live Synology probe connected successfully to `aprs.glidernet.org:14580` as the receive-only/unverified client `ATOMMON`. With no server-side filter, only APRS server keepalive/comment lines arrived. Adding the APRS prefix filter `p/PW` immediately produced live `PW...` source packets.
+
+Observed candidate stations included `PWNesclif`, `PWEDRPACP`, `PWRankins`, `PWFirefly`, `PWEGBS` and `PWAachen`.
+
+Three useful packet types/patterns were observed:
+
+1. `OGNSDR` position packets, for example a `PW...>OGNSDR` packet containing APRS latitude/longitude and `/A=` altitude.
+2. `OGNSDR` technical-health packets containing fields such as receiver software version, CPU load, RAM usage, NTP offset/correction, temperature, EGM96 offset and RF metrics.
+3. A separate `APRS` status/heartbeat packet with a body of the form `v20260707 OGN-R/PilotAware`.
+
+The third form is particularly important: `OGN-R/PilotAware` is direct evidence in the live packet body that the source is running the PilotAware OGN-R software. This is a substantially stronger ATOM classification signal than the `PW` prefix alone. The `PW` prefix remains useful as a server-side discovery filter, but application-level classification should use the PilotAware marker where available.
+
+The live sample also shows that a station can emit a PilotAware heartbeat via destination `APRS` while its lower-level OGN receiver telemetry is sent separately via destination `OGNSDR`. The production model should therefore merge observations by station/source callsign rather than expect one packet to contain all health data.
+
+### Example fields confirmed live
+
+A live `PWEDRPACP` OGNSDR status observation contained software `v0.3.2.ARM`, CPU, RAM, NTP, temperature, EGM96 and multiple RF measurements. A live `PWEGBS` observation showed the same general structure with different values. These confirm that the technical fields targeted by the ATOM Monitor data model are genuinely available for at least some live `PW` receivers.
+
+Aircraft-count fragments such as `Acfts[1h]` may occur inside receiver-health packets. ATOM Monitor does not need aircraft identity, position or movement data; these aggregate receiver-health fragments are not used to build aircraft tracking functionality.
 
 ## PWMalham
 
-`PWMalham` was selected as the initial reference station. Research via OGN/KTrax-associated data showed it as a ground receiver and demonstrated the type of station-level metadata/history we want to reproduce from underlying sources rather than depending on a third-party UI.
+`PWMalham` remains the initial reference station. Research via OGN/KTrax-associated data showed it as a ground receiver and demonstrated the type of station-level metadata/history we want to reproduce from underlying sources rather than depending on a third-party UI.
 
 Do not treat previously observed PWMalham numeric values as permanent station facts; they were time-specific observations.
 
@@ -27,19 +47,19 @@ A health monitor cannot build its map solely from stations currently transmittin
 1. a persistent/bootstrapped ATOM station registry; and
 2. live health observations that update that registry.
 
-Finding a reliable complete bootstrap source is currently one of the highest-priority research tasks.
+Finding a reliable complete bootstrap source remains a high-priority research task.
 
 ## Questions still open
 
-- What exact receiver/status packets does PWMalham currently emit?
-- What is the normal status/heartbeat interval?
-- How consistent are health fields across ATOM software versions?
-- Does every PilotAware ATOM use a `PW...` station identifier, and is that convention sufficient to classify stations?
-- Is there a PilotAware-published complete station list/map data endpoint suitable for use?
-- Can an OGN receiver-list endpoint provide a bootstrap registry including inactive receivers?
-- What server-side APRS filter gives the smallest receiver-status-only stream?
-- What upstream usage/login requirements should the production collector follow?
-- Which health thresholds are meaningful after observing real data?
+- What packets does `PWMalham` currently emit when it is active?
+- What is the normal `OGN-R/PilotAware` heartbeat interval? The live sample suggests frequent reports, but a longer observation is needed before setting thresholds.
+- Does every current PilotAware ATOM emit the exact `OGN-R/PilotAware` marker?
+- Does every PilotAware ATOM use a `PW...` station identifier? The prefix must not yet be treated as authoritative.
+- How consistent are OGNSDR health fields across ATOM hardware/software versions?
+- Is there a PilotAware-published complete station list/map data endpoint suitable for registry bootstrap?
+- Can an OGN receiver-list endpoint provide inactive receivers for registry bootstrap?
+- What is the best production server-side filter while retaining all ATOM stations and excluding unnecessary traffic?
+- Which health thresholds are meaningful after observing real heartbeat cadence?
 
 ## Research discipline
 

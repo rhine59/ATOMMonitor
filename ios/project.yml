@@ -33,6 +33,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: uk.co.rhine59.ATOMMonitorUITests
         TEST_TARGET_NAME: ATOMMonitor
+        GENERATE_INFOPLIST_FILE: YES
 schemes:
   ATOMMonitor:
     build:

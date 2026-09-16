@@ -1,0 +1,976 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -project ATOMMonitor.xcodeproj -scheme ATOMMonitor -destination id=973A79C9-079E-4B0C-ADEF-00D6D6CB32CA -derivedDataPath /tmp/ATOMMonitor-DerivedData "-only-testing:ATOMMonitorUITests/ATOMMonitorDemoUITests/testRecordedFeatureTour"
+
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (2 targets)
+    Target 'ATOMMonitorUITests' in project 'ATOMMonitor'
+        ➜ Explicit dependency on target 'ATOMMonitor' in project 'ATOMMonitor'
+    Target 'ATOMMonitor' in project 'ATOMMonitor' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: c9bfe636f6271ad41ba6043a3e01734d
+Build description path: /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/XCBuildData/c9bfe636f6271ad41ba6043a3e01734d.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk /tmp/ATOMMonitor-DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-6cfe768891a92b912361537c460fe42b.sdkstatcache
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -o /tmp/ATOMMonitor-DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-6cfe768891a92b912361537c460fe42b.sdkstatcache
+
+CreateBuildDirectory /tmp/ATOMMonitor-DerivedData/Build/Products
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor.xcodeproj
+    builtin-create-build-directory /tmp/ATOMMonitor-DerivedData/Build/Products
+
+CreateBuildDirectory /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor.xcodeproj
+    builtin-create-build-directory /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex
+
+CreateBuildDirectory /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor.xcodeproj
+    builtin-create-build-directory /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator
+
+CreateBuildDirectory /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor.xcodeproj
+    builtin-create-build-directory /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+
+CreateBuildDirectory /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ExplicitPrecompiledModules
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor.xcodeproj
+    builtin-create-build-directory /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ExplicitPrecompiledModules
+
+CreateBuildDirectory /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor.xcodeproj
+    builtin-create-build-directory /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor-dae4a05776a4f34e7ec4ece59c627cab-VFS-iphonesimulator/all-product-headers.yaml
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor.xcodeproj
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor-dae4a05776a4f34e7ec4ece59c627cab-VFS-iphonesimulator/all-product-headers.yaml
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ProductTypeInfoPlistAdditions.plist (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ProductTypeInfoPlistAdditions.plist
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/empty-ATOMMonitorUITests.plist (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/empty-ATOMMonitorUITests.plist
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.hmap (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.hmap
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-project-headers.hmap (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-project-headers.hmap
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-generated-files.hmap (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-generated-files.hmap
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-own-target-headers.hmap (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-own-target-headers.hmap
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.DependencyStaticMetadataFileList (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.DependencyStaticMetadataFileList
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/DerivedSources/Entitlements-Simulated.plist (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/DerivedSources/Entitlements-Simulated.plist
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.DependencyMetadataFileList (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.DependencyMetadataFileList
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-all-target-headers.hmap (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-all-target-headers.hmap
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.SwiftFileList (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.SwiftFileList
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.SwiftConstValuesFileList (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests_const_extract_protocols.json (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests_const_extract_protocols.json
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests-OutputFileMap.json (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests-OutputFileMap.json
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.LinkFileList (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.LinkFileList
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-all-non-framework-target-headers.hmap (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-all-non-framework-target-headers.hmap
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/empty-ATOMMonitor.plist (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/empty-ATOMMonitor.plist
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.DependencyStaticMetadataFileList (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.DependencyStaticMetadataFileList
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.hmap (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.hmap
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/DerivedSources/Entitlements-Simulated.plist (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/DerivedSources/Entitlements-Simulated.plist
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.SwiftConstValuesFileList (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.LinkFileList (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.LinkFileList
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor-OutputFileMap.json (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor-OutputFileMap.json
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.SwiftFileList (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.SwiftFileList
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor_const_extract_protocols.json (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor_const_extract_protocols.json
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.DependencyMetadataFileList (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.DependencyMetadataFileList
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-generated-files.hmap (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-generated-files.hmap
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-all-target-headers.hmap (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-all-target-headers.hmap
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-project-headers.hmap (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-project-headers.hmap
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-own-target-headers.hmap (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-own-target-headers.hmap
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-all-non-framework-target-headers.hmap (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-all-non-framework-target-headers.hmap
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-DebugDylibPath-normal-arm64.txt (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-DebugDylibPath-normal-arm64.txt
+
+WriteAuxiliaryFile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-DebugDylibInstallName-normal-arm64.txt (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    write-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-DebugDylibInstallName-normal-arm64.txt
+
+MkDir /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    /bin/mkdir -p /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app
+
+MkDir /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    /bin/mkdir -p /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest
+
+ProcessProductPackaging "" /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.app-Simulated.xcent (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+    Entitlements:
+    
+    {
+    "application-identifier" = "VNQTGCW476.uk.co.rhine59.ATOMMonitor";
+}
+    
+    builtin-productPackagingUtility -entitlements -format xml -o /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.app-Simulated.xcent
+
+ProcessProductPackagingDER /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.app-Simulated.xcent /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.app-Simulated.xcent.der (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    /usr/bin/derq query -f xml -i /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.app-Simulated.xcent -o /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.app-Simulated.xcent.der --raw
+
+Ld /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/__preview.dylib normal (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.0-simulator -dynamiclib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -O0 -L/tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -F/tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -install_name @rpath/ATOMMonitor.debug.dylib -Xlinker -dead_strip -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -dependency_info -Xlinker /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor_dependency_info.dat -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __entitlements -Xlinker /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.app-Simulated.xcent -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __ents_der -Xlinker /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.app-Simulated.xcent.der -Xlinker -no_adhoc_codesign -o /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/__preview.dylib
+
+CpResource /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/stations.json /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/Resources/stations.json (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/Resources/stations.json /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app
+
+CpResource /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/demo-stations.json /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/Resources/demo-stations.json (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/Resources/demo-stations.json /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app
+
+ProcessInfoPlistFile /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/Info.plist /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/empty-ATOMMonitor.plist (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-infoPlistUtility /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/empty-ATOMMonitor.plist -producttype com.apple.product-type.application -genpkginfo /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -o /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/Info.plist
+
+SwiftDriver ATOMMonitor normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ATOMMonitor -Onone @/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /tmp/ATOMMonitor-DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -F /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -c -j16 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /tmp/ATOMMonitor-DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-6cfe768891a92b912361537c460fe42b.sdkstatcache -output-file-map /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -sdk-module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.swiftmodule -validate-clang-modules-once -clang-build-session-file /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor_const_extract_protocols.json -Xcc -iquote -Xcc /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-generated-files.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-own-target-headers.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-all-target-headers.hmap -Xcc -iquote -Xcc /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-project-headers.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/DerivedSources-normal/arm64 -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/DerivedSources/arm64 -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor-Swift.h -working-directory /Users/richardhine/Documents/Xcode/ATOMMonitor/ios -experimental-emit-module-separately -disable-cmo
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/_AvailabilityInternal-5LKV2P6DYWE9CI2RHX3R961XY.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/_Builtin_stddef-7LZ5ZCBKBZ40D13FDCVYU3PCG.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/SwiftShims-82TF793Q6H9LO4OH33E5B3XA9.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/ptrcheck-4542BVEYSYF4II5RZOBINKP91.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/_Builtin_stdarg-CA94OQ5IWV2GJTO8K5G4J5JV2.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/DeveloperToolsSupport-7DC0ODV7LMSYQIHFC29UD1TC0.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/_SwiftConcurrencyShims-B943IRYD2MKMHYCX345S5L0CW.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/_Builtin_stdbool-9LLHTP641BFELI8Z3H6T4Z3W2.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/_Builtin_float-DO1ZBAO0CV3UFDAK8TKRNX72M.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/ptrauth-D4CBTKCR22W2GJ009HNP3WJ8P.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/_DarwinFoundation1-DIVR5IX4W2YFRKANE1QBI2PVD.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/_Builtin_limits-8VGBBEAA7I27THCV6J0LW0DHO.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/_DarwinFoundation2-94VC9EZ6JLH4IF2FVSY58GG5G.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/sys_types-39QGIA8BUKWT9IK5UGVWBHOM3.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/_Builtin_stdint-1UCVRF5E74EW6U9EKFMXTP4XL.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/_Builtin_tgmath-B9OFG2V1GIJPNTCT84OHHYM4F.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/_Builtin_stdatomic-4EDOE43Z7BIP6P7BGXVVIW0Z6.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/_DarwinFoundation3-2F9O0BZGL05M7FWU2WECECTIG.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/_Builtin_intrinsics-60MLML8NDBFH6JGKSKLW9SBS5.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/_Builtin_inttypes-4TGD4LZYA9NHZZ44EYBIW9E8T.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/Darwin-DEJOQJTY3B9RSLRCTS9EWL81E.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/simd-2T14C2HVZSN8L3HBCZ9HLJXFO.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/MachO-99AD15JQM2LJ21J665R1G094I.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/ObjectiveC-7F2PP1XBPSK2JTTDT52G1ADR9.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/Spatial-EQMLMLAKHCWN8V1VDHF124KXO.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/os_object-71LTDOJGLWHI4DLRU6A0FG15O.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/os_workgroup-BWEWUT57NVJ4XQ56GYT691UXY.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/Dispatch-B3ABJJTT821R5N3VLMC8B80Q5.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/CoreFoundation-1J5DHSXJKINBMM5IP2ETVDUKR.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/XPC-1WR4BE9GCHXLFI0EUUYCKTMJJ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/os-3EZY25KHGRKDTBMZEEKT178PV.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/CFNetwork-3GTK0XP1B4781MFI9HO6842GW.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/CoreGraphics-BVFZKLRTAWD4UV8DHZW3NBVWD.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/Security-BAJRZ0EDRB27P6B5R4IAX9KTH.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/CoreText-8QX4SZVYVPE2FO2FTXOASE3JU.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/ImageIO-3XHBR69E0IVB6ICKN7W079OP7.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/Foundation-18ZC69T3AK4M17DHJF2JBYKCG.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/DataDetection-DE997RY1FIS0K7WVNE406QRA0.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/UIUtilities-8R9QHGH66W58FMBKUAS2VB2QM.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/CoreTransferable-5MB8P4T4SOVSRI847Q283VFYJ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/FileProvider-5HFC5EGDJKGBN502L680F206N.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/CoreData-EEHQ9PXVAR85T28PX7VPV6W8R.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/OSLog-2U4ETEJP1ZBFPG0GV1FGKFPHX.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/IOSurface-9FF1YOATH9YL3WF4ZHG3YZK71.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/Accessibility-AQ56Q24YEO8BLS168ZLZNMFCM.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/UniformTypeIdentifiers-85IU64KB8DWLJNVQDO0GFPMSN.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/OpenGLES-45XW2YUANPEWGF1QZPQUYRT4C.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/UserNotifications-QM3L55ALJMEO9XYX7ILR97Y4.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/Symbols-11LBJDU6PBEPLJTO3PR3QBJ8E.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/_LocationEssentials-5SZG8DQCG5SSIEO7AZDXGFACW.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/CoreLocation-EOSL9CF8O186PLM06SJNEEC73.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/Metal-AM6JXTV1RKGPY4IETNJE67HWB.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/CoreVideo-928RGRHSHZSJEESP3K315C9KX.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/CoreImage-75EH23CK9MJUO31RK9H4ZYW1S.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/QuartzCore-BFP5T0VFYZOQN3SQEP1PDM63V.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/SwiftUICore-EEHL8DT5S4K4IH7N0IK2JQPQ2.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/UIKit-389GQEK8HPES6KY24VXWBKUIY.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/SwiftUI-4EMNFKQLLSC87SA9I67WU8XXM.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/MapKit-4MY9YT3FJJHJQSTO4XX3RUXYA.pcm
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ ATOMMonitor (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+EmitSwiftModule normal arm64 (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+
+SwiftCompile normal arm64 Compiling\ ContentView.swift /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/Views/ContentView.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+SwiftCompile normal arm64 /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/Views/ContentView.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+
+SwiftCompile normal arm64 Compiling\ StationMapView.swift /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/Views/StationMapView.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+SwiftCompile normal arm64 /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/Views/StationMapView.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+
+SwiftCompile normal arm64 Compiling\ StationDetailView.swift /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/Views/StationDetailView.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+SwiftCompile normal arm64 /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/Views/StationDetailView.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+
+SwiftCompile normal arm64 Compiling\ ATOMStation.swift /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/Models/ATOMStation.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+SwiftCompile normal arm64 /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/Models/ATOMStation.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+
+SwiftCompile normal arm64 Compiling\ StationRepository.swift /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/Services/StationRepository.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+SwiftCompile normal arm64 /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/Services/StationRepository.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+
+SwiftCompile normal arm64 Compiling\ StationListView.swift /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/Views/StationListView.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+SwiftCompile normal arm64 /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/Views/StationListView.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+
+SwiftCompile normal arm64 Compiling\ ATOMMonitorApp.swift /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/ATOMMonitorApp.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+SwiftCompile normal arm64 /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/ATOMMonitorApp.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+
+SwiftCompile normal arm64 Compiling\ StationStore.swift /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/ViewModels/StationStore.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+SwiftCompile normal arm64 /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitor/ViewModels/StationStore.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for ATOMMonitor (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+SwiftDriver\ Compilation\ Requirements ATOMMonitor normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ATOMMonitor -Onone @/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /tmp/ATOMMonitor-DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -F /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -c -j16 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /tmp/ATOMMonitor-DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-6cfe768891a92b912361537c460fe42b.sdkstatcache -output-file-map /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -sdk-module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.swiftmodule -validate-clang-modules-once -clang-build-session-file /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor_const_extract_protocols.json -Xcc -iquote -Xcc /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-generated-files.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-own-target-headers.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-all-target-headers.hmap -Xcc -iquote -Xcc /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-project-headers.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/DerivedSources-normal/arm64 -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/DerivedSources/arm64 -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor-Swift.h -working-directory /Users/richardhine/Documents/Xcode/ATOMMonitor/ios -experimental-emit-module-separately -disable-cmo
+
+SwiftMergeGeneratedHeaders /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/DerivedSources/ATOMMonitor-Swift.h /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor-Swift.h (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-swiftHeaderTool -arch arm64 /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor-Swift.h -o /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/DerivedSources/ATOMMonitor-Swift.h
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.swiftmodule/arm64-apple-ios-simulator.swiftdoc /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.swiftdoc (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.swiftdoc /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.swiftmodule/arm64-apple-ios-simulator.swiftdoc
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.swiftmodule/arm64-apple-ios-simulator.swiftmodule /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.swiftmodule (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.swiftmodule /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.swiftmodule/arm64-apple-ios-simulator.swiftmodule
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.swiftmodule/arm64-apple-ios-simulator.abi.json /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.abi.json (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.abi.json /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.swiftmodule/arm64-apple-ios-simulator.abi.json
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.swiftsourceinfo (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.swiftsourceinfo /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo
+
+ProcessProductPackaging "" /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.xctest-Simulated.xcent (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+    Entitlements:
+    
+    {
+    "application-identifier" = "VNQTGCW476.uk.co.rhine59.ATOMMonitorUITests.xctrunner";
+    "keychain-access-groups" =     (
+        "VNQTGCW476.uk.co.rhine59.ATOMMonitorUITests.xctrunner"
+    );
+}
+    
+    builtin-productPackagingUtility -entitlements -format xml -o /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.xctest-Simulated.xcent
+
+ProcessProductPackagingDER /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.xctest-Simulated.xcent /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.xctest-Simulated.xcent.der (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    /usr/bin/derq query -f xml -i /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.xctest-Simulated.xcent -o /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.xctest-Simulated.xcent.der --raw
+
+SwiftDriver ATOMMonitorUITests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ATOMMonitorUITests -Onone @/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /tmp/ATOMMonitor-DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -parse-as-library -c -j16 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /tmp/ATOMMonitor-DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-6cfe768891a92b912361537c460fe42b.sdkstatcache -output-file-map /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -sdk-module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.swiftmodule -validate-clang-modules-once -clang-build-session-file /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests_const_extract_protocols.json -Xcc -iquote -Xcc /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-generated-files.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-own-target-headers.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-all-target-headers.hmap -Xcc -iquote -Xcc /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-project-headers.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/DerivedSources-normal/arm64 -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/DerivedSources/arm64 -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests-Swift.h -working-directory /Users/richardhine/Documents/Xcode/ATOMMonitor/ios -experimental-emit-module-separately -disable-cmo
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/XCUIAutomation-2W29MKM2D0GIEP3Y0BZZEBPMV.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/XCTest-202WN78LOSX8LFI5XH98ZWA6T.pcm
+
+SwiftExplicitDependencyCompileModuleFromInterface arm64 /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/XCUIAutomation-151D0XBGFQ4ZH.swiftmodule
+
+SwiftExplicitDependencyCompileModuleFromInterface arm64 /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/XCTest-22WCIC8VKTNYK.swiftmodule
+
+SwiftCompile normal arm64 Compiling\ ATOMMonitorDemoUITests.swift /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitorUITests/ATOMMonitorDemoUITests.swift (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+
+SwiftCompile normal arm64 /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitorUITests/ATOMMonitorDemoUITests.swift (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ ATOMMonitorUITests (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+
+SwiftCompile normal arm64 /Users/richardhine/Documents/Xcode/ATOMMonitor/ios/ATOMMonitorUITests/ATOMMonitorDemoUITests.swift (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for ATOMMonitorUITests (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+
+SwiftDriver\ Compilation\ Requirements ATOMMonitorUITests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ATOMMonitorUITests -Onone @/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /tmp/ATOMMonitor-DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -parse-as-library -c -j16 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /tmp/ATOMMonitor-DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-6cfe768891a92b912361537c460fe42b.sdkstatcache -output-file-map /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -sdk-module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.swiftmodule -validate-clang-modules-once -clang-build-session-file /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests_const_extract_protocols.json -Xcc -iquote -Xcc /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-generated-files.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-own-target-headers.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-all-target-headers.hmap -Xcc -iquote -Xcc /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-project-headers.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/DerivedSources-normal/arm64 -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/DerivedSources/arm64 -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests-Swift.h -working-directory /Users/richardhine/Documents/Xcode/ATOMMonitor/ios -experimental-emit-module-separately -disable-cmo
+
+SwiftMergeGeneratedHeaders /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/DerivedSources/ATOMMonitorUITests-Swift.h /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests-Swift.h (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-swiftHeaderTool -arch arm64 /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests-Swift.h -o /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/DerivedSources/ATOMMonitorUITests-Swift.h
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests.swiftmodule/arm64-apple-ios-simulator.swiftmodule /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.swiftmodule (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.swiftmodule /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests.swiftmodule/arm64-apple-ios-simulator.swiftmodule
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests.swiftmodule/arm64-apple-ios-simulator.swiftdoc /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.swiftdoc (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.swiftdoc /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests.swiftmodule/arm64-apple-ios-simulator.swiftdoc
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests.swiftmodule/arm64-apple-ios-simulator.abi.json /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.abi.json (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.abi.json /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests.swiftmodule/arm64-apple-ios-simulator.abi.json
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.swiftsourceinfo (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.swiftsourceinfo /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo
+
+SwiftDriverJobDiscovery normal arm64 Compiling StationStore.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+SwiftDriverJobDiscovery normal arm64 Compiling StationRepository.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+SwiftDriverJobDiscovery normal arm64 Compiling ATOMStation.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+SwiftDriverJobDiscovery normal arm64 Compiling ATOMMonitorDemoUITests.swift (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+
+SwiftDriver\ Compilation ATOMMonitorUITests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-Swift-Compilation -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ATOMMonitorUITests -Onone @/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /tmp/ATOMMonitor-DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -parse-as-library -c -j16 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /tmp/ATOMMonitor-DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-6cfe768891a92b912361537c460fe42b.sdkstatcache -output-file-map /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -sdk-module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.swiftmodule -validate-clang-modules-once -clang-build-session-file /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests_const_extract_protocols.json -Xcc -iquote -Xcc /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-generated-files.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-own-target-headers.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-all-target-headers.hmap -Xcc -iquote -Xcc /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests-project-headers.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/DerivedSources-normal/arm64 -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/DerivedSources/arm64 -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests-Swift.h -working-directory /Users/richardhine/Documents/Xcode/ATOMMonitor/ios -experimental-emit-module-separately -disable-cmo
+
+SwiftDriverJobDiscovery normal arm64 Compiling ATOMMonitorApp.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+SwiftDriverJobDiscovery normal arm64 Compiling StationDetailView.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+SwiftDriverJobDiscovery normal arm64 Compiling StationListView.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+SwiftDriverJobDiscovery normal arm64 Compiling ContentView.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+SwiftDriverJobDiscovery normal arm64 Compiling StationMapView.swift (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+SwiftDriver\ Compilation ATOMMonitor normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-Swift-Compilation -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ATOMMonitor -Onone @/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /tmp/ATOMMonitor-DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -F /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -c -j16 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /tmp/ATOMMonitor-DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-6cfe768891a92b912361537c460fe42b.sdkstatcache -output-file-map /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -sdk-module-cache-path /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.swiftmodule -validate-clang-modules-once -clang-build-session-file /tmp/ATOMMonitor-DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor_const_extract_protocols.json -Xcc -iquote -Xcc /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-generated-files.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-own-target-headers.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-all-target-headers.hmap -Xcc -iquote -Xcc /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-project-headers.hmap -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/DerivedSources-normal/arm64 -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/DerivedSources/arm64 -Xcc -I/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor-Swift.h -working-directory /Users/richardhine/Documents/Xcode/ATOMMonitor/ios -experimental-emit-module-separately -disable-cmo
+
+Ld /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/ATOMMonitor.debug.dylib normal (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.0-simulator -dynamiclib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -O0 -L/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -F/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -filelist /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.LinkFileList -install_name @rpath/ATOMMonitor.debug.dylib -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker @executable_path/Frameworks -Xlinker -dead_strip -Xlinker -object_path_lto -Xlinker /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -dependency_info -Xlinker /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.swiftmodule @/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor-linker-args.resp -Xlinker -alias -Xlinker _main -Xlinker ___debug_main_executable_dylib_entry_point -Xlinker -no_adhoc_codesign -o /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/ATOMMonitor.debug.dylib
+
+ConstructStubExecutorLinkFileList /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-ExecutorLinkFileList-normal-arm64.txt (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    construct-stub-executor-link-file-list /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/ATOMMonitor.debug.dylib /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libPreviewsJITStubExecutor_no_swift_entry_point.a /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libPreviewsJITStubExecutor.a --output /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-ExecutorLinkFileList-normal-arm64.txt
+note: Using stub executor library with Swift entry point. (in target 'ATOMMonitor' from project 'ATOMMonitor')
+
+Ld /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/ATOMMonitor normal (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.0-simulator -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -O0 -L/tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -F/tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -Xlinker -rpath -Xlinker @executable_path -Xlinker -rpath -Xlinker @executable_path/Frameworks -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -e ___debug_blank_executor_main -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_dylib -Xlinker /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-DebugDylibPath-normal-arm64.txt -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_instlnm -Xlinker /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-DebugDylibInstallName-normal-arm64.txt -Xlinker -filelist -Xlinker /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor-ExecutorLinkFileList-normal-arm64.txt -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __entitlements -Xlinker /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.app-Simulated.xcent -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __ents_der -Xlinker /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.app-Simulated.xcent.der /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/ATOMMonitor.debug.dylib -Xlinker -no_adhoc_codesign -o /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/ATOMMonitor
+
+CopySwiftLibs /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/ATOMMonitor.debug.dylib --scan-folder /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/Frameworks --scan-folder /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/PlugIns --scan-folder /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/SystemExtensions --scan-folder /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+ExtractAppIntentsMetadata (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name ATOMMonitor --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk --xcode-version 17F113 --platform-family iOS --deployment-target 17.0 --bundle-identifier uk.co.rhine59.ATOMMonitor --output /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app --target-triple arm64-apple-ios17.0-simulator --binary-file /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/ATOMMonitor --dependency-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor_dependency_info.dat --stringsdata-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.SwiftFileList --metadata-file-list /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.DependencyMetadataFileList --static-metadata-file-list /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.DependencyStaticMetadataFileList --swift-const-vals-list /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/Objects-normal/arm64/ATOMMonitor.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-09-16 15:30:29.803 appintentsmetadataprocessor[50182:21167106] Starting appintentsmetadataprocessor export
+2026-09-16 15:30:29.804 appintentsmetadataprocessor[50182:21167106] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+AppIntentsSSUTraining (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsnltrainingprocessor --infoplist-path /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/Info.plist --temp-dir-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ssu --bundle-id uk.co.rhine59.ATOMMonitor --product-path /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app --extracted-metadata-path /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/Metadata.appintents --metadata-file-list /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitor.build/ATOMMonitor.DependencyMetadataFileList --source-file /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/Info.plist --archive-ssu-assets
+2026-09-16 15:30:29.824 appintentsnltrainingprocessor[50183:21167121] Parsing options for appintentsnltrainingprocessor
+2026-09-16 15:30:29.824 appintentsnltrainingprocessor[50183:21167121] Starting AppIntents SSU YAML Generation
+2026-09-16 15:30:29.825 appintentsnltrainingprocessor[50183:21167121] No AppShortcuts found - Skipping.
+
+CodeSign /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/ATOMMonitor.debug.dylib (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/ATOMMonitor.debug.dylib
+
+CodeSign /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/__preview.dylib (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app/__preview.dylib
+
+CodeSign /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app
+
+RegisterExecutionPolicyException /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-RegisterExecutionPolicyException /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app
+
+Validate /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-validationUtility /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app -shallow-bundle -infoplist-subpath Info.plist
+
+Touch /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app (in target 'ATOMMonitor' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    /usr/bin/touch -c /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitor.app
+
+ProcessInfoPlistFile /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest/Info.plist /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/empty-ATOMMonitorUITests.plist (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-infoPlistUtility /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/empty-ATOMMonitorUITests.plist -producttype com.apple.product-type.bundle.ui-testing -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ProductTypeInfoPlistAdditions.plist -o /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest/Info.plist
+
+Ld /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest/ATOMMonitorUITests normal (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.0-simulator -bundle -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -O0 -L/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -filelist /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.LinkFileList -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker @loader_path/Frameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -Xlinker -dead_strip -Xlinker -object_path_lto -Xlinker /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -dependency_info -Xlinker /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.swiftmodule @/tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests-linker-args.resp -Xlinker -needed_framework -Xlinker XCTest -framework XCTest -Xlinker -needed-lXCTestSwiftSupport -lXCTestSwiftSupport -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __entitlements -Xlinker /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.xctest-Simulated.xcent -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __ents_der -Xlinker /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.xctest-Simulated.xcent.der -Xlinker -no_adhoc_codesign -o /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest/ATOMMonitorUITests
+
+CopySwiftLibs /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest/ATOMMonitorUITests --scan-folder /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest/Frameworks --scan-folder /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest/PlugIns --scan-folder /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest/SystemExtensions --scan-folder /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+ExtractAppIntentsMetadata (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name ATOMMonitorUITests --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk --xcode-version 17F113 --platform-family iOS --deployment-target 17.0 --bundle-identifier uk.co.rhine59.ATOMMonitorUITests --output /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest --target-triple arm64-apple-ios17.0-simulator --binary-file /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest/ATOMMonitorUITests --dependency-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests_dependency_info.dat --stringsdata-file /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.SwiftFileList --metadata-file-list /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.DependencyMetadataFileList --static-metadata-file-list /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.DependencyStaticMetadataFileList --swift-const-vals-list /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/Objects-normal/arm64/ATOMMonitorUITests.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-09-16 15:30:30.139 appintentsmetadataprocessor[50191:21167223] Starting appintentsmetadataprocessor export
+2026-09-16 15:30:30.140 appintentsmetadataprocessor[50191:21167223] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+AppIntentsSSUTraining (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsnltrainingprocessor --infoplist-path /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest/Info.plist --temp-dir-path /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ssu --bundle-id uk.co.rhine59.ATOMMonitorUITests --product-path /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest --extracted-metadata-path /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest/Metadata.appintents --metadata-file-list /tmp/ATOMMonitor-DerivedData/Build/Intermediates.noindex/ATOMMonitor.build/Debug-iphonesimulator/ATOMMonitorUITests.build/ATOMMonitorUITests.DependencyMetadataFileList --source-file /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest/Info.plist --archive-ssu-assets
+2026-09-16 15:30:30.160 appintentsnltrainingprocessor[50192:21167225] Parsing options for appintentsnltrainingprocessor
+2026-09-16 15:30:30.160 appintentsnltrainingprocessor[50192:21167225] Starting AppIntents SSU YAML Generation
+2026-09-16 15:30:30.161 appintentsnltrainingprocessor[50192:21167225] No AppShortcuts found - Skipping.
+
+CopyPlistFile /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Info.plist /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Xcode/Agents/XCTRunner.app/Info.plist (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copyPlist --validate --convert xml1 --macro-expansion WRAPPEDPRODUCTNAME ATOMMonitorUITests-Runner --macro-expansion WRAPPEDPRODUCTBUNDLEIDENTIFIER uk.co.rhine59.ATOMMonitorUITests.xctrunner --macro-expansion TESTPRODUCTNAME ATOMMonitorUITests --macro-expansion TESTPRODUCTBUNDLEIDENTIFIER uk.co.rhine59.ATOMMonitorUITests --copy-value UIDeviceFamily /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest/Info.plist --outdir /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app -- /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Xcode/Agents/XCTRunner.app/Info.plist
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PkgInfo /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Xcode/Agents/XCTRunner.app/PkgInfo (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Xcode/Agents/XCTRunner.app/PkgInfo /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app
+
+CopyAndPreserveArchs /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/ATOMMonitorUITests-Runner (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/lipo /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Xcode/Agents/XCTRunner.app/XCTRunner -output /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/ATOMMonitorUITests-Runner -extract arm64
+
+MkDir /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    /bin/mkdir -p /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Frameworks/XCUnit.framework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCUnit.framework (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCUnit.framework /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Frameworks
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Frameworks/libXCTestSwiftSupport.dylib /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Frameworks
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Frameworks/XCUIAutomation.framework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Frameworks
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Frameworks/XCTestSupport.framework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTestSupport.framework (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTestSupport.framework /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Frameworks
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Frameworks/XCTAutomationSupport.framework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTAutomationSupport.framework (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTAutomationSupport.framework /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Frameworks
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Frameworks/XCTest.framework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCTest.framework (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCTest.framework /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Frameworks
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Frameworks/XCTestCore.framework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTestCore.framework (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTestCore.framework /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Frameworks
+
+Copy /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Frameworks/Testing.framework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/Testing.framework (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/Testing.framework /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/Frameworks
+
+CodeSign /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest
+
+RegisterExecutionPolicyException /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    builtin-RegisterExecutionPolicyException /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest
+
+Touch /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    /usr/bin/touch -c /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app/PlugIns/ATOMMonitorUITests.xctest
+
+CodeSign /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app (in target 'ATOMMonitorUITests' from project 'ATOMMonitor')
+    cd /Users/richardhine/Documents/Xcode/ATOMMonitor/ios
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app
+/tmp/ATOMMonitor-DerivedData/Build/Products/Debug-iphonesimulator/ATOMMonitorUITests-Runner.app: replacing existing signature
+
+2026-09-16 15:30:39.632514+0100 ATOMMonitorUITests-Runner[50230:21168038] [Default] Running tests...
+2026-09-16 15:30:39.656565+0100 ATOMMonitorUITests-Runner[50230:21168137] [General] Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+2026-09-16 15:30:39.698282+0100 ATOMMonitorUITests-Runner[50230:21168136] [General] Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-09-16 15:30:43.065.
+Test Suite 'ATOMMonitorUITests.xctest' started at 2026-09-16 15:30:43.065.
+Test Suite 'ATOMMonitorDemoUITests' started at 2026-09-16 15:30:43.066.
+Test Case '-[ATOMMonitorUITests.ATOMMonitorDemoUITests testRecordedFeatureTour]' started.
+    t =     0.00s Start Test at 2026-09-16 15:30:43.066
+    t =     0.03s Set Up
+    t =     0.03s Open uk.co.rhine59.ATOMMonitor
+    t =     0.03s     Launch uk.co.rhine59.ATOMMonitor
+2026-09-16 15:30:43.657 xcodebuild[50084:21166456] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-09-16 15:30:43.657 xcodebuild[50084:21166456] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     1.42s         Setting up automation session
+    t =     2.11s         Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =     3.98s DEMO: Map: edge-to-edge station health map, last-updated time and manual refresh
+ATOM_DEMO_STEP|Map: edge-to-edge station health map, last-updated time and manual refresh
+    t =     3.98s Waiting 8.0s for "Map" Button to exist
+    t =     5.02s     Checking `Expect predicate `existsNoRetry == 1` for object "Map" Button`
+    t =     5.02s         Checking existence of `"Map" Button`
+    t =     5.14s Waiting 3.0s for "Refresh stations" Button to exist
+    t =     6.16s     Checking `Expect predicate `existsNoRetry == 1` for object "Refresh stations" Button`
+    t =     6.16s         Checking existence of `"Refresh stations" Button`
+    t =     8.22s Tap "Refresh stations" Button
+    t =     8.22s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =     8.23s     Find the "Refresh stations" Button
+    t =     8.27s     Check for interrupting elements affecting "arrow.clockwise" Button
+    t =     8.29s     Synthesize event
+    t =     8.69s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    10.69s DEMO: Map: choose Standard, Satellite + Labels and Satellite layers
+ATOM_DEMO_STEP|Map: choose Standard, Satellite + Labels and Satellite layers
+    t =    10.70s Waiting 3.0s for "Map layers" Button to exist
+    t =    11.72s     Checking `Expect predicate `existsNoRetry == 1` for object "Map layers" Button`
+    t =    11.72s         Checking existence of `"Map layers" Button`
+    t =    11.76s Tap "Map layers" Button
+    t =    11.76s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    11.76s     Find the "Map layers" Button
+    t =    11.79s     Check for interrupting elements affecting "Map layers" Button
+    t =    11.81s     Synthesize event
+    t =    12.10s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    13.01s Waiting 2.0s for "Satellite + Labels" Button to exist
+    t =    14.05s     Checking `Expect predicate `existsNoRetry == 1` for object "Satellite + Labels" Button`
+    t =    14.05s         Checking existence of `"Satellite + Labels" Button`
+    t =    14.08s Tap "Satellite + Labels" Button
+    t =    14.08s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    14.08s     Find the "Satellite + Labels" Button
+    t =    14.11s     Check for interrupting elements affecting "map" Button
+    t =    14.13s     Synthesize event
+    t =    14.42s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    17.23s Tap "Map layers" Button
+    t =    17.23s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    17.23s     Find the "Map layers" Button
+    t =    17.27s     Check for interrupting elements affecting "Map layers" Button
+    t =    17.29s     Synthesize event
+    t =    17.58s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    18.41s Waiting 2.0s for "Satellite" Button to exist
+    t =    19.45s     Checking `Expect predicate `existsNoRetry == 1` for object "Satellite" Button`
+    t =    19.45s         Checking existence of `"Satellite" Button`
+    t =    19.49s Tap "Satellite" Button
+    t =    19.49s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    19.49s     Find the "Satellite" Button
+    t =    19.52s     Check for interrupting elements affecting "map" Button
+    t =    19.55s     Synthesize event
+    t =    19.84s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    22.66s Tap "Map layers" Button
+    t =    22.66s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    22.67s     Find the "Map layers" Button
+    t =    22.71s     Check for interrupting elements affecting "Map layers" Button
+    t =    22.74s     Synthesize event
+    t =    23.03s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    23.86s Waiting 2.0s for "Standard" Button to exist
+    t =    24.90s     Checking `Expect predicate `existsNoRetry == 1` for object "Standard" Button`
+    t =    24.90s         Checking existence of `"Standard" Button`
+    t =    24.94s Tap "Standard" Button
+    t =    24.94s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    24.95s     Find the "Standard" Button
+    t =    24.98s     Check for interrupting elements affecting "map" Button
+    t =    25.01s     Synthesize event
+    t =    25.29s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    28.45s DEMO: Map: home button reports when no home station is set
+ATOM_DEMO_STEP|Map: home button reports when no home station is set
+    t =    28.45s Waiting 3.0s for "Go to home station" Button to exist
+    t =    29.48s     Checking `Expect predicate `existsNoRetry == 1` for object "Go to home station" Button`
+    t =    29.48s         Checking existence of `"Go to home station" Button`
+    t =    29.53s Tap "Go to home station" Button
+    t =    29.53s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    29.53s     Find the "Go to home station" Button
+    t =    29.56s     Check for interrupting elements affecting "house.fill" Button
+    t =    29.59s     Synthesize event
+    t =    29.87s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    30.15s Waiting 3.0s for "No home station set" StaticText to exist
+    t =    31.17s     Checking `Expect predicate `existsNoRetry == 1` for object "No home station set" StaticText`
+    t =    31.17s         Checking existence of `"No home station set" StaticText`
+    t =    31.23s Tap "OK" Button
+    t =    31.23s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    31.23s     Find the "OK" Button
+    t =    31.27s     Check for interrupting elements affecting "OK" Button
+    t =    31.30s     Synthesize event
+    t =    31.58s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    32.85s DEMO: Stations: searchable station registry, manual refresh and pull-to-refresh
+ATOM_DEMO_STEP|Stations: searchable station registry, manual refresh and pull-to-refresh
+    t =    32.85s Tap "Stations" Button
+    t =    32.85s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    32.85s     Find the "Stations" Button
+    t =    32.88s     Check for interrupting elements affecting "list.bullet" Button
+    t =    32.91s     Synthesize event
+    t =    33.20s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    34.65s Waiting 3.0s for "ATOM Stations" NavigationBar to exist
+    t =    35.68s     Checking `Expect predicate `existsNoRetry == 1` for object "ATOM Stations" NavigationBar`
+    t =    35.68s         Checking existence of `"ATOM Stations" NavigationBar`
+    t =    35.76s Waiting 2.0s for "Refresh stations" Button to exist
+    t =    36.79s     Checking `Expect predicate `existsNoRetry == 1` for object "Refresh stations" Button`
+    t =    36.79s         Checking existence of `"Refresh stations" Button`
+    t =    36.84s Tap "Refresh stations" Button
+    t =    36.84s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    36.84s     Find the "Refresh stations" Button
+    t =    36.87s     Check for interrupting elements affecting "arrow.clockwise" Button
+    t =    36.91s     Synthesize event
+    t =    37.20s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    40.03s Waiting 2.0s for Table (First Match) to exist
+    t =    41.07s     Checking `Expect predicate `existsNoRetry == 1` for object Table (First Match)`
+    t =    41.07s         Checking existence of `Table (First Match)`
+    t =    41.15s         Capturing element debug description
+    t =    42.03s     Checking `Expect predicate `existsNoRetry == 1` for object Table (First Match)`
+    t =    42.03s         Checking existence of `Table (First Match)`
+    t =    42.11s         Capturing element debug description
+    t =    42.11s     Checking existence of `Table (First Match)`
+    t =    42.17s Collecting debug information to assist test failure triage
+    t =    42.17s     Requesting snapshot of accessibility hierarchy for app with pid 50250
+    t =    42.22s DEMO: Stations: search, favourite and inspect complete station telemetry
+ATOM_DEMO_STEP|Stations: search, favourite and inspect complete station telemetry
+    t =    42.22s Waiting 2.0s for SearchField (First Match) to exist
+    t =    43.25s     Checking `Expect predicate `existsNoRetry == 1` for object SearchField (First Match)`
+    t =    43.26s         Checking existence of `SearchField (First Match)`
+    t =    43.30s Tap SearchField (First Match)
+    t =    43.30s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    43.30s     Find the SearchField (First Match)
+    t =    43.33s     Check for interrupting elements affecting "Find an ATOM station" SearchField
+    t =    43.36s     Synthesize event
+    t =    43.66s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    43.94s Type 'Demo Healthy' into "Find an ATOM station" SearchField
+    t =    43.94s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    44.44s     Find the "Find an ATOM station" SearchField
+    t =    44.50s     Check for interrupting elements affecting "Find an ATOM station" SearchField
+    t =    44.54s     Synthesize event
+    t =    44.94s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    45.95s Waiting 2.0s for Button (First Match) to exist
+    t =    46.99s     Checking `Expect predicate `existsNoRetry == 1` for object Button (First Match)`
+    t =    46.99s         Checking existence of `Button (First Match)`
+    t =    47.08s Tap Button (First Match)
+    t =    47.08s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    47.08s     Find the Button (First Match)
+    t =    47.14s     Check for interrupting elements affecting "star" Button
+    t =    47.16s     Synthesize event
+    t =    47.46s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    47.47s Checking existence of `"Clear text" Button`
+    t =    47.53s Tap "Clear text" Button
+    t =    47.53s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    47.53s     Find the "Clear text" Button
+    t =    47.58s     Check for interrupting elements affecting "Clear text" Button
+    t =    47.60s     Synthesize event
+    t =    47.90s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    47.95s Waiting 3.0s for "PW Demo Healthy" StaticText to exist
+    t =    48.99s     Checking `Expect predicate `existsNoRetry == 1` for object "PW Demo Healthy" StaticText`
+    t =    48.99s         Checking existence of `"PW Demo Healthy" StaticText`
+    t =    49.08s Tap "PW Demo Healthy" StaticText
+    t =    49.08s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    49.09s     Find the "PW Demo Healthy" StaticText
+    t =    49.15s     Check for interrupting elements affecting "PW Demo Healthy" StaticText
+    t =    49.19s     Synthesize event
+    t =    49.48s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    53.36s Checking existence of `Button (First Match)`
+    t =    53.41s Tap Button (First Match)
+    t =    53.41s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    53.41s     Find the Button (First Match)
+    t =    53.43s     Check for interrupting elements affecting "BackButton" Button
+    t =    53.49s     Synthesize event
+    t =    53.78s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    54.15s DEMO: Favourites: selected ground stations
+ATOM_DEMO_STEP|Favourites: selected ground stations
+    t =    54.15s Tap "Favourites" Button
+    t =    54.15s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    54.15s     Find the "Favourites" Button
+    t =    54.18s     Check for interrupting elements affecting "star.fill" Button
+    t =    54.21s     Synthesize event
+    t =    54.51s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    57.21s DEMO: Settings: set a home station and verify the Map home button
+ATOM_DEMO_STEP|Settings: set a home station and verify the Map home button
+    t =    57.21s Tap "Settings" Button
+    t =    57.21s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    57.22s     Find the "Settings" Button
+    t =    57.26s     Check for interrupting elements affecting "gearshape.fill" Button
+    t =    57.28s     Synthesize event
+    t =    57.57s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    61.08s Waiting 2.0s for "Home station" Button to exist
+    t =    62.10s     Checking `Expect predicate `existsNoRetry == 1` for object "Home station" Button`
+    t =    62.10s         Checking existence of `"Home station" Button`
+    t =    62.18s         Capturing element debug description
+    t =    63.09s     Checking `Expect predicate `existsNoRetry == 1` for object "Home station" Button`
+    t =    63.09s         Checking existence of `"Home station" Button`
+    t =    63.15s         Capturing element debug description
+    t =    63.15s     Checking existence of `"Home station" Button`
+    t =    63.19s Collecting debug information to assist test failure triage
+    t =    63.19s     Requesting snapshot of accessibility hierarchy for app with pid 50250
+    t =    63.24s Tap "Map" Button
+    t =    63.24s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    63.24s     Find the "Map" Button
+    t =    63.28s     Check for interrupting elements affecting "map.fill" Button
+    t =    63.32s     Synthesize event
+    t =    63.61s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    67.12s Waiting 2.0s for "Go to home station" Button to exist
+    t =    68.14s     Checking `Expect predicate `existsNoRetry == 1` for object "Go to home station" Button`
+    t =    68.14s         Checking existence of `"Go to home station" Button`
+    t =    68.18s Tap "Go to home station" Button
+    t =    68.18s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    68.18s     Find the "Go to home station" Button
+    t =    68.20s     Check for interrupting elements affecting "house.fill" Button
+    t =    68.23s     Synthesize event
+    t =    68.53s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    70.78s DEMO: Settings: server connection and configurable 1-10 minute refresh interval
+ATOM_DEMO_STEP|Settings: server connection and configurable 1-10 minute refresh interval
+    t =    70.79s Tap "Settings" Button
+    t =    70.79s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    70.79s     Find the "Settings" Button
+    t =    70.84s     Check for interrupting elements affecting "gearshape.fill" Button
+    t =    70.88s     Found 1 interrupting element:
+    t =    70.88s         Find the "Home station" Alert
+    t =    70.90s "Home station" Alert from Target Application 'uk.co.rhine59.ATOMMonitor'
+    t =    70.90s     Invoking UI interruption monitors for "Home station" Alert from Target Application 'uk.co.rhine59.ATOMMonitor'
+    t =    70.90s         Find the "Home station" Alert
+    t =    70.92s         Checking existence of `Button (Elements matching predicate 'userTestingAttributes CONTAINS "cancel-button"')`
+    t =    70.95s         Get all elements bound by accessibility element for: Elements matching predicate 'userTestingAttributes CONTAINS "default-button"'
+    t =    70.98s         Checking existence of `"OK" Button`
+    t =    71.01s Default interruption handler attempting to dismiss alert by tapping "OK" Button.
+    t =    71.01s         Tap "OK" Button
+    t =    71.01s             Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    71.02s             Find the "OK" Button
+    t =    71.05s             Check for interrupting elements affecting "OK" Button
+    t =    71.08s             Synthesize event
+    t =    71.37s             Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    71.66s         Waiting 1.0s for Alert to not exist
+    t =    72.66s             Checking `Expect predicate `existsNoRetry == 0` for object Alert`
+    t =    72.66s                 Checking existence of `Alert`
+    t =    72.70s             Checking existence of `Alert`
+    t =    72.72s         Verifying handling...
+    t =    72.74s Confirmed successful handling of interrupting element
+    t =    72.74s     Synthesize event
+    t =    73.04s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    76.46s Checking existence of `"Refresh interval" StaticText`
+    t =    76.53s Waiting 2.0s for "Refresh interval" StaticText to exist
+    t =    77.54s     Checking `Expect predicate `existsNoRetry == 1` for object "Refresh interval" StaticText`
+    t =    77.54s         Checking existence of `"Refresh interval" StaticText`
+    t =    77.61s Checking existence of `Button (First Match)`
+    t =    77.68s DEMO: Help: project purpose and user guide
+ATOM_DEMO_STEP|Help: project purpose and user guide
+    t =    77.68s Tap "Help" Button
+    t =    77.68s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    77.68s     Find the "Help" Button
+    t =    77.72s     Check for interrupting elements affecting "questionmark.circle.fill" Button
+    t =    77.75s     Synthesize event
+    t =    78.05s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    81.42s DEMO: Map: cached snapshot, persisted layer and last-updated indicator remain available
+ATOM_DEMO_STEP|Map: cached snapshot, persisted layer and last-updated indicator remain available
+    t =    81.42s Tap "Map" Button
+    t =    81.42s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    81.43s     Find the "Map" Button
+    t =    81.46s     Check for interrupting elements affecting "map.fill" Button
+    t =    81.48s     Synthesize event
+    t =    81.78s     Wait for uk.co.rhine59.ATOMMonitor to idle
+    t =    86.12s Tear Down
+Test Case '-[ATOMMonitorUITests.ATOMMonitorDemoUITests testRecordedFeatureTour]' passed (86.630 seconds).
+Test Suite 'ATOMMonitorDemoUITests' passed at 2026-09-16 15:32:09.697.
+	 Executed 1 test, with 0 failures (0 unexpected) in 86.630 (86.632) seconds
+Test Suite 'ATOMMonitorUITests.xctest' passed at 2026-09-16 15:32:09.698.
+	 Executed 1 test, with 0 failures (0 unexpected) in 86.630 (86.633) seconds
+Test Suite 'Selected tests' passed at 2026-09-16 15:32:09.699.
+	 Executed 1 test, with 0 failures (0 unexpected) in 86.630 (86.634) seconds
+2026-09-16 15:32:25.727 xcodebuild[50084:21166456] [MT] IDETestOperationsObserverDebug: 115.398 elapsed -- Testing started completed.
+2026-09-16 15:32:25.727 xcodebuild[50084:21166456] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-09-16 15:32:25.727 xcodebuild[50084:21166456] [MT] IDETestOperationsObserverDebug: 115.398 sec, +115.398 sec -- end
+
+Test session results, code coverage, and logs:
+	/tmp/ATOMMonitor-DerivedData/Logs/Test/Test-ATOMMonitor-2026.09.16_15-30-22-+0100.xcresult
+
+** TEST SUCCEEDED **
+
+Testing started

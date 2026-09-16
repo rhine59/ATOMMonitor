@@ -1,5 +1,7 @@
-# Xcode
+# Xcode build products
 DerivedData/
+
+# Xcode user-specific state
 *.xcuserstate
 xcuserdata/
 
@@ -9,5 +11,21 @@ server/data/*.sqlite3-journal
 server/data/*.sqlite3-wal
 server/data/*.sqlite3-shm
 
-# Generated demonstration recordings/build products
-artifacts/
+# Generated ATOM Monitor artefacts
+# Ignore everything in artifacts except finished MP4s and logs.
+artifacts/*
+!artifacts/*.mp4
+!artifacts/*.log
+
+# Raw Simulator recordings can exceed GitHub's 100 MB limit.
+artifacts/*-raw.mp4
+
+# Python generated files
+__pycache__/
+*.pyc
+
+# Accidental/generated duplicate Xcode projects
+* 2.xcodeproj/
+
+# Never track raw Simulator recordings, including numbered Finder copies
+artifacts/*-raw*.mp4

@@ -1,0 +1,483 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		364B48D87541926CB34A9A2C /* StationRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FF11F3EFED65E6F71511112 /* StationRepository.swift */; };
+		3A405A3D2151FB33A4BDBDE3 /* StationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49D06232DE02CA985A829FF4 /* StationListView.swift */; };
+		4E3E54CA6BF28324F59AE988 /* ATOMMonitorDemoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 381FB3719C1622E0D155B79B /* ATOMMonitorDemoUITests.swift */; };
+		5250504757F20F6F96EFBCE8 /* ATOMMonitorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C32FED4738C4BCAFBFE88F /* ATOMMonitorApp.swift */; };
+		5455E39A3DC50938F3BE2C95 /* demo-stations.json in Resources */ = {isa = PBXBuildFile; fileRef = EEEBCC28FFD208BCF1A5D10B /* demo-stations.json */; };
+		6420C9511292894C131D04FA /* StationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B035EFFFAC5B806B55340289 /* StationStore.swift */; };
+		6EEA4C97A69E72783ED709AA /* stations.json in Resources */ = {isa = PBXBuildFile; fileRef = A0970C976C086A2A5F6E0D85 /* stations.json */; };
+		A439CAE7434B9889D310D8C1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7142494431906585573DBB26 /* ContentView.swift */; };
+		B6AA95EF0AF011D0DE25F6F2 /* StationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C751216009317AF14EBEA163 /* StationDetailView.swift */; };
+		C22BCA391C0221A73594297B /* ATOMStation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F5B30B432A417C920C561C /* ATOMStation.swift */; };
+		CCD9EC815421A99D843A9C35 /* StationMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9006BDD5E2600681DE897495 /* StationMapView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		94308CF0AF8D62ED28A3AB79 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7958BB9634DDB06EB7F0C0BF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 259E4EC92BE92F4C78668FE5;
+			remoteInfo = ATOMMonitor;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		34F5B30B432A417C920C561C /* ATOMStation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ATOMStation.swift; sourceTree = "<group>"; };
+		381FB3719C1622E0D155B79B /* ATOMMonitorDemoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ATOMMonitorDemoUITests.swift; sourceTree = "<group>"; };
+		49D06232DE02CA985A829FF4 /* StationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationListView.swift; sourceTree = "<group>"; };
+		4FF11F3EFED65E6F71511112 /* StationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationRepository.swift; sourceTree = "<group>"; };
+		7142494431906585573DBB26 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		9006BDD5E2600681DE897495 /* StationMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationMapView.swift; sourceTree = "<group>"; };
+		A0970C976C086A2A5F6E0D85 /* stations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = stations.json; sourceTree = "<group>"; };
+		AE41B1045B1FA1CA63A9BA94 /* ATOMMonitor.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ATOMMonitor.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AEF44CD890BB4A86F1C48377 /* ATOMMonitorUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ATOMMonitorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B035EFFFAC5B806B55340289 /* StationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationStore.swift; sourceTree = "<group>"; };
+		B1C32FED4738C4BCAFBFE88F /* ATOMMonitorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ATOMMonitorApp.swift; sourceTree = "<group>"; };
+		C751216009317AF14EBEA163 /* StationDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationDetailView.swift; sourceTree = "<group>"; };
+		EEEBCC28FFD208BCF1A5D10B /* demo-stations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "demo-stations.json"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		08021AF23FB88C220CA616E6 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				EEEBCC28FFD208BCF1A5D10B /* demo-stations.json */,
+				A0970C976C086A2A5F6E0D85 /* stations.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		26D7ABDC2F739084AE63DB97 /* ATOMMonitor */ = {
+			isa = PBXGroup;
+			children = (
+				B1C32FED4738C4BCAFBFE88F /* ATOMMonitorApp.swift */,
+				C236238B1D5528644DAE8F6E /* Models */,
+				08021AF23FB88C220CA616E6 /* Resources */,
+				286CA75E3BD0F6F4B49A4D04 /* Services */,
+				A4322842E1784E079748923E /* ViewModels */,
+				EF18CAC91074359007ECFAAB /* Views */,
+			);
+			path = ATOMMonitor;
+			sourceTree = "<group>";
+		};
+		286CA75E3BD0F6F4B49A4D04 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				4FF11F3EFED65E6F71511112 /* StationRepository.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		5AF88B7281E9DFDA69EB05C0 = {
+			isa = PBXGroup;
+			children = (
+				26D7ABDC2F739084AE63DB97 /* ATOMMonitor */,
+				DC25B6D889160F378D2BF113 /* ATOMMonitorUITests */,
+				5C026739848490776C65909B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		5C026739848490776C65909B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AE41B1045B1FA1CA63A9BA94 /* ATOMMonitor.app */,
+				AEF44CD890BB4A86F1C48377 /* ATOMMonitorUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A4322842E1784E079748923E /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				B035EFFFAC5B806B55340289 /* StationStore.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		C236238B1D5528644DAE8F6E /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				34F5B30B432A417C920C561C /* ATOMStation.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		DC25B6D889160F378D2BF113 /* ATOMMonitorUITests */ = {
+			isa = PBXGroup;
+			children = (
+				381FB3719C1622E0D155B79B /* ATOMMonitorDemoUITests.swift */,
+			);
+			path = ATOMMonitorUITests;
+			sourceTree = "<group>";
+		};
+		EF18CAC91074359007ECFAAB /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				7142494431906585573DBB26 /* ContentView.swift */,
+				C751216009317AF14EBEA163 /* StationDetailView.swift */,
+				49D06232DE02CA985A829FF4 /* StationListView.swift */,
+				9006BDD5E2600681DE897495 /* StationMapView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		259E4EC92BE92F4C78668FE5 /* ATOMMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B14968686362089B80363D72 /* Build configuration list for PBXNativeTarget "ATOMMonitor" */;
+			buildPhases = (
+				F5DB9D290C18AFB0244A19AA /* Sources */,
+				C7664175119F5A203DF5BC96 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ATOMMonitor;
+			packageProductDependencies = (
+			);
+			productName = ATOMMonitor;
+			productReference = AE41B1045B1FA1CA63A9BA94 /* ATOMMonitor.app */;
+			productType = "com.apple.product-type.application";
+		};
+		92B32847FEA3DF18750FBC9C /* ATOMMonitorUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85E62414A7964785ED2DA124 /* Build configuration list for PBXNativeTarget "ATOMMonitorUITests" */;
+			buildPhases = (
+				39473098B57887DB9578E3C9 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				66F57E1CF21330A2AE613B1E /* PBXTargetDependency */,
+			);
+			name = ATOMMonitorUITests;
+			packageProductDependencies = (
+			);
+			productName = ATOMMonitorUITests;
+			productReference = AEF44CD890BB4A86F1C48377 /* ATOMMonitorUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7958BB9634DDB06EB7F0C0BF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					92B32847FEA3DF18750FBC9C = {
+						TestTargetID = 259E4EC92BE92F4C78668FE5;
+					};
+				};
+			};
+			buildConfigurationList = E2583C2CABC63C697A4A6A2C /* Build configuration list for PBXProject "ATOMMonitor" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 5AF88B7281E9DFDA69EB05C0;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 5C026739848490776C65909B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				259E4EC92BE92F4C78668FE5 /* ATOMMonitor */,
+				92B32847FEA3DF18750FBC9C /* ATOMMonitorUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C7664175119F5A203DF5BC96 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5455E39A3DC50938F3BE2C95 /* demo-stations.json in Resources */,
+				6EEA4C97A69E72783ED709AA /* stations.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		39473098B57887DB9578E3C9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4E3E54CA6BF28324F59AE988 /* ATOMMonitorDemoUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5DB9D290C18AFB0244A19AA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5250504757F20F6F96EFBCE8 /* ATOMMonitorApp.swift in Sources */,
+				C22BCA391C0221A73594297B /* ATOMStation.swift in Sources */,
+				A439CAE7434B9889D310D8C1 /* ContentView.swift in Sources */,
+				B6AA95EF0AF011D0DE25F6F2 /* StationDetailView.swift in Sources */,
+				3A405A3D2151FB33A4BDBDE3 /* StationListView.swift in Sources */,
+				CCD9EC815421A99D843A9C35 /* StationMapView.swift in Sources */,
+				364B48D87541926CB34A9A2C /* StationRepository.swift in Sources */,
+				6420C9511292894C131D04FA /* StationStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		66F57E1CF21330A2AE613B1E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 259E4EC92BE92F4C78668FE5 /* ATOMMonitor */;
+			targetProxy = 94308CF0AF8D62ED28A3AB79 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		81A399B85062A348E5780AA7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = uk.co.rhine59.ATOMMonitorUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ATOMMonitor;
+			};
+			name = Release;
+		};
+		831AB226B5213F707240AEBD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		8D5E7DAF051B7E93E5D2F249 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		9F59A3CA9249F4327B86E310 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = uk.co.rhine59.ATOMMonitorUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ATOMMonitor;
+			};
+			name = Debug;
+		};
+		BB971FC1CCD4705EAC9B9678 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "ATOM Monitor";
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "ATOM Monitor connects to your configured server to retrieve ATOM ground-station health information.";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = uk.co.rhine59.ATOMMonitor;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		E3CC381CE2125DDC4EE4CAEA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "ATOM Monitor";
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "ATOM Monitor connects to your configured server to retrieve ATOM ground-station health information.";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = uk.co.rhine59.ATOMMonitor;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		85E62414A7964785ED2DA124 /* Build configuration list for PBXNativeTarget "ATOMMonitorUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9F59A3CA9249F4327B86E310 /* Debug */,
+				81A399B85062A348E5780AA7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B14968686362089B80363D72 /* Build configuration list for PBXNativeTarget "ATOMMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BB971FC1CCD4705EAC9B9678 /* Debug */,
+				E3CC381CE2125DDC4EE4CAEA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E2583C2CABC63C697A4A6A2C /* Build configuration list for PBXProject "ATOMMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8D5E7DAF051B7E93E5D2F249 /* Debug */,
+				831AB226B5213F707240AEBD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7958BB9634DDB06EB7F0C0BF /* Project object */;
+}

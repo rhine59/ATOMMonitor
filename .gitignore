@@ -1,6 +1,13 @@
+# Xcode
+DerivedData/
+*.xcuserstate
+xcuserdata/
 
 # Runtime ATOM Monitor database
 server/data/*.sqlite3
 server/data/*.sqlite3-journal
 server/data/*.sqlite3-wal
 server/data/*.sqlite3-shm
+
+# Generated demonstration recordings/build products
+artifacts/

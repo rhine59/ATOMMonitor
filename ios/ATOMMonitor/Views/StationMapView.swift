@@ -50,15 +50,7 @@ struct StationMapView: View {
                 .onChange(of: homeStationID) { _, _ in hasAppliedInitialHome = false; applyHomeIfNeeded() }
                 .mapControls { MapCompass(); MapScaleView() }
 
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("ATOM Stations")
-                        .font(.title2.bold())
-                        .foregroundStyle(.primary)
-                        .padding(.horizontal, 4)
-                    searchBar
-                }
-                .padding(.horizontal, adaptiveHorizontalPadding(for: geometry.size.width))
-                .padding(.top, max(8, geometry.safeAreaInsets.top + 6))
+                mapChrome(topInset: geometry.safeAreaInsets.top, width: geometry.size.width)
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
         }
@@ -73,6 +65,23 @@ struct StationMapView: View {
             .presentationDragIndicator(.visible)
         }
         .alert("Unable to load stations", isPresented: errorPresented) { Button("OK") { store.clearError() } } message: { Text(store.errorMessage ?? "Unknown error") }
+    }
+
+    private func mapChrome(topInset: CGFloat, width: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("ATOM Stations")
+                .font(.title2.bold())
+                .foregroundStyle(.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+                .padding(.horizontal, 4)
+            searchBar
+        }
+        .padding(.horizontal, adaptiveHorizontalPadding(for: width))
+        // GeometryReader itself ignores the safe area, so its safeAreaInsets can
+        // be zero on a physical device. Reserve a status-area floor while still
+        // honouring a larger reported inset (e.g. Dynamic Island devices).
+        .padding(.top, max(topInset, 50) + 6)
     }
 
     private func adaptiveHorizontalPadding(for width: CGFloat) -> CGFloat { width < 390 ? 12 : 16 }

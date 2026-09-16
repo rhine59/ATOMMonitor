@@ -6,13 +6,19 @@ This document is the reproducible build/test record for the Synology server and 
 
 Repository location on the DS918: `/volume1/docker/ATOMMonitor`.
 
-Git commands are run as the normal user. Docker/Compose commands on this Synology are run with `sudo`.
+Git commands are run as the normal user. Docker/Compose commands on this Synology are run with `sudo`. The complete clean-install, backup, reverse-proxy and recovery procedure is in `SYNOLOGY-HOSTING-RUNBOOK.md`.
 
 ### Network ports
 
-Synology DSM nginx already listens on host TCP port 8080. ATOM Monitor therefore publishes its REST API on **host port 8088**. Inside the Docker network the API continues to listen on port 8080, so the collector posts to `http://atom-api:8080/api/v1/observations`. LAN/iPhone clients use `http://192.168.1.99:8088/`.
+Synology DSM nginx already listens on host TCP port 8080. ATOM Monitor therefore publishes its REST API on **host port 8088**. Inside the Docker network the API continues to listen on port 8080, so the collector posts to `http://atom-api:8080/api/v1/observations`.
 
-The port decision was made after a Synology build reported `listen tcp4 0.0.0.0:8080: listen: address already in use`; `sudo netstat -tulpn | grep ':8080'` identified Synology nginx as the listener. The DSM nginx service is left untouched.
+Port 8088 is internal/LAN diagnostic access. Normal remote access is HTTPS through DSM Reverse Proxy at:
+
+```text
+https://granvillehouse.synology.me:8445/
+```
+
+DSM forwards that HTTPS service internally to `http://localhost:8088`. Do not directly Internet-forward port 8088.
 
 ### Automated server build/test
 
@@ -61,6 +67,15 @@ curl http://192.168.1.99:8088/health
 curl http://192.168.1.99:8088/api/v1/stations
 ```
 
+Public-path checks:
+
+```sh
+curl -v https://granvillehouse.synology.me:8445/health
+curl -v https://granvillehouse.synology.me:8445/api/v1/stations
+```
+
+The public test must validate the certificate normally; do not use `-k` as a production workaround.
+
 ## iPhone application
 
 Local Mac repository: `~/Documents/Xcode/ATOMMonitor`.
@@ -73,7 +88,7 @@ xcodegen generate
 open ATOMMonitor.xcodeproj
 ```
 
-Build in Xcode and install on the iPhone. The default API endpoint is `http://192.168.1.99:8088/`. The app has a local-network usage description and local-network HTTP allowance for this LAN service.
+Build in Xcode and install on the iPhone. The verified normal remote service is `https://granvillehouse.synology.me:8445/`. Until the compiled default is changed and regression-tested, Settings can be used to configure/test that endpoint. The LAN address `http://192.168.1.99:8088/` is retained as a diagnostic route only.
 
 ### Automated Simulator feature tour
 
@@ -87,42 +102,33 @@ git pull
 
 The script generates the Xcode project, selects an available iPhone Simulator, runs `ATOMMonitorDemoUITests/testRecordedFeatureTour`, records the Simulator and retains the UI-test log under `artifacts/`.
 
-**DerivedData must not be written beneath this repository's `~/Documents` path on the current Mac.** During the 16 September 2026 regression run, an app built under `artifacts/DerivedData` acquired `com.apple.FinderInfo` and `com.apple.fileprovider.fpfs#P` metadata on the generated `ATOMMonitor.app` directory. Xcode then failed CodeSign with `resource fork, Finder information, or similar detritus not allowed`. The source resources themselves had no extended attributes.
+**DerivedData must not be written beneath this repository's `~/Documents` path on the current Mac.** During the 16 September 2026 regression run, an app built under `artifacts/DerivedData` acquired File Provider metadata and Xcode failed CodeSign with `resource fork, Finder information, or similar detritus not allowed`. Rebuilding with DerivedData at `/tmp/ATOMMonitor-DerivedData` succeeded, with a clean app bundle and valid code signature.
 
-The diagnosis was confirmed by rebuilding the same project with DerivedData at `/tmp/ATOMMonitor-DerivedData`: Xcode reported `** BUILD SUCCEEDED **`, `xattr -lr` on the generated app returned no extended attributes, and `codesign --verify --verbose=4` reported `valid on disk` and `satisfies its Designated Requirement`.
-
-`record-demo.sh` therefore defaults to:
-
-```text
-/tmp/ATOMMonitor-DerivedData
-```
-
-and removes that directory before each automated tour. This keeps generated app bundles outside File Provider-managed `Documents` storage. To use another clean location, set `ATOM_DERIVED_DATA`, for example:
+`record-demo.sh` therefore defaults to `/tmp/ATOMMonitor-DerivedData` and removes that directory before each automated tour. To use another clean location:
 
 ```sh
 ATOM_DERIVED_DATA="$HOME/Library/Developer/Xcode/DerivedData/ATOMMonitor-Demo" ./scripts/record-demo.sh
 ```
 
-Do not revert the recorder to `artifacts/DerivedData` unless the filesystem metadata issue has been independently shown to be resolved.
-
 ### iPhone acceptance test
 
-1. Confirm the phone is on a network that can reach `192.168.1.99:8088`.
-2. Launch ATOM Monitor and permit local-network access if iOS asks.
-3. Confirm Stations loads server-provided stations rather than fixture data.
-4. Confirm stations with coordinates appear on Map and clustering works.
-5. Confirm Map manual refresh works and Last updated advances only after a successful snapshot.
-6. Exercise Standard, Satellite + Labels and Satellite map layers.
-7. With no home station configured, tap Home and confirm `No home station set`; then configure a home station and confirm Home returns the map to it.
+1. Configure/test `https://granvillehouse.synology.me:8445/`; for a true external-path test disable Wi-Fi and use cellular data.
+2. Launch ATOM Monitor and confirm Stations loads server-provided stations rather than fixture data.
+3. Confirm stations with coordinates appear on Map and clustering works.
+4. Confirm Map manual refresh works and Last updated advances only after a successful snapshot.
+5. Exercise Standard, Satellite + Labels and Satellite map layers.
+6. With no home station configured, tap Home and confirm `No home station set`; then configure a home station and confirm Home returns the map to it.
+7. Open a station detail and confirm **Record date & time** displays an absolute local date/time for `lastSeen`; confirm Last heartbeat, Last seen, Last position and Last technical status remain relative-age values. For a missing timestamp, confirm `Not reported`.
 8. Add a station to Favourites from Map and from Stations.
-9. Disconnect the Synology/network temporarily and relaunch/refresh; the last station cache should remain available.
+9. Disconnect the server/network temporarily and relaunch/refresh; the last station cache should remain available and Map should report `No Network` for the failed current request.
 10. Confirm favourite records remain available from the durable local favourites cache after a successful server refresh.
 11. Restore connectivity and verify fresh server data replaces the general cache.
 12. Remove a favourite in Settings and verify the preference is retained.
-13. Confirm no aircraft movement/identity UI or data appears anywhere.
+13. Open Help → User Guide and verify the station timestamp behaviour is documented locally/offline.
+14. Confirm no aircraft movement/identity UI or data appears anywhere.
 
 ## What constitutes an end-to-end pass
 
-An end-to-end pass requires: collector unit tests passing; both Docker services running; `/health` returning success on host port 8088; `/api/v1/stations` returning PilotAware-confirmed persistent station records; LAN access to port 8088; iPhone decoding and displaying those records; and local caching/favourites behaviour working as described above.
+An end-to-end pass requires: collector unit tests passing; both Docker services running; `/health` returning success on host port 8088; `/api/v1/stations` returning PilotAware-confirmed persistent station records; public HTTPS access through `granvillehouse.synology.me:8445`; iPhone decoding/displaying those records including the absolute station record timestamp; and local caching/favourites behaviour working as described above.
 
 Runtime logs are evidence of a particular build, not source code. Commit a `build-test.log` when a milestone or fault investigation needs a permanent record; routine repeated logs need not be committed indefinitely.

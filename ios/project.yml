@@ -17,5 +17,7 @@ targets:
         TARGETED_DEVICE_FAMILY: 1
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: ATOM Monitor
+        INFOPLIST_KEY_NSLocalNetworkUsageDescription: ATOM Monitor connects to your Synology server to retrieve ATOM ground-station health information.
+        INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking: YES
     scheme:
       gatherCoverageData: false

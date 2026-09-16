@@ -5,6 +5,7 @@ struct StationMapView: View {
     @ObservedObject var store: StationStore
     let homeStationID: String
     @Binding var favouriteStationIDs: String
+    @AppStorage("stationMapLayer") private var mapLayerRawValue = StationMapLayer.standard.rawValue
     @State private var position: MapCameraPosition = .region(Self.defaultRegion)
     @State private var visibleRegion = Self.defaultRegion
     @State private var hasAppliedInitialHome = false
@@ -12,6 +13,7 @@ struct StationMapView: View {
 
     private static let defaultRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude:54.2,longitude:-2.5),span:MKCoordinateSpan(latitudeDelta:7.5,longitudeDelta:7.5))
     private var positionedStations:[ATOMStation]{store.filteredStations.filter{$0.coordinate != nil}}
+    private var mapLayer:StationMapLayer{StationMapLayer(rawValue:mapLayerRawValue) ?? .standard}
 
     var body:some View{
         GeometryReader{geometry in ZStack(alignment:.top){
@@ -19,7 +21,7 @@ struct StationMapView: View {
             case .station(let station): if let coordinate=station.coordinate{Annotation(station.name,coordinate:coordinate){Button{detailStation=station}label:{Image(systemName:station.health.symbol).font(.title2.weight(.bold)).foregroundStyle(.white).frame(width:42,height:42).background(tint(for:station.health),in:Circle()).overlay(Circle().stroke(.white,lineWidth:3))}.buttonStyle(.plain)}}
             case .cluster(let cluster):Annotation("stations",coordinate:cluster.coordinate){Button{zoomInto(cluster)}label:{Text(String(cluster.stations.count)).font(.headline.bold()).foregroundStyle(.white).frame(width:48,height:48).background(.blue,in:Circle())}.buttonStyle(.plain)}
             }}}
-            .mapStyle(.standard(elevation:.realistic)).frame(width:geometry.size.width,height:geometry.size.height).ignoresSafeArea(.container,edges:.all).onMapCameraChange(frequency:.onEnd){visibleRegion=$0.region}.onAppear{applyHomeIfNeeded()}.onChange(of:store.stations){_,_ in applyHomeIfNeeded()}.onChange(of:homeStationID){_,_ in hasAppliedInitialHome=false;applyHomeIfNeeded()}.mapControls{MapCompass();MapScaleView()}
+            .mapStyle(mapLayer.style).frame(width:geometry.size.width,height:geometry.size.height).ignoresSafeArea(.container,edges:.all).onMapCameraChange(frequency:.onEnd){visibleRegion=$0.region}.onAppear{applyHomeIfNeeded()}.onChange(of:store.stations){_,_ in applyHomeIfNeeded()}.onChange(of:homeStationID){_,_ in hasAppliedInitialHome=false;applyHomeIfNeeded()}.mapControls{MapCompass();MapScaleView()}
             mapChrome(topInset:geometry.safeAreaInsets.top,width:geometry.size.width)
         }.frame(width:geometry.size.width,height:geometry.size.height)}
         .ignoresSafeArea(.container,edges:.all)
@@ -34,13 +36,21 @@ struct StationMapView: View {
                 Text("ATOM Stations").font(.title2.bold()).foregroundStyle(.primary).lineLimit(1).minimumScaleFactor(0.85)
                 Spacer(minLength:6)
                 VStack(alignment:.trailing,spacing:1){if let updated=store.lastSuccessfulRefresh{Text("Last updated: \(updated.formatted(date:.omitted,time:.shortened))").accessibilityLabel("Last updated \(updated.formatted(date:.abbreviated,time:.shortened))")}else{Text("Last updated: —")}}.font(.caption).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.75)
+                mapLayerMenu
                 Button{Task{await store.load()}}label:{if store.isLoading{ProgressView().controlSize(.small).frame(width:30,height:30)}else{Image(systemName:"arrow.clockwise").font(.headline).frame(width:30,height:30)}}.buttonStyle(.bordered).buttonBorderShape(.circle).disabled(store.isLoading).accessibilityLabel("Refresh stations")
             }.padding(.horizontal,4)
             searchBar
         }.padding(.horizontal,adaptiveHorizontalPadding(for:width)).padding(.top,max(topInset,50)+6)
     }
 
-    private func adaptiveHorizontalPadding(for width:CGFloat)->CGFloat{width<390 ? 12:16}
+    private var mapLayerMenu:some View{
+        Menu{
+            ForEach(StationMapLayer.allCases){layer in Button{mapLayerRawValue=layer.rawValue}label:{Label(layer.title,systemImage:mapLayer==layer ? "checkmark":"map")}}
+        }label:{Image(systemName:"square.3.layers.3d").font(.headline).frame(width:30,height:30)}
+        .buttonStyle(.bordered).buttonBorderShape(.circle).accessibilityLabel("Map layers")
+    }
+
+    private func adaptiveHorizontalPadding(for width:CGFloat)->CGFloat{width<390 ? 10:14}
     private var mapItems:[StationMapItem]{cluster(positionedStations,in:visibleRegion)}
     private func cluster(_ stations:[ATOMStation],in region:MKCoordinateRegion)->[StationMapItem]{guard stations.count>1 else{return stations.map{.station($0)}};let a=max(region.span.latitudeDelta/7,0.0008),b=max(region.span.longitudeDelta/5,0.0008);let groups=Dictionary(grouping:stations){s->GridKey in let c=s.coordinate!;return GridKey(latitude:Int(floor(c.latitude/a)),longitude:Int(floor(c.longitude/b)))};return groups.values.map{$0.count==1 ? .station($0[0]):.cluster(StationCluster(stations:$0))}}
     private func zoomInto(_ cluster:StationCluster){let c=cluster.stations.compactMap(\.coordinate),a=c.map(\.latitude),o=c.map(\.longitude);guard let amin=a.min(),let amax=a.max(),let omin=o.min(),let omax=o.max() else{return};let lat=max(max((amax-amin)*2.5,visibleRegion.span.latitudeDelta/3),0.01),lon=max(max((omax-omin)*2.5,visibleRegion.span.longitudeDelta/3),0.01);withAnimation{position = .region(MKCoordinateRegion(center:cluster.coordinate,span:MKCoordinateSpan(latitudeDelta:lat,longitudeDelta:lon)))}}
@@ -48,6 +58,13 @@ struct StationMapView: View {
     private var searchBar:some View{HStack(spacing:10){Image(systemName:"magnifyingglass").foregroundStyle(.secondary);TextField("Find",text:$store.searchText).textInputAutocapitalization(.never).autocorrectionDisabled();if !store.searchText.isEmpty{Button{store.searchText=""}label:{Image(systemName:"xmark.circle.fill").foregroundStyle(.secondary)}.buttonStyle(.plain)}}.padding(.horizontal,16).frame(height:46).background(.regularMaterial,in:Capsule())}
     private var errorPresented:Binding<Bool>{Binding(get:{store.errorMessage != nil},set:{if !$0{store.clearError()}})}
     private func tint(for h:StationHealth)->Color{switch h{case .healthy:return .green;case .warning:return .orange;case .noRecentHeartbeat:return .red;case .unknown:return .gray}}
+}
+
+private enum StationMapLayer:String,CaseIterable,Identifiable{
+    case standard,hybrid,imagery
+    var id:String{rawValue}
+    var title:String{switch self{case .standard:return "Standard";case .hybrid:return "Satellite + Labels";case .imagery:return "Satellite"}}
+    var style:MapStyle{switch self{case .standard:return .standard(elevation:.realistic);case .hybrid:return .hybrid(elevation:.realistic);case .imagery:return .imagery(elevation:.realistic)}}
 }
 private struct GridKey:Hashable{let latitude:Int;let longitude:Int}
 private struct StationCluster:Identifiable{let stations:[ATOMStation];var id:String{stations.map(\.id).sorted().joined(separator:"|")};var coordinate:CLLocationCoordinate2D{let c=stations.compactMap(\.coordinate);return CLLocationCoordinate2D(latitude:c.map(\.latitude).reduce(0,+)/Double(c.count),longitude:c.map(\.longitude).reduce(0,+)/Double(c.count))}}

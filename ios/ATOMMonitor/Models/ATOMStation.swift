@@ -4,8 +4,8 @@ import CoreLocation
 struct ATOMStation: Identifiable, Codable, Hashable {
     let id: String
     let name: String
-    let latitude: Double
-    let longitude: Double
+    let latitude: Double?
+    let longitude: Double?
     let altitudeMetres: Double?
     let health: StationHealth
     let lastHeartbeat: Date?
@@ -20,32 +20,14 @@ struct ATOMStation: Identifiable, Codable, Hashable {
     let rfCorrectionPPM: Double?
     let signalQualityDB: Double?
 
-    var coordinate: CLLocationCoordinate2D {
-        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    var coordinate: CLLocationCoordinate2D? {
+        guard let latitude, let longitude else { return nil }
+        return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
 }
 
 enum StationHealth: String, Codable, CaseIterable {
-    case healthy
-    case warning
-    case noRecentHeartbeat
-    case unknown
-
-    var title: String {
-        switch self {
-        case .healthy: "Healthy"
-        case .warning: "Warning"
-        case .noRecentHeartbeat: "No recent heartbeat"
-        case .unknown: "Unknown"
-        }
-    }
-
-    var symbol: String {
-        switch self {
-        case .healthy: "checkmark.circle.fill"
-        case .warning: "exclamationmark.triangle.fill"
-        case .noRecentHeartbeat: "xmark.circle.fill"
-        case .unknown: "questionmark.circle.fill"
-        }
-    }
+    case healthy, warning, noRecentHeartbeat, unknown
+    var title: String { switch self { case .healthy: "Healthy"; case .warning: "Warning"; case .noRecentHeartbeat: "No recent heartbeat"; case .unknown: "Unknown" } }
+    var symbol: String { switch self { case .healthy: "checkmark.circle.fill"; case .warning: "exclamationmark.triangle.fill"; case .noRecentHeartbeat: "xmark.circle.fill"; case .unknown: "questionmark.circle.fill" } }
 }

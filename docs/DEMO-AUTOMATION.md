@@ -14,10 +14,12 @@ The recording contains ATOM ground-station health/status only: no aircraft ident
 - `artifacts/` — ignored generated video, test log and DerivedData.
 
 ## Requirements
-Xcode/Xcode command-line tools, XcodeGen and at least one installed iPhone Simulator are required. FFmpeg is optional for MP4 annotation/post-processing:
+Xcode/Xcode command-line tools, XcodeGen and at least one installed iPhone Simulator are required. FFmpeg is optional for MP4 post-processing:
 
     brew install xcodegen
     brew install ffmpeg
+
+`drawtext` is an optional FFmpeg filter and is not present in every Homebrew/build configuration. The recorder now detects it rather than assuming it exists.
 
 ## Run
 From the repository root:
@@ -33,14 +35,8 @@ Force another installed device with:
 
     DEVICE="iPhone 17 Pro Max" ./scripts/record-demo.sh
 
-List devices with:
-
-    xcrun simctl list devices available | grep "iPhone"
-
 ## Automated tour
 The current UI test demonstrates Map, Stations/search, adding a favourite, full station health/technical detail, Favourites, Settings, editable server address and Test Connection, Help, and return to Map. Each major phase emits an `ATOM_DEMO_STEP` activity into the test log. The server test deliberately uses a documentation-only HTTPS hostname in demo mode; a failed connection is a valid demonstration of connection diagnostics and does not affect deterministic station data.
-
-The test launches with `--demo-mode` so it never depends on the production Synology API. The production app continues to use the saved/configured server URL.
 
 ## Outputs
 
@@ -49,22 +45,32 @@ The test launches with `--demo-mode` so it never depends on the production Synol
     artifacts/ATOMMonitor-Demo-test.log
     artifacts/DerivedData/
 
-The raw file is the direct Simulator capture. When FFmpeg is installed, the final MP4 receives the automated-demo title overlay and H.264 web-compatible encoding. The test log captures the Xcode/XCUITest result and named feature-tour activities.
+The raw file is direct Simulator capture. If FFmpeg includes `drawtext`, the final H.264 MP4 receives the automated-tour title overlay. If FFmpeg is installed without `drawtext`, the script creates the web-compatible H.264 MP4 without the text overlay. If FFmpeg transcoding itself fails, or FFmpeg is absent, the valid raw recording is copied to the final MP4 path. Presentation post-processing must never discard a successful Simulator recording.
 
-## Failure handling
-A UI-test failure returns a non-zero exit code but the video and log are retained. This is intentional: the recording can show exactly where the interaction stopped. Inspect:
+## Recorded failure: FFmpeg `drawtext` unavailable
+On 16 September 2026 the first XCUITest recorder run produced a valid 1206×2622 H.264 Simulator recording but FFmpeg terminated with:
 
-    tail -100 artifacts/ATOMMonitor-Demo-test.log
+    No such filter: 'drawtext'
+    Error opening output file .../ATOMMonitor-Demo.mp4
 
-and search steps with:
+The raw recording was only 2.87 seconds long, which also indicates that the UI test itself stopped very early; that is a separate issue to diagnose from `ATOMMonitor-Demo-test.log`. The recorder was hardened so missing `drawtext` can no longer mask the underlying UI-test result or prevent a final MP4 being preserved.
 
-    grep 'ATOM_DEMO_STEP' artifacts/ATOMMonitor-Demo-test.log
+## Diagnosing UI-test failures
+A UI-test failure returns a non-zero exit code but video and log remain. Inspect:
+
+    tail -120 artifacts/ATOMMonitor-Demo-test.log
+
+and:
+
+    grep -E 'ATOM_DEMO_STEP|error:|failed|Assertion' artifacts/ATOMMonitor-Demo-test.log
+
+A recording of only a few seconds normally means XCUITest failed during launch or its first interaction; the FFmpeg stage happens after recording and cannot itself explain the short raw capture.
 
 ## Simulator selection history
-The original recorder assumed `iPhone 16 Pro`, which was not installed on the Xcode 26 development Mac. The script now discovers available devices dynamically, preferring iPhone 17 Pro, iPhone 17, iPhone 16e, iPhone Air and iPhone 17 Pro Max before falling back to the first available iPhone. Duplicate model names across installed runtimes are handled by selecting the first matching UDID.
+The original recorder assumed `iPhone 16 Pro`, which was not installed on the Xcode 26 development Mac. The script now discovers available devices dynamically, preferring iPhone 17 Pro, iPhone 17, iPhone 16e, iPhone Air and iPhone 17 Pro Max before falling back to the first available iPhone.
 
 ## Test layers
-The demo/XCUITest complements rather than replaces server parser/unit tests, Synology live OGN/API integration tests and physical-iPhone testing. In particular, successful demo mode does not prove production DNS/HTTPS reachability, while successful production API tests do not prove all UI interactions.
+Demo/XCUITest complements server parser/unit tests, Synology live OGN/API integration tests and physical-iPhone testing. Successful demo mode does not prove production DNS/HTTPS reachability, and successful production API tests do not prove every UI interaction.
 
 ## Version control
-Commit fixtures, UI tests, scripts, annotation definitions, build/test instructions and meaningful failure diagnoses. Do not commit generated MP4s, DerivedData or other disposable build products. The `artifacts/` directory remains ignored.
+Commit fixtures, UI tests, scripts, annotation definitions, build/test instructions and meaningful failure diagnoses. Do not commit generated MP4s, DerivedData or disposable build products. `artifacts/` remains ignored.

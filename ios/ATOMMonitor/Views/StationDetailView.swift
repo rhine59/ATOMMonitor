@@ -7,6 +7,7 @@ struct StationDetailView: View {
         List {
             Section("Health") {
                 LabeledContent("Status", value: station.health.title)
+                LabeledContent("Record date & time", value: absolute(station.lastSeen))
                 LabeledContent("Last heartbeat", value: relative(station.lastHeartbeat))
                 LabeledContent("Last seen", value: relative(station.lastSeen))
                 LabeledContent("Last position", value: relative(station.lastPosition))
@@ -76,5 +77,10 @@ struct StationDetailView: View {
     private func relative(_ date: Date?) -> String {
         guard let date else { return "Not reported" }
         return date.formatted(.relative(presentation: .named))
+    }
+
+    private func absolute(_ date: Date?) -> String {
+        guard let date else { return "Not reported" }
+        return date.formatted(date: .abbreviated, time: .standard)
     }
 }

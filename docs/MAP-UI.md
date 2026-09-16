@@ -7,7 +7,7 @@ ATOM Monitor opens directly to the station map. The map is the application canva
 The Map tab is not embedded in a NavigationStack. It owns its compact title/search overlay and MapKit extends edge-to-edge behind the status area and bottom tab bar. Other tabs retain NavigationStack where conventional navigation is appropriate. The map uses GeometryReader and runtime dimensions; no fixed iPhone screen dimensions are used.
 
 ## Map chrome and status area
-`ATOM Stations`, last-update indicator, map-layer selector, Home button, manual refresh and compact `Find` field float over MapKit. Controls use compact adaptive sizing so the header can be regression-tested across small, standard, Pro and Max iPhones.
+`ATOM Stations`, map-layer selector, Home button and manual refresh occupy the top control row. The `Last updated` indicator is displayed on its own line immediately beneath those buttons and above the compact `Find` field. This keeps the timestamp readable without competing horizontally with the title and controls. Controls use compact adaptive sizing so the header can be regression-tested across small, standard, Pro and Max iPhones.
 
 ### Map layers
 The layers button (`square.3.layers.3d`) switches the Apple MapKit base map without changing station annotations, health colours, clustering, search or selection:
@@ -24,7 +24,7 @@ The Map header includes a Home button (`house.fill`). The configured home statio
 If no home station is configured, tapping Home displays exactly `No home station set`. If the selected station exists but has no reported coordinates, it displays `Home station location not reported`. The feature therefore does not require iPhone location permission.
 
 ### Manual refresh and Last updated
-The refresh button immediately requests a fresh station snapshot. `Last updated: HH:MM` records the last successful snapshot refresh, not the latest attempted request. Cached startup data shows its saved time; a successful refresh advances it; a failed refresh leaves it unchanged.
+The refresh button immediately requests a fresh station snapshot. `Last updated: HH:MM` records the last successful snapshot refresh, not the latest attempted request. Cached startup data shows its saved time; a successful refresh advances it; a failed refresh leaves it unchanged. The indicator sits directly below the top button row and above the Find field.
 
 ## Annotation state
 - green — Healthy;

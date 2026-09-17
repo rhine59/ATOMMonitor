@@ -21,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
@@ -351,12 +353,23 @@ fun App(vm: StationVM = viewModel()) {
 
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                Tab.entries.forEach { item ->
-                    NavigationBarItem(
-                        selected = tab == item,
-                        onClick = { tab = item },
-                        icon = {
+            Surface(tonalElevation = 3.dp) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Tab.entries.forEach { item ->
+                        val selected = tab == item
+
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable { tab = item }
+                                .padding(vertical = 6.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
                             Icon(
                                 imageVector = when (item) {
                                     Tab.Map -> Icons.Default.Map
@@ -366,11 +379,25 @@ fun App(vm: StationVM = viewModel()) {
                                     Tab.Settings -> Icons.Default.Settings
                                     Tab.Help -> Icons.Default.Help
                                 },
-                                contentDescription = null
+                                contentDescription = item.title,
+                                modifier = Modifier.size(22.dp),
+                                tint = if (selected)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    LocalContentColor.current
                             )
-                        },
-                        label = { Text(item.title) }
-                    )
+
+                            Text(
+                                text = item.title,
+                                maxLines = 1,
+                                fontSize = 10.sp,
+                                color = if (selected)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    LocalContentColor.current
+                            )
+                        }
+                    }
                 }
             }
         }

@@ -5,6 +5,8 @@ final class StationStore: ObservableObject {
     @Published private(set) var stations: [ATOMStation] = []
     @Published var searchText = ""
     @Published var selectedStation: ATOMStation?
+    @Published var selectedHealthFilters: Set<StationHealth> = []
+    @Published var selectedPilotAwareVersions: Set<String> = []
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
     @Published private(set) var lastSuccessfulRefresh: Date?
@@ -20,19 +22,41 @@ final class StationStore: ObservableObject {
         }
     }
 
+    var availableHealthValues: [StationHealth] {
+        StationHealth.allCases.filter { health in stations.contains { $0.health == health } }
+    }
+
+    var availablePilotAwareVersions: [String] {
+        Array(Set(stations.compactMap { $0.pilotAwareVersion?.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty })).sorted { $0.localizedStandardCompare($1) == .orderedAscending }
+    }
+
+    var hasActiveFilters: Bool { !selectedHealthFilters.isEmpty || !selectedPilotAwareVersions.isEmpty }
+
     var filteredStations: [ATOMStation] {
-        guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return stations }
-        return stations.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        return stations.filter { station in
+            let matchesSearch = query.isEmpty || station.name.localizedCaseInsensitiveContains(query)
+            let matchesHealth = selectedHealthFilters.isEmpty || selectedHealthFilters.contains(station.health)
+            let matchesVersion = selectedPilotAwareVersions.isEmpty || (station.pilotAwareVersion.map { selectedPilotAwareVersions.contains($0) } ?? false)
+            return matchesSearch && matchesHealth && matchesVersion
+        }
+    }
+
+    func clearFilters() {
+        selectedHealthFilters.removeAll()
+        selectedPilotAwareVersions.removeAll()
     }
 
     func load() async {
-        // Keep the existing in-memory/disk-cached snapshot visible while the
-        // network request runs. A failed refresh must never blank the map/list.
         isLoading = stations.isEmpty
         defer { isLoading = false }
         do {
             let fresh = try await repository.stations().sorted { $0.name < $1.name }
             stations = fresh
+            let validVersions = Set(availablePilotAwareVersions)
+            selectedPilotAwareVersions.formIntersection(validVersions)
+            let validHealth = Set(availableHealthValues)
+            selectedHealthFilters.formIntersection(validHealth)
             let now = Date()
             lastSuccessfulRefresh = now
             try cache.save(stations: fresh, at: now)

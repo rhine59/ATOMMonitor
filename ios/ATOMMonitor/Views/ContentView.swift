@@ -43,7 +43,7 @@ private struct SettingsView: View {
         Section("Favourite stations"){if favourites.isEmpty{Text("No favourites selected.").foregroundStyle(.secondary)}else{ForEach(favourites){s in HStack{Text(s.name);Spacer();Button(role:.destructive){remove(s.id)}label:{Image(systemName:"minus.circle.fill")}.buttonStyle(.borderless)}}}}
     }}
     private func saveServer(){do{let url=try ServerConfiguration.normalizedURL(from:serverURL);serverURL=url.absoluteString;savedServerURL=url.absoluteString;connectionMessage="Saved. Reloading stations…";connectionSucceeded=true;Task{await store.load()}}catch{connectionMessage=error.localizedDescription;connectionSucceeded=false}}
-    private func testServer() async{isTesting=true;defer{isTesting=false};do{let r=try await APIStationRepository.testConnection(to:serverURL);connectionMessage="Connected: \(r.status)";connectionSucceeded=true}catch{connectionMessage=error.localizedDescription;connectionSucceeded=false}}
+    private func testServer() async{isTesting=true;defer{isTesting=false};do{let r=try await APIStationRepository.testConnection(to:serverURL);let status=r.status.uppercased();connectionMessage=r.confirmedStations.map{"\(status) — \($0) stations"} ?? "\(status) — station count not reported";connectionSucceeded=true}catch{connectionMessage=error.localizedDescription;connectionSucceeded=false}}
     private func remove(_ id:String){var u=ids;u.remove(id);favouriteStationIDs=u.sorted().joined(separator:",")}
 }
 

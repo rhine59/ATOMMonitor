@@ -5,6 +5,7 @@ struct ContentView: View {
     @AppStorage("homeStationID") private var homeStationID = ""
     @AppStorage("favouriteStationIDs") private var favouriteStationIDs = ""
     @AppStorage("stationRefreshMinutes") private var stationRefreshMinutes = 5
+    @AppStorage("inactiveAfterDays") private var inactiveAfterDays = 2
 
     init(repository: any StationRepository) { _store = StateObject(wrappedValue: StationStore(repository: repository)) }
 
@@ -13,19 +14,11 @@ struct ContentView: View {
             StationMapView(store: store, homeStationID: homeStationID, favouriteStationIDs: $favouriteStationIDs).tabItem { Label("Map", systemImage: "map.fill") }
             NavigationStack { StationListView(store: store, favouriteStationIDs: $favouriteStationIDs).navigationTitle("ATOM Stations").navigationBarTitleDisplayMode(.inline) }.tabItem { Label("Stations", systemImage: "list.bullet") }
             NavigationStack { FavouritesView(store: store, favouriteStationIDs: favouriteStationIDs).navigationTitle("Favourites").navigationBarTitleDisplayMode(.inline) }.tabItem { Label("Favourites", systemImage: "star.fill") }
-            NavigationStack { SettingsView(store: store, homeStationID: $homeStationID, favouriteStationIDs: $favouriteStationIDs, stationRefreshMinutes: $stationRefreshMinutes).navigationTitle("Settings").navigationBarTitleDisplayMode(.inline) }.tabItem { Label("Settings", systemImage: "gearshape.fill") }
+            NavigationStack { SettingsView(store: store, homeStationID: $homeStationID, favouriteStationIDs: $favouriteStationIDs, stationRefreshMinutes: $stationRefreshMinutes, inactiveAfterDays: $inactiveAfterDays).navigationTitle("Settings").navigationBarTitleDisplayMode(.inline) }.tabItem { Label("Settings", systemImage: "gearshape.fill") }
             NavigationStack { HelpView().navigationTitle("Help").navigationBarTitleDisplayMode(.inline) }.tabItem { Label("Help", systemImage: "questionmark.circle.fill") }
         }
-        .task(id: stationRefreshMinutes) {
-            await store.load()
-            while !Task.isCancelled {
-                let minutes = min(max(stationRefreshMinutes, 1), 10)
-                do { try await Task.sleep(for: .seconds(Double(minutes * 60))) }
-                catch { return }
-                guard !Task.isCancelled else { return }
-                await store.load()
-            }
-        }
+        .onChange(of:inactiveAfterDays){_,_ in store.inactiveThresholdChanged()}
+        .task(id: stationRefreshMinutes) { await store.load(); while !Task.isCancelled { let minutes=min(max(stationRefreshMinutes,1),10);do{try await Task.sleep(for:.seconds(Double(minutes*60)))}catch{return};guard !Task.isCancelled else{return};await store.load()} }
     }
 }
 
@@ -33,50 +26,26 @@ private struct FavouritesView: View {
     @ObservedObject var store: StationStore; let favouriteStationIDs: String
     private var ids:Set<String>{Set(favouriteStationIDs.split(separator:",").map(String.init))}
     private var favourites:[ATOMStation]{store.stations.filter{ids.contains($0.id)}.sorted{$0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending}}
-    var body:some View{Group{if favourites.isEmpty{ContentUnavailableView("No Favourite Stations",systemImage:"star",description:Text("Add favourites from Map or Stations."))}else{List(favourites){station in NavigationLink{StationDetailView(station:station)}label:{VStack(alignment:.leading,spacing:7){HStack{Text(station.name).font(.headline);Spacer();Label(station.health.title,systemImage:station.health.symbol).font(.caption.weight(.semibold)).foregroundStyle(colour(station.health))};Text(station.lastHeartbeat.map{"Last heartbeat: \($0.formatted(date:.abbreviated,time:.standard))"} ?? "Last heartbeat: Not reported").font(.caption).foregroundStyle(.secondary);Text(location(station)).font(.caption2).foregroundStyle(.secondary)}}}}}}
+    var body:some View{Group{if favourites.isEmpty{ContentUnavailableView("No Favourite Stations",systemImage:"star",description:Text("Add favourites from Map or Stations."))}else{List(favourites){station in let health=store.displayHealth(for:station);NavigationLink{StationDetailView(station:station)}label:{VStack(alignment:.leading,spacing:7){HStack{Text(station.name).font(.headline);Spacer();Label(health.title,systemImage:health.symbol).font(.caption.weight(.semibold)).foregroundStyle(colour(health))};Text(station.lastHeartbeat.map{"Last heartbeat: \($0.formatted(date:.abbreviated,time:.standard))"} ?? "Last heartbeat: Not reported").font(.caption).foregroundStyle(.secondary);Text(location(station)).font(.caption2).foregroundStyle(.secondary)}}}}}}
     private func location(_ s:ATOMStation)->String{guard let a=s.latitude,let o=s.longitude else{return "Location: Not reported"};return String(format:"%.4f°, %.4f°",a,o)}
-    private func colour(_ h:StationHealth)->Color{switch h{case .healthy:return .green;case .warning:return .orange;case .noRecentHeartbeat:return .red;case .unknown:return .gray}}
+    private func colour(_ h:StationHealth)->Color{switch h{case .healthy:return .green;case .warning:return .orange;case .noRecentHeartbeat,.inactive:return .red;case .unknown:return .gray}}
 }
 
 private struct SettingsView: View {
-    @ObservedObject var store: StationStore
-    @Binding var homeStationID:String
-    @Binding var favouriteStationIDs:String
-    @Binding var stationRefreshMinutes:Int
-    @AppStorage(ServerConfiguration.key) private var savedServerURL = ""
-    @State private var serverURL = ServerConfiguration.configuredURLString
-    @State private var isTesting = false
-    @State private var connectionMessage:String?
-    @State private var connectionSucceeded = false
-    private var ids:Set<String>{Set(favouriteStationIDs.split(separator:",").map(String.init))}
-    private var sortedStations:[ATOMStation]{store.stations.sorted{$0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending}}
-    private var favourites:[ATOMStation]{sortedStations.filter{ids.contains($0.id)}}
+    @ObservedObject var store: StationStore;@Binding var homeStationID:String;@Binding var favouriteStationIDs:String;@Binding var stationRefreshMinutes:Int;@Binding var inactiveAfterDays:Int
+    @AppStorage(ServerConfiguration.key) private var savedServerURL = "";@State private var serverURL=ServerConfiguration.configuredURLString;@State private var isTesting=false;@State private var connectionMessage:String?;@State private var connectionSucceeded=false
+    private var ids:Set<String>{Set(favouriteStationIDs.split(separator:",").map(String.init))};private var sortedStations:[ATOMStation]{store.stations.sorted{$0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending}};private var favourites:[ATOMStation]{sortedStations.filter{ids.contains($0.id)}}
     var body:some View{Form{
-        Section("Server"){TextField("https://atom.example.net/",text:$serverURL).textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL);HStack{Button("Save"){saveServer()}.disabled(serverURL.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty);Spacer();Button{Task{await testServer()}}label:{if isTesting{ProgressView()}else{Label("Test Connection",systemImage:"network")}}.disabled(isTesting)};if let message=connectionMessage{Label(message,systemImage:connectionSucceeded ? "checkmark.circle.fill":"xmark.circle.fill").foregroundStyle(connectionSucceeded ? .green:.red).font(.footnote)};Text("Use the public HTTPS DNS name for normal operation. A local HTTP address may be retained temporarily for LAN diagnostics.").font(.footnote).foregroundStyle(.secondary)}
-        Section("Data refresh"){Stepper(value:$stationRefreshMinutes,in:1...10,step:1){HStack{Text("Refresh interval");Spacer();Text("\(stationRefreshMinutes) min").foregroundStyle(.secondary)}};Text("Station data is fetched once when ATOM Monitor starts, then automatically every \(stationRefreshMinutes) minute\(stationRefreshMinutes == 1 ? "" : "s"). The default is 5 minutes; the interval can be set from 1 to 10 minutes and is remembered on this iPhone.").font(.footnote).foregroundStyle(.secondary)}
-        Section("Map"){Picker("Home station",selection:$homeStationID){Text("Default UK view").tag("");ForEach(sortedStations.filter{$0.coordinate != nil}){Text($0.name).tag($0.id)}};Text("The Map tab opens centred and zoomed around the selected home station.").font(.footnote).foregroundStyle(.secondary)}
-        Section("Favourite stations"){if favourites.isEmpty{Text("No favourites selected. Add them from Map or Stations.").foregroundStyle(.secondary)}else{ForEach(favourites){s in HStack{VStack(alignment:.leading){Text(s.name);Text(s.health.title).font(.caption).foregroundStyle(.secondary)};Spacer();Button(role:.destructive){remove(s.id)}label:{Image(systemName:"minus.circle.fill")}.buttonStyle(.borderless)}}};Text("Add favourites from Map or Stations. Remove them here in Settings.").font(.footnote).foregroundStyle(.secondary)}
+        Section("Server"){TextField("https://atom.example.net/",text:$serverURL).textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL);HStack{Button("Save"){saveServer()};Spacer();Button{Task{await testServer()}}label:{if isTesting{ProgressView()}else{Label("Test Connection",systemImage:"network")}}};if let m=connectionMessage{Label(m,systemImage:connectionSucceeded ? "checkmark.circle.fill":"xmark.circle.fill").foregroundStyle(connectionSucceeded ? .green:.red).font(.footnote)}}
+        Section("Data refresh"){Stepper(value:$stationRefreshMinutes,in:1...10){HStack{Text("Refresh interval");Spacer();Text("\(stationRefreshMinutes) min").foregroundStyle(.secondary)}};Text("Default 5 minutes. Station data is fetched at startup and while the app is active.").font(.footnote).foregroundStyle(.secondary)}
+        Section("Station status"){Stepper(value:$inactiveAfterDays,in:1...30){HStack{Text("Inactive after");Spacer();Text("\(inactiveAfterDays) day\(inactiveAfterDays == 1 ? "":"s")").foregroundStyle(.secondary)}};Text("A station whose latest record has not been seen for this many days is shown as Inactive. Default: 2 days. Inactive stations use a red map icon.").font(.footnote).foregroundStyle(.secondary)}
+        Section("Map"){Picker("Home station",selection:$homeStationID){Text("Default UK view").tag("");ForEach(sortedStations.filter{$0.coordinate != nil}){Text($0.name).tag($0.id)}}}
+        Section("Favourite stations"){if favourites.isEmpty{Text("No favourites selected.").foregroundStyle(.secondary)}else{ForEach(favourites){s in HStack{Text(s.name);Spacer();Button(role:.destructive){remove(s.id)}label:{Image(systemName:"minus.circle.fill")}.buttonStyle(.borderless)}}}}
     }}
-    private func saveServer(){do{let url=try ServerConfiguration.normalizedURL(from:serverURL);serverURL=url.absoluteString;savedServerURL=url.absoluteString;connectionMessage="Saved. Reloading stations from the new server…";connectionSucceeded=true;Task{await store.load()}}catch{connectionMessage=error.localizedDescription;connectionSucceeded=false}}
-    private func testServer() async {isTesting=true;defer{isTesting=false};do{let result=try await APIStationRepository.testConnection(to:serverURL);let count=result.confirmedStations.map{" — \($0) confirmed stations"} ?? "";connectionMessage="Connected: \(result.status)\(count)";connectionSucceeded=true}catch{connectionMessage=error.localizedDescription;connectionSucceeded=false}}
+    private func saveServer(){do{let url=try ServerConfiguration.normalizedURL(from:serverURL);serverURL=url.absoluteString;savedServerURL=url.absoluteString;connectionMessage="Saved. Reloading stations…";connectionSucceeded=true;Task{await store.load()}}catch{connectionMessage=error.localizedDescription;connectionSucceeded=false}}
+    private func testServer() async{isTesting=true;defer{isTesting=false};do{let r=try await APIStationRepository.testConnection(to:serverURL);connectionMessage="Connected: \(r.status)";connectionSucceeded=true}catch{connectionMessage=error.localizedDescription;connectionSucceeded=false}}
     private func remove(_ id:String){var u=ids;u.remove(id);favouriteStationIDs=u.sorted().joined(separator:",")}
 }
 
 private struct HelpView:View{var body:some View{List{Section{NavigationLink{UserGuideView()}label:{Label("User Guide",systemImage:"book.fill")}};Section("About"){Text("ATOM Monitor displays the operational health and technical status of PilotAware ATOM ground stations. It does not display or record aircraft movements.")}}}}
-
-private struct UserGuideView:View{
-    var body:some View{ScrollView{VStack(alignment:.leading,spacing:18){
-        guideSection("What ATOM Monitor does","ATOM Monitor is an iPhone application for viewing the operational health and technical status of PilotAware ATOM ground stations. It does not display, record or retain aircraft movements, tracks or aircraft identities.")
-        guideSection("Map","The map adapts to the iPhone display. Clusters separate as the map is zoomed. Tap a station to open its complete detail. Green means Healthy, amber Warning, red No recent heartbeat and grey Unknown. The initial view centres on the Home station selected in Settings, or uses the default wider UK view. The status below the title shows the last successful update; if the server cannot be reached it shows No Network while cached station data remains visible.")
-        guideSection("Filters","Map and Stations share filters for Status and PilotAware version. The available choices are created from values already present in the collected station data rather than a hard-coded version list. Select one or more values in either section; leaving a section empty means all values. If both Status and version are selected, a station must match both. Find/search is combined with the filters. The active-filter indicator shows how many stations remain and Clear filters restores the complete registry.")
-        guideSection("Stations","Stations shows the persistent station registry, subject to the same Find, Status and PilotAware version filters used by Map. Selecting a station opens its detailed operational and technical status.")
-        guideSection("Favourites","Favourites provides a quick view of selected stations. Favourites are stored locally on the iPhone and do not change server collection.")
-        guideSection("Server","The server address can be edited and saved in Settings. Test Connection checks the configured service. Normal remote operation should use the public HTTPS DNS address.")
-        guideSection("Data refresh","ATOM Monitor fetches station data immediately when the app starts and then at the configured interval. The default is 5 minutes. Settings allows a whole-minute interval from 1 to 10 minutes, remembered on this iPhone. Automatic refresh operates while the app is active; iOS may suspend it in the background.")
-        guideSection("Cached data","The most recent successful station snapshot is cached locally. If the network or server is unavailable, the previous station data remains visible. The cache is a latest snapshot only, not a history database, and contains no aircraft data.")
-        guideSection("Home station","Choose Home station in Settings to define where the Map initially centres. The Home button returns to that station. If none is configured, the app reports No home station set.")
-        guideSection("Station details","The Health section shows Record date & time as the exact local date and time of the station's latest record, while Last heartbeat, Last seen, Last position and Last technical status remain relative age indicators. Depending on source data, details can also include station name, coordinates and altitude, software versions, CPU load and temperature, RAM, NTP timing, RF information, uptime and supply voltage. Unsupported data displays Not reported.")
-        guideSection("Privacy","Aircraft traffic is outside ATOM Monitor's scope. The app and server are intended to monitor ground-station health and must not store aircraft tracks, identities or movement history.")
-    }.padding()}.navigationTitle("User Guide").navigationBarTitleDisplayMode(.inline)}
-    private func guideSection(_ title:String,_ text:String)->some View{VStack(alignment:.leading,spacing:6){Text(title).font(.headline);Text(text).foregroundStyle(.secondary).fixedSize(horizontal:false,vertical:true)}}
-}
+private struct UserGuideView:View{var body:some View{ScrollView{VStack(alignment:.leading,spacing:18){guideSection("What ATOM Monitor does","ATOM Monitor monitors PilotAware ATOM ground-station operational health only. It does not display, record or retain aircraft movements, tracks or aircraft identities.");guideSection("Map","Green means Healthy, amber Warning, red No recent heartbeat or Inactive, and grey Unknown. A cluster containing both green Healthy and red Inactive stations is yellow. Clusters separate as the map is zoomed.");guideSection("Filters","Map and Stations share Status and PilotAware version filters. Status includes Inactive when inactive stations exist. Version choices come from values already collected. Find combines with these filters.");guideSection("Inactive stations","Settings contains Inactive after, default 2 days. If a station's latest lastSeen record is at least that old it is displayed as Inactive, overriding its live server health for presentation/filtering. Change the threshold from 1 to 30 days.");guideSection("Station details","Record date & time shows the exact local date/time of the latest station record. Other observation ages remain relative. Missing values display Not reported.");guideSection("Cached data","The latest successful station snapshot remains visible after a connection failure. It is not a history database and contains no aircraft data.");guideSection("Privacy","Aircraft traffic is outside ATOM Monitor's scope.")}.padding()}.navigationTitle("User Guide").navigationBarTitleDisplayMode(.inline)};private func guideSection(_ t:String,_ x:String)->some View{VStack(alignment:.leading,spacing:6){Text(t).font(.headline);Text(x).foregroundStyle(.secondary)}}}

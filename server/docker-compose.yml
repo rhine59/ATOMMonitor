@@ -11,6 +11,19 @@ services:
     environment:
       ATOM_DB: /data/atommonitor.sqlite3
       PORT: "8080"
+      PYTHONUNBUFFERED: "1"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/ready', timeout=4).read()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    stop_grace_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   ogn-station-probe:
     build:
@@ -18,5 +31,12 @@ services:
     container_name: atommonitor-ogn-probe
     restart: unless-stopped
     depends_on:
-      - atom-api
+      atom-api:
+        condition: service_healthy
     command: ["--prefix", "PW", "--api-url", "http://atom-api:8080/api/v1/observations"]
+    stop_grace_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"

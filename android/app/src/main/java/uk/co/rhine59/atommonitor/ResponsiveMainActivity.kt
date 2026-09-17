@@ -30,6 +30,7 @@ class ResponsiveMainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ResponsiveApp(vm: StationVM = viewModel()) {
     var tab by remember { mutableStateOf(Tab.Map) }

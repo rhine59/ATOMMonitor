@@ -10,6 +10,7 @@ services:
       - ./data:/data
     environment:
       ATOM_DB: /data/atommonitor.sqlite3
+      ATOM_INGEST_TOKEN: ${ATOM_INGEST_TOKEN:?Set ATOM_INGEST_TOKEN in server/.env}
       PORT: "8080"
       PYTHONUNBUFFERED: "1"
     healthcheck:
@@ -33,6 +34,8 @@ services:
     depends_on:
       atom-api:
         condition: service_healthy
+    environment:
+      ATOM_INGEST_TOKEN: ${ATOM_INGEST_TOKEN:?Set ATOM_INGEST_TOKEN in server/.env}
     command: ["--prefix", "PW", "--api-url", "http://atom-api:8080/api/v1/observations"]
     stop_grace_period: 20s
     logging:

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Persistent ATOM ground-station registry/API. No aircraft data is accepted or stored."""
 from __future__ import annotations
-import os,sqlite3
+import hmac,os,sqlite3
 from datetime import datetime,timezone
 from flask import Flask,jsonify,request
-DB_PATH=os.getenv("ATOM_DB","/data/atommonitor.sqlite3"); app=Flask(__name__)
+DB_PATH=os.getenv("ATOM_DB","/data/atommonitor.sqlite3"); INGEST_TOKEN=os.getenv("ATOM_INGEST_TOKEN",""); app=Flask(__name__)
 def db():
  os.makedirs(os.path.dirname(DB_PATH),exist_ok=True);c=sqlite3.connect(DB_PATH);c.row_factory=sqlite3.Row
  c.execute("""CREATE TABLE IF NOT EXISTS stations(id TEXT PRIMARY KEY,name TEXT NOT NULL,isPilotAware INTEGER NOT NULL DEFAULT 0,latitude REAL,longitude REAL,altitudeMetres REAL,lastPosition TEXT,lastHeartbeat TEXT,lastTechnicalStatus TEXT,pilotAwareVersion TEXT,softwareVersion TEXT,cpuLoadPercent REAL,ramUsedMB REAL,ramTotalMB REAL,cpuTemperatureC REAL,ntpOffsetMS REAL,ntpCorrectionPPM REAL,frequencyCorrectionKHz REAL,rfCorrectionPPM REAL,signalQualityDB REAL,voltageV REAL,uptimeMinutes INTEGER,lastSeen TEXT NOT NULL)""")
@@ -49,6 +49,9 @@ def ready():
   return jsonify({"status":"not_ready","service":"atommonitor-api","database":"unavailable"}),503
 @app.post('/api/v1/observations')
 def observation():
+ supplied=request.headers.get("Authorization","")
+ expected=f"Bearer {INGEST_TOKEN}" if INGEST_TOKEN else ""
+ if not expected or not hmac.compare_digest(supplied,expected):return jsonify({"error":"unauthorized"}),401
  if not upsert(request.get_json(silent=True) or {}):return jsonify({"error":"invalid ground-station observation"}),400
  return jsonify({"status":"accepted"}),202
 @app.get('/api/v1/stations')

@@ -33,3 +33,6 @@ artifacts/*-raw*.mp4
 # macOS Finder metadata
 .DS_Store
 **/.DS_Store
+
+# Local secrets
+server/.env

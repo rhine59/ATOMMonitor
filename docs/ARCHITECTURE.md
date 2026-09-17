@@ -1,94 +1,88 @@
-# Architecture
+# ATOM Monitor — Architecture
 
-## Overview
+Last updated: 17 September 2026
 
-ATOM Monitor is proposed as two cooperating components:
+## Purpose and scope
 
-1. A server-side collector/API, intended to run in Docker on a Synology NAS.
-2. A native SwiftUI iPhone client.
+ATOM Monitor monitors the operational health and technical status of PilotAware ATOM ground stations. It does not display, record or retain aircraft movements, tracks, aircraft identities or aircraft packet history.
+
+## Current architecture
 
 ```text
-       OGN APRS infrastructure
-        receiver/status data
-                |
-                v
-      +---------------------+
-      | Collector service   |
-      |---------------------|
-      | TCP/APRS client     |
-      | receiver parser     |
-      | ATOM classifier     |
-      | health evaluator    |
-      +----------+----------+
-                 |
-                 v
-      +---------------------+
-      | Persistent storage  |
-      |---------------------|
-      | station registry    |
-      | latest health       |
-      | health history      |
-      +----------+----------+
-                 |
-                 v
-      +---------------------+
-      | REST API            |
-      +----------+----------+
-                 |
-              HTTPS
-                 |
-                 v
-      +---------------------+
-      | SwiftUI iPhone app  |
-      |---------------------|
-      | MapKit              |
-      | search              |
-      | station details     |
-      | history             |
-      +---------------------+
+OGN APRS (receiver-status traffic only)
+        |
+        v
+Synology NAS / Docker Compose
+  ogn-station-probe collector
+        |
+        | authenticated station observations
+        v
+  ATOM API (Gunicorn + Flask)
+        |
+        v
+  SQLite persistent station registry
+        |
+        +---- HTTPS public reads via DSM reverse proxy :8445
+        |
+        +---- HTTP LAN diagnostics :8088
+        v
+iOS SwiftUI client / Android Kotlin Compose client
 ```
 
-## Why use a server collector?
+The collector connects receive-only to the OGN APRS service and classifies PilotAware/ATOM ground-station messages. Aircraft messages are discarded and are not persisted.
 
-A central collector maintains one polite, persistent connection to the upstream OGN APRS service, can reconnect independently of the phone, keeps historical data while the app is closed, avoids iOS background-network limitations, and gives the iPhone a simple HTTPS/JSON interface.
+## Server deployment
 
-## Collector responsibilities
+The current production deployment runs on the Synology NAS using Docker Compose. The API container is served by Gunicorn 23.0.0 with two workers and two threads per worker. The collector waits for the API readiness healthcheck before starting.
 
-- Connect/reconnect to the selected OGN APRS server.
-- Request/filter receiver/status data as efficiently as the protocol permits.
-- Parse receiver beacon/status messages.
-- Identify candidate PilotAware ATOM stations.
-- Upsert station identity/location into a persistent registry.
-- Record current and historical technical telemetry.
-- Derive a health state using explicit rules.
-- Discard aircraft position traffic; do not write it to persistent storage.
-- Expose health and station information through the REST API.
+The API exposes inexpensive process liveness at `/health` and database-backed readiness at `/ready`. Docker checks `/ready` and uses bounded JSON logging, a graceful stop period and `restart: unless-stopped`.
 
-## Persistence
+The SQLite database is persisted outside the disposable container filesystem. PostgreSQL and horizontally replicated stateless API instances remain future resilience/scalability work; multiple API replicas must not be introduced while SQLite is the shared state mechanism.
 
-PostgreSQL is a good production fit, especially if the Synology already hosts PostgreSQL-backed Docker applications. SQLite may be useful for an early collector prototype. The application should keep persistence behind a repository/storage abstraction so the first parser tests do not depend on the final database.
+## Network boundary
 
-## iOS responsibilities
+Normal remote clients use:
 
-- Fetch station registry/current health from REST API.
-- Cache enough station data for a responsive map.
-- Render station annotations and clusters.
-- Search station names locally or via API.
-- Present compact map selection card.
-- Present detailed station health.
-- Fetch historical series only when requested.
-- Optionally use device location for map centring/nearest stations.
+`https://granvillehouse.synology.me:8445/`
 
-## Provider abstraction
+DSM reverse proxy terminates valid HTTPS and forwards internally to the API published on host port 8088. Port 8088 is retained for trusted LAN diagnostics and must not be exposed directly to the Internet.
 
-The server should distinguish source adapters from the canonical station model. Proposed adapters:
+Public station reads are intentionally available. `POST /api/v1/observations` is a write boundary and requires `Authorization: Bearer <token>`. The collector and API receive the same `ATOM_INGEST_TOKEN` through the local `server/.env`. That file is ignored by Git and the token must never be committed, printed in documentation or exposed in diagnostic output.
 
-- `OGNAPRSProvider` — primary live receiver/status source.
-- `PilotAwareProvider` — future supplementary metadata/status if a suitable stable endpoint is available.
-- `RegistryBootstrapProvider` — method for seeding known ATOM stations so failed stations remain discoverable.
+## Station state ordering
 
-This avoids coupling the app itself to OGN/APRS packet formats.
+Station observations are ordered independently by category: position, technical status and PilotAware heartbeat. A delayed older packet cannot overwrite newer state in the same category. Explicit packet timestamps that are malformed or more than five minutes ahead of the observation receive time are rejected so an erroneous remote clock cannot poison later ordering. A stale rejected observation does not move `lastSeen` backwards or forwards.
 
-## Security and deployment
+## Client architecture
 
-The iPhone should communicate with the server over HTTPS. Upstream credentials/passcodes, if required, stay server-side and are never compiled into the app. Docker configuration should use environment variables/secrets rather than committed credentials.
+Both phone clients consume the same station-only REST API and maintain a local last-successful station cache plus durable user preferences/favourites. They derive the configurable Inactive state locally from `lastSeen`; the default threshold is two days.
+
+The product rule is cross-platform parity: a user-facing phone feature or behaviour change is implemented on both iOS and Android in the same development cycle unless a documented platform-specific reason prevents it. Build and runtime-test status are tracked independently for each platform.
+
+### iOS
+
+The iPhone client is SwiftUI, iOS 17+, iPhone only. It provides Map, Stations, Favourites, Report, Settings and Help. It uses the public HTTPS server by default and supports LAN diagnostics. Map/Home behaviour does not request device location.
+
+### Android
+
+The Android client is native Kotlin/Jetpack Compose, API 26 minimum, and provides the same six functional areas. It uses osmdroid for its native map and the same public HTTPS server by default.
+
+## Station detail contract
+
+Station Detail presents the effective status icon and a plain-language explanation, station identity/software, location, system, time and radio telemetry, using `Not reported` for absent optional telemetry. The latest station record has an absolute local date/time while observation ages remain relative.
+
+Uptime, supply voltage and frequency correction are deliberately omitted from the displayed detail schema because the live feed does not populate them reliably. Compatibility fields may remain in the API/client model. RF correction is a separate field and remains displayed.
+
+When coordinates exist, Station Detail provides a Google Maps link requesting satellite imagery, zoom 18 and a pin/query at the exact station latitude/longitude.
+
+## Health presentation
+
+Server health values are Healthy, Warning, No recent heartbeat and Unknown. Clients additionally derive Inactive from the configured age threshold. A Healthy station reporting an older PilotAware version may be presented as Healthy — back-level software without changing its operational health state.
+
+Missing optional technical telemetry by itself is not treated as a station failure.
+
+## Resilience roadmap
+
+The current Phase 1 deployment has health/readiness checks, authenticated ingestion, bounded logging, graceful restart behaviour, production WSGI serving and stale/future-packet protection. Next resilience work includes automated SQLite backup/recovery, then PostgreSQL migration before stateless API replication/load balancing.
+
+Two replicas on the same Synology would protect only against an individual process/container failure; they would not protect against NAS, router, broadband, power or site failure.

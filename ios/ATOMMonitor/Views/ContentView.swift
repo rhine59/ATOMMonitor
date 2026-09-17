@@ -1,74 +1,104 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var store: StationStore
-    @AppStorage("homeStationID") private var homeStationID = ""
-    @AppStorage("favouriteStationIDs") private var favouriteStationIDs = ""
-    @AppStorage("stationRefreshMinutes") private var stationRefreshMinutes = 5
-    @AppStorage("inactiveAfterDays") private var inactiveAfterDays = 2
-    @State private var showingHomeStationAdvice = false
-
-    init(repository: any StationRepository) { _store = StateObject(wrappedValue: StationStore(repository: repository)) }
+    @StateObject private var store = StationStore()
 
     var body: some View {
         TabView {
-            StationMapView(store: store, homeStationID: homeStationID, favouriteStationIDs: $favouriteStationIDs).tabItem { Label("Map", systemImage: "map.fill") }
-            NavigationStack { StationListView(store: store, favouriteStationIDs: $favouriteStationIDs).navigationTitle("Stations").navigationBarTitleDisplayMode(.inline) }.tabItem { Label("Stations", systemImage: "list.bullet") }
-            NavigationStack { FavouritesView(store: store, favouriteStationIDs: favouriteStationIDs).navigationTitle("Favourites").navigationBarTitleDisplayMode(.inline) }.tabItem { Label("Favourites", systemImage: "star.fill") }
-            NavigationStack { ReportView(store: store) }.tabItem { Label("Report", systemImage: "chart.bar.doc.horizontal") }
-            NavigationStack { SettingsView(store: store, homeStationID: $homeStationID, favouriteStationIDs: $favouriteStationIDs, stationRefreshMinutes: $stationRefreshMinutes, inactiveAfterDays: $inactiveAfterDays).navigationTitle("Settings").navigationBarTitleDisplayMode(.inline) }.tabItem { Label("Settings", systemImage: "gearshape.fill") }
-            NavigationStack { HelpView().navigationTitle("Help").navigationBarTitleDisplayMode(.inline) }.tabItem { Label("Help", systemImage: "questionmark.circle.fill") }
+            NavigationStack { StationMapView(store: store) }
+                .tabItem { Label("Map", systemImage: "map") }
+
+            NavigationStack { StationListView(store: store) }
+                .tabItem { Label("Stations", systemImage: "list.bullet") }
+
+            NavigationStack { FavouritesView(store: store) }
+                .tabItem { Label("Favourites", systemImage: "star") }
+
+            NavigationStack { ReportView(store: store) }
+                .tabItem { Label("Report", systemImage: "chart.bar") }
+
+            NavigationStack { SettingsView(store: store) }
+                .tabItem { Label("Settings", systemImage: "gearshape") }
+
+            NavigationStack { HelpView() }
+                .tabItem { Label("Help", systemImage: "questionmark.circle") }
         }
-        .onAppear { if homeStationID.isEmpty && !ProcessInfo.processInfo.arguments.contains("--demo-mode") { showingHomeStationAdvice = true } }
-        .alert("Set a Home Station", isPresented: $showingHomeStationAdvice) { Button("OK") {} } message: { Text("Set your Home station in Settings. When filters are applied, the Map will automatically focus on the nearest matching station to your Home station. Without a Home station, filtered results use the UK map view.") }
-        .onChange(of:inactiveAfterDays){_,_ in store.inactiveThresholdChanged()}
-        .task(id: stationRefreshMinutes) { await store.load(); while !Task.isCancelled { let minutes=min(max(stationRefreshMinutes,1),10);do{try await Task.sleep(for:.seconds(Double(minutes*60)))}catch{return};guard !Task.isCancelled else{return};await store.load()} }
+        .task { await store.start() }
     }
 }
 
 private struct FavouritesView: View {
-    @ObservedObject var store: StationStore; let favouriteStationIDs: String
-    private var ids:Set<String>{Set(favouriteStationIDs.split(separator:",").map(String.init))}
-    private var favourites:[ATOMStation]{store.stations.filter{ids.contains($0.id)}.sorted{$0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending}}
-    var body:some View{Group{if favourites.isEmpty{ContentUnavailableView("No Favourite Stations",systemImage:"star",description:Text("Add favourites from Map or Stations."))}else{List(favourites){station in let health=store.displayHealth(for:station);NavigationLink{StationDetailView(station:station,displayHealth:health,isBackLevelSoftware:store.isBackLevelSoftware(station))}label:{VStack(alignment:.leading,spacing:7){HStack{Text(station.name).font(.headline);Spacer();Label(health.title,systemImage:health.symbol).font(.caption.weight(.semibold)).foregroundStyle(colour(health))};Text(station.lastHeartbeat.map{"Last heartbeat: \($0.formatted(date:.abbreviated,time:.standard))"} ?? "Last heartbeat: Not reported").font(.caption).foregroundStyle(.secondary);Text(location(station)).font(.caption2).foregroundStyle(.secondary)}}}}}}
-    private func location(_ s:ATOMStation)->String{guard let a=s.latitude,let o=s.longitude else{return "Location: Not reported"};return String(format:"%.4f°, %.4f°",a,o)}
-    private func colour(_ h:StationHealth)->Color{switch h{case .healthy:return .green;case .warning:return .orange;case .noRecentHeartbeat:return .blue;case .inactive:return .red;case .unknown:return .gray}}
-}
+    @ObservedObject var store: StationStore
 
-private struct SettingsView: View {
-    @ObservedObject var store: StationStore;@Binding var homeStationID:String;@Binding var favouriteStationIDs:String;@Binding var stationRefreshMinutes:Int;@Binding var inactiveAfterDays:Int
-    @AppStorage(ServerConfiguration.key) private var savedServerURL = ""
-    @AppStorage(MapIconColourPreferences.healthyKey) private var healthyColour = MapIconColour.green.rawValue
-    @AppStorage(MapIconColourPreferences.backLevelKey) private var backLevelColour = MapIconColour.purple.rawValue
-    @AppStorage(MapIconColourPreferences.noRecentHeartbeatKey) private var noRecentHeartbeatColour = MapIconColour.blue.rawValue
-    @AppStorage(MapIconColourPreferences.inactiveKey) private var inactiveColour = MapIconColour.red.rawValue
-    @AppStorage(MapIconColourPreferences.warningKey) private var warningColour = MapIconColour.orange.rawValue
-    @AppStorage(MapIconColourPreferences.unknownKey) private var unknownColour = MapIconColour.gray.rawValue
-    @State private var serverURL=ServerConfiguration.configuredURLString;@State private var isTesting=false;@State private var connectionMessage:String?;@State private var connectionSucceeded=false
-    private var ids:Set<String>{Set(favouriteStationIDs.split(separator:",").map(String.init))};private var sortedStations:[ATOMStation]{store.stations.sorted{$0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending}};private var favourites:[ATOMStation]{sortedStations.filter{ids.contains($0.id)}}
-    var body:some View{Form{
-        Section("Server"){TextField("https://atom.example.net/",text:$serverURL).textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL);HStack{Button("Save"){saveServer()};Spacer();Button{Task{await testServer()}}label:{if isTesting{ProgressView()}else{Label("Test Connection",systemImage:"network")}}};if let m=connectionMessage{Label(m,systemImage:connectionSucceeded ? "checkmark.circle.fill":"xmark.circle.fill").foregroundStyle(connectionSucceeded ? .green:.red).font(.footnote)}}
-        Section("Data refresh"){Stepper(value:$stationRefreshMinutes,in:1...10){HStack{Text("Refresh interval");Spacer();Text("\(stationRefreshMinutes) min").foregroundStyle(.secondary)}};Text("Default 5 minutes. Station data is fetched at startup and while the app is active.").font(.footnote).foregroundStyle(.secondary)}
-        Section("Station status"){Stepper(value:$inactiveAfterDays,in:1...30){HStack{Text("Inactive after");Spacer();Text("\(inactiveAfterDays) day\(inactiveAfterDays == 1 ? "":"s")").foregroundStyle(.secondary)}};Text("A station whose latest record has not been seen for this many days is shown as Inactive. Default: 2 days.").font(.footnote).foregroundStyle(.secondary)}
-        Section("Map icon colours"){
-            colourPicker("Healthy",selection:$healthyColour)
-            colourPicker("Back-level software",selection:$backLevelColour)
-            colourPicker("No recent heartbeat",selection:$noRecentHeartbeatColour)
-            colourPicker("Inactive",selection:$inactiveColour)
-            colourPicker("Warning",selection:$warningColour)
-            colourPicker("Unknown",selection:$unknownColour)
-            Button("Restore default colours"){restoreColours()}
-            Text("Defaults: Healthy green, Back-level software purple, No recent heartbeat blue, Inactive red, Warning orange and Unknown grey.").font(.footnote).foregroundStyle(.secondary)
+    var body: some View {
+        List {
+            if store.favouriteStations.isEmpty {
+                ContentUnavailableView("No Favourites", systemImage: "star", description: Text("Mark a ground station as a favourite from Station Detail."))
+            } else {
+                ForEach(store.favouriteStations) { station in
+                    NavigationLink {
+                        StationDetailView(
+                            station: station,
+                            displayHealth: store.displayHealth(for: station),
+                            isBackLevelSoftware: store.isBackLevelSoftware(station)
+                        )
+                    } label: {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(station.name).font(.headline)
+                            Text("\(store.displayHealth(for: station).title) • \(station.pilotAwareVersion ?? "Version not reported")")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
         }
-        Section("Map"){Picker("Home station",selection:$homeStationID){Text("Default UK view").tag("");ForEach(sortedStations.filter{$0.coordinate != nil}){Text($0.name).tag($0.id)}};Text("Home station is used as the reference point when filters are applied: the Map focuses on the nearest matching station. Without one, filtered results use the UK view.").font(.footnote).foregroundStyle(.secondary)}
-        Section("Favourite stations"){if favourites.isEmpty{Text("No favourites selected.").foregroundStyle(.secondary)}else{ForEach(favourites){s in HStack{Text(s.name);Spacer();Button(role:.destructive){remove(s.id)}label:{Image(systemName:"minus.circle.fill")}.buttonStyle(.borderless)}}}}
-    }}
-    private func colourPicker(_ title:String,selection:Binding<String>)->some View{Picker(title,selection:selection){ForEach(MapIconColour.allCases){c in HStack{Circle().fill(c.color).frame(width:12,height:12);Text(c.title)}.tag(c.rawValue)}}}
-    private func restoreColours(){healthyColour=MapIconColour.green.rawValue;backLevelColour=MapIconColour.purple.rawValue;noRecentHeartbeatColour=MapIconColour.blue.rawValue;inactiveColour=MapIconColour.red.rawValue;warningColour=MapIconColour.orange.rawValue;unknownColour=MapIconColour.gray.rawValue}
-    private func saveServer(){do{let url=try ServerConfiguration.normalizedURL(from:serverURL);serverURL=url.absoluteString;savedServerURL=url.absoluteString;connectionMessage="Saved. Reloading stations…";connectionSucceeded=true;Task{await store.load()}}catch{connectionMessage=error.localizedDescription;connectionSucceeded=false}}
-    private func testServer() async{isTesting=true;defer{isTesting=false};do{let r=try await APIStationRepository.testConnection(to:serverURL);let status=r.status.uppercased();connectionMessage=r.confirmedStations.map{"\(status) — \($0) stations"} ?? "\(status) — station count not reported";connectionSucceeded=true}catch{connectionMessage=error.localizedDescription;connectionSucceeded=false}}
-    private func remove(_ id:String){var u=ids;u.remove(id);favouriteStationIDs=u.sorted().joined(separator:",")}
+        .navigationTitle("Favourites")
+    }
 }
 
-private struct HelpView:View{var body:some View{List{Section{NavigationLink{UserGuideView()}label:{Label("User Guide",systemImage:"book.fill")}};Section("About"){Text("ATOM Monitor displays the operational health and technical status of PilotAware ATOM ground stations. It does not display or record aircraft movements.")}}}}
-private struct UserGuideView:View{var body:some View{ScrollView{VStack(alignment:.leading,spacing:18){guideSection("What ATOM Monitor does","ATOM Monitor monitors PilotAware ATOM ground-station operational health only. It does not display, record or retain aircraft movements, tracks or aircraft identities.");guideSection("Map","Set a Home station in Settings. When Status or PilotAware version filters are applied, Map focuses on the matching station nearest to Home. If no Home station is configured, filtered results return to the UK map view. Map icon colours are configurable in Settings. Defaults are Healthy green, Back-level software purple, No recent heartbeat blue, Inactive red, Warning orange and Unknown grey. Clusters separate as the map is zoomed.");guideSection("Filters","Map and Stations share Status and PilotAware version filters. Status includes Inactive when inactive stations exist. Version choices come from values already collected. Find combines with these filters.");guideSection("Report","The Report tab summarises the current station dataset with counts by operational status and PilotAware software version. Share report creates a formatted HTML report and a CSV containing the station-level data used for the report, then opens the standard iPhone share sheet so the files can be sent using Mail, Messages, AirDrop, Files or other available services.");guideSection("Inactive stations","Settings contains Inactive after, default 2 days. If a station's latest lastSeen record is at least that old it is displayed as Inactive, overriding its live server health for presentation/filtering. Change the threshold from 1 to 30 days.");guideSection("Station details","Station Detail shows the same effective status icon and configured colour used on the Map, together with an explanation of what that icon means. Record date & time shows the exact local date/time of the latest station record; other observation ages remain relative. The Location section can open the reported station coordinates in Google Earth satellite view. Fields not supplied by the live station feed are omitted from the display where appropriate; other missing values display Not reported.");guideSection("Cached data","The latest successful station snapshot remains visible after a connection failure. It is not a history database and contains no aircraft data.");guideSection("Privacy","Aircraft traffic is outside ATOM Monitor's scope.")}.padding()}.navigationTitle("User Guide").navigationBarTitleDisplayMode(.inline)};private func guideSection(_ t:String,_ x:String)->some View{VStack(alignment:.leading,spacing:6){Text(t).font(.headline);Text(x).foregroundStyle(.secondary)}}}
+private struct HelpView: View {
+    var body: some View {
+        List {
+            Section("What ATOM Monitor does") {
+                Text("ATOM Monitor monitors the operational health and technical status of PilotAware ATOM ground stations. It does not display or record aircraft movements, tracks or aircraft identities.")
+            }
+
+            Section("Map and Stations") {
+                Text("Map and Stations use the same station dataset and the same Status and PilotAware-version filters. Find searches station names. An empty filter means all values are included.")
+                Text("The Map Home control centres on the configured Home ATOM station. Device location is not required. With filters active, the map focuses on the matching station nearest Home; if Home is not configured it falls back to the UK view.")
+                Text("The status line shows the last successful update and station count. If the network is unavailable, the most recent cached station data remains available and No Network is shown.")
+            }
+
+            Section("Station status") {
+                Text("Healthy means a recent PilotAware heartbeat has been received with no current operational warning. Warning means the station is reporting but its heartbeat is becoming stale or telemetry indicates a warning. No recent heartbeat means the recent-heartbeat threshold has been exceeded. Unknown means there is insufficient recent information.")
+                Text("Inactive is derived on the phone when the latest station record is at least the configured Inactive-after age. The default is 2 days.")
+                Text("A Healthy station may also be shown as back-level software when its reported PilotAware version is older than the newest version currently seen. This does not change its operational health state.")
+            }
+
+            Section("Station details") {
+                Text("Station Detail repeats the effective map/status icon in its configured colour and explains what the icon means. It shows an absolute local Record date & time and relative ages for heartbeat, seen, position and technical reports.")
+                Text("Available station, location, system, time and radio telemetry is shown; missing optional values appear as Not reported. Uptime, supply voltage and frequency correction are deliberately not displayed because the live station feed does not populate them reliably. RF correction is a separate radio field and remains available when reported.")
+                Text("When station coordinates are available, View satellite location in Google Maps opens the exact latitude/longitude with a map pin and requests satellite imagery at zoom 18.")
+            }
+
+            Section("Favourites") {
+                Text("Favourite ground stations are stored locally and remain available between launches. Open a station and use the star control to add or remove it.")
+            }
+
+            Section("Report") {
+                Text("Report summarises the current station dataset by operational status and PilotAware software version. Share creates a formatted HTML report with responsive bar graphs plus a station-level CSV attachment and opens the iPhone share sheet.")
+            }
+
+            Section("Settings") {
+                Text("The production service uses the configured HTTPS server. Test Connection checks server/database readiness and reports the confirmed station count. Refresh interval is configurable from 1 to 10 minutes and automatic refresh runs while the app is in the foreground.")
+                Text("Inactive after is configurable from 1 to 30 days. Map layer and map/status colours are stored locally.")
+            }
+
+            Section("Privacy and scope") {
+                Text("ATOM Monitor stores ground-station status, preferences, favourites and a station cache. It does not request device location for Home behaviour and must not be used to display or retain aircraft movements or aircraft identities.")
+            }
+        }
+        .navigationTitle("User Guide")
+    }
+}

@@ -68,7 +68,7 @@ Do not create a separate Android project in Android Studio. Open this existing d
 
 ## 4. Open the project in Android Studio
 
-Start Android Studio and choose **Open**. Select:
+Start Android Studio and choose **Open**. Select the `android` directory itself, not `app` and not the top-level `ATOMMonitor` directory:
 
 ```text
 ~/Documents/Xcode/ATOMMonitor/android
@@ -76,9 +76,13 @@ Start Android Studio and choose **Open**. Select:
 
 Android Studio should recognise `settings.gradle.kts` and import the Gradle project. The root project is named `ATOMMonitorAndroid` and includes the `:app` module.
 
-Allow Gradle Sync to complete. The first sync can take several minutes because Android/Compose/osmdroid dependencies must be downloaded.
+Allow **Gradle project sync** to finish before attempting to create or run a device. During sync the toolbar may initially show **Add Configuration** and a disabled Run button. After a successful sync the toolbar should show the **app** run configuration and an active Run button. Do not accept suggested Gradle/plugin upgrades merely because Android Studio offers them; this repository already has a verified toolchain.
 
 If Android Studio asks which JDK to use, select a Java 17-compatible JDK/JBR.
+
+The Android Studio Assistant panel is not required to build or test ATOM Monitor. An **Error loading assistant panel** message can be ignored if Gradle sync and the Android project itself are otherwise healthy.
+
+Android Studio may also offer to add IDE project settings to Git. Do not automatically add `.idea` or other local IDE state; these are not part of the application build checkpoint unless deliberately reviewed and approved.
 
 ## 5. Gradle wrapper
 
@@ -182,17 +186,46 @@ or:
 
 Do not commit the generated `build/` directories or debug APK to Git. Commit source, wrapper/toolchain files, documentation and relevant build/test evidence instead.
 
-## 9. Create an Android emulator
+## 9. Create the standard Android emulator
 
-In Android Studio open **Tools → Device Manager** and choose **Create Virtual Device**.
+The standard ATOM Monitor Android regression emulator established on 17 September 2026 is a **Pixel 10a** using the **API 37.2 “CinnamonBun”, Android 17.0, Google Play, ARM64-v8a, 16 KB page-size** system image. On the Apple-silicon development Mac this is the appropriate ARM image. The Pixel 10a profile is 1080 × 2424 at 420 dpi.
 
-A Pixel phone profile is a sensible first test target. Select an Android system image compatible with the project's API 37 toolchain, download it if required, complete the virtual-device wizard and start the emulator.
+Use the following procedure after the project has completed Gradle sync:
 
-When the emulator has fully booted, select it in Android Studio's device selector and press **Run** for the `app` configuration.
+1. Look at the device selector in the Android Studio toolbar. On a new installation it may say **No Devices**. Its dropdown can show physical-device options such as **Pair Devices Using Wi-Fi** and **Troubleshoot Device Connections**; those options do not create an emulator.
+2. Open **Tools → Device Manager** from the Android Studio/macOS menu bar. If the Device Manager has no entries, click **Add a new device…** near the bottom or the **+** button at the top.
+3. Choose **Create Virtual Device** if Android Studio presents a choice of device types.
+4. Under the **Phone** hardware profiles select **Pixel 10a**. Do not select the experimental resizable profile for the standard regression device.
+5. Click **Next**.
+6. In **Configure virtual device**, leave the name as `Pixel 10a` unless there is a reason to distinguish multiple test images.
+7. Select the API 37 system image. The verified configuration is:
 
-Android Studio will build, install and launch ATOM Monitor automatically.
+```text
+API: API 37.2 "CinnamonBun", Android 17.0
+Services: Google Play Store
+System image: 16 KB Page Size Google Play ARM 64 v8a System Image
+ABI: arm64-v8a
+```
+
+8. If the image is not already installed, Android Studio will download it. At the initial setup this download was approximately 2.2 GB.
+9. Click **Finish** and allow Android Studio to complete the image download and virtual-device creation.
+10. When creation completes, `Pixel 10a` should appear both in Device Manager and in the toolbar device selector.
+
+### Boot the emulator before installing ATOM Monitor
+
+For the first runtime test, boot Android separately before asking Android Studio to install the app. This distinguishes emulator/platform startup problems from ATOM Monitor application problems.
+
+1. Do **not** initially press the main green Run triangle beside the `app` configuration.
+2. Open **Tools → Device Manager**.
+3. Locate **Pixel 10a**.
+4. Click its launch/play control.
+5. Wait for the emulator to reach the normal Android lock/home screen. The first boot may take a minute or two.
+6. Once Android itself is fully booted, return to Android Studio, ensure **Pixel 10a** is selected as the target device and **app** is selected as the run configuration.
+7. Press the main green **Run** triangle to build/install/launch ATOM Monitor.
 
 The emulator needs Internet connectivity because the normal ATOM service is the public HTTPS endpoint.
+
+If the toolbar continues to show **No Devices** after the AVD has been created, return to Device Manager and confirm the Pixel 10a exists and can boot independently before troubleshooting the application.
 
 ## 10. Install on a physical Android phone from Android Studio
 

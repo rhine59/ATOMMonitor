@@ -137,7 +137,15 @@ The Gradle wrapper has now been generated and verified locally, including the wr
 
 ### Android build checkpoint — 17 September 2026
 
-The first confirmed Android debug APK build passed using API 37, Android Gradle Plugin 9.4.0, Gradle 9.6.0 and Java 17. The generated APK was approximately 16 MB. Build evidence is retained in `artifacts/ATOMMonitor-Android-build.log` and `artifacts/ATOMMonitor-Android-kotlin-build.log`. This proves compilation and APK packaging; Android runtime/regression testing remains pending.
+The first confirmed Android debug APK build passed using API 37, Android Gradle Plugin 9.4.0, Gradle 9.6.0 and Java 17. The generated APK was approximately 16 MB. Build evidence is retained in `artifacts/ATOMMonitor-Android-build.log` and `artifacts/ATOMMonitor-Android-kotlin-build.log`.
+
+### Android runtime networking checkpoint — 17 September 2026
+
+The Android client was run in Android Studio on a Pixel 10a emulator using Android 17 / API 37.2. The emulator browser independently reached the public `/ready` and `/api/v1/stations` endpoints successfully. Initial app refresh failed with `android.os.NetworkOnMainThreadException`; Logcat traced the exception to `StationVM.refresh()` because synchronous `HttpURLConnection` work was running on the main/UI coroutine dispatcher.
+
+Commit `b472821` fixes the refresh by moving blocking HTTP work into `withContext(Dispatchers.IO)` while retaining Compose state updates on the main thread. The same change preserves detailed exception logging for future refresh failures. `./gradlew assembleDebug` passed after the change. The rebuilt app then loaded the live public station dataset successfully: 305 stations were shown and map markers rendered. The count is runtime evidence, not a hard-coded expected value.
+
+This passes Android public-server connectivity, live station retrieval, JSON parsing, station count presentation and basic map-data rendering. It does not by itself pass the complete Android regression suite: Station Detail interactions, report/share, favourites, filtering, settings behaviour, cache/no-network behaviour, Google Maps intent and the outstanding parity items still require their own runtime checks.
 
 Android runtime regression should cover the same six product areas as iPhone and the same Station Detail information contract. In particular verify the new Android detail icon/explanation, telemetry sections, omitted unused fields, and Google Maps satellite/pin intent.
 
@@ -164,4 +172,4 @@ Simulator recordings/logs that are final evidence may be tracked. Raw intermedia
 
 ## Current evidence
 
-Phase 1 Synology resilience/security evidence is recorded in `docs/PHASE1-TEST-EVIDENCE-2026-09-17.md`. The feature register is the authoritative current status source; historical checkpoint documents are snapshots and should not be interpreted as overriding it.
+Phase 1 Synology resilience/security evidence is recorded in `docs/PHASE1-TEST-EVIDENCE-2026-09-17.md`. The Android public-server runtime networking checkpoint is recorded above. The feature register is the authoritative current status source; historical checkpoint documents are snapshots and should not be interpreted as overriding it.

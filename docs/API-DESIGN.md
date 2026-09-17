@@ -1,54 +1,77 @@
-# REST API Design
+# ATOM Monitor — API Design
 
-Draft interface between the Synology-hosted service and the iPhone app.
+Last updated: 17 September 2026
 
-## Principles
+The API exists solely to support PilotAware ATOM ground-station operational-health monitoring. Aircraft movements, aircraft identities, tracks and aircraft packet history are outside the API and persistence model.
 
-- HTTPS JSON.
-- iPhone does not parse APRS.
-- Map request is compact and fast.
-- Detailed/history data is fetched on demand.
-- API distinguishes observed fields from derived health state.
+## Base addresses
 
-## Candidate endpoints
+Production phone clients default to:
+
+`https://granvillehouse.synology.me:8445/`
+
+Trusted LAN diagnostics may use the Synology host on port 8088. Port 8088 must not be Internet-exposed.
+
+## Read endpoints
+
+### `GET /health`
+
+Cheap process-liveness probe. It deliberately has no database dependency.
+
+Typical response:
+
+```json
+{"status":"ok","service":"atommonitor-api"}
+```
+
+### `GET /ready`
+
+Database-backed readiness probe. It opens the database, executes a simple query and reports the number of confirmed PilotAware stations. HTTP 200 means ready; database/readiness failure returns HTTP 503.
+
+Typical response shape:
+
+```json
+{"status":"ready","service":"atommonitor-api","database":"ok","confirmedStations":305}
+```
+
+The count is live data and must not be hard-coded by clients or documentation tests.
 
 ### `GET /api/v1/stations`
 
-Returns enough data for the map and search.
+Returns the current persistent station registry used by iOS and Android. Optional telemetry may be null/missing and clients display `Not reported` rather than inventing values.
 
-```json
-[
-  {
-    "id": "PWMalham",
-    "name": "PWMalham",
-    "latitude": 54.002,
-    "longitude": -2.142,
-    "altitude_m": 147,
-    "health": "healthy",
-    "health_reason": null,
-    "last_heartbeat_at": "2026-09-15T18:30:00Z"
-  }
-]
-```
+Important station fields include identity/name, latitude/longitude/altitude, server health, observation timestamps, PilotAware/receiver software versions, CPU/RAM/temperature, NTP offset/correction, RF correction and signal quality.
 
-Values above are illustrative; live values must come from the server.
+Compatibility fields such as uptime, supply voltage and frequency correction can remain in the wire/model schema even though current phone Station Detail views deliberately do not display them.
 
-### `GET /api/v1/stations/{id}`
+## Observation ingestion
 
-Returns full current details including optional system/time/RF telemetry.
+### `POST /api/v1/observations`
 
-### `GET /api/v1/stations/{id}/history?range=24h`
+Private collector write endpoint. It requires:
 
-Returns time-series observations suitable for charting. Candidate ranges: `24h`, `7d`, `30d`.
+`Authorization: Bearer <ATOM_INGEST_TOKEN>`
 
-### `GET /api/v1/health`
+The shared token is supplied to the collector and API through the local `server/.env`, which is ignored by Git. Never commit or document the token value.
 
-Service health, upstream OGN connection state, last upstream message/status observation and database connectivity. This is important so the iPhone can distinguish `the collector cannot see OGN` from `a particular ATOM has stopped reporting`.
+Unauthenticated or incorrect-token writes return HTTP 401 before parsing/upsert. Accepted station observations return HTTP 202. Invalid observations, including implausible future packet timestamps, return HTTP 400.
 
-## Versioning
+## Ordering and timestamp rules
 
-Start at `/api/v1`. Avoid exposing database structure directly so server persistence can evolve independently of the iOS app.
+Observation ordering is category-specific:
 
-## Caching
+- position -> `lastPosition`
+- technical status -> `lastTechnicalStatus`
+- PilotAware heartbeat -> `lastHeartbeat`
 
-Station map data can use conditional requests/ETags or a short cache interval. Historical series can be cached more aggressively than latest health.
+An incoming observation older than the already stored timestamp for its category is accepted as stale/no-op rather than replacing newer category state. Categories are independent, so a new heartbeat does not prevent a valid position update and vice versa.
+
+If an explicit packet timestamp is malformed, or is more than five minutes later than its receive timestamp, the observation is rejected. If packet time is absent, receive time is used. This protects persistent state from faulty remote clocks.
+
+## Client health semantics
+
+The server supplies the base health state. Phone clients may additionally derive `Inactive` when `lastSeen` is at least the configured Inactive-after age (default two days). Therefore consumers should not assume the server health string is the complete presentation state.
+
+## Security boundary
+
+Public HTTPS GET access is intentional for station-health information. Observation ingestion is authenticated. The collector is station-only and the API must never grow aircraft-position/identity endpoints as part of ATOM Monitor.

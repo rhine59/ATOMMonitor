@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -25,7 +26,9 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.osmdroid.config.Configuration
@@ -275,6 +278,7 @@ class StationVM(app: Application) : AndroidViewModel(app) {
             refreshing = true
 
             runCatching {
+                val response = withContext(Dispatchers.IO) {
                 val base = server.trim().let {
                     if (it.endsWith('/')) it else "$it/"
                 }
@@ -291,10 +295,10 @@ class StationVM(app: Application) : AndroidViewModel(app) {
                     error("HTTP ${connection.responseCode}")
                 }
 
-                val response =
-                    connection.inputStream
-                        .bufferedReader()
-                        .use { it.readText() }
+                connection.inputStream
+                    .bufferedReader()
+                    .use { it.readText() }
+                }
 
                 stations = JSONArray(response).stations()
 
@@ -308,7 +312,8 @@ class StationVM(app: Application) : AndroidViewModel(app) {
                 lastUpdated = Instant.now()
                 error = null
             }.onFailure {
-                error = it.message ?: "No Network"
+                Log.e("ATOMMonitor", "Station refresh failed", it)
+                error = "${it::class.simpleName}: ${it.message ?: "No message"}"
             }
 
             refreshing = false

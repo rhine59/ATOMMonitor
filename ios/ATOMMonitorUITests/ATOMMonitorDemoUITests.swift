@@ -33,7 +33,7 @@ final class ATOMMonitorDemoUITests: XCTestCase {
 
         step("Stations: searchable station registry, manual refresh and pull-to-refresh")
         app.tabBars.buttons["Stations"].tap()
-        XCTAssertTrue(app.navigationBars["ATOM Stations"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.navigationBars["Stations"].waitForExistence(timeout: 3))
         let listRefresh = app.buttons["Refresh stations"].firstMatch
         XCTAssertTrue(listRefresh.waitForExistence(timeout: 2))
         listRefresh.tap(); sleep(2)
@@ -57,6 +57,14 @@ final class ATOMMonitorDemoUITests: XCTestCase {
 
         step("Favourites: selected ground stations")
         app.tabBars.buttons["Favourites"].tap(); sleep(2)
+
+        step("Report: station status and PilotAware-version summary")
+        app.tabBars.buttons["Report"].tap(); sleep(2)
+        XCTAssertTrue(app.navigationBars["Report"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Total stations"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["Status"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["PilotAware versions"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.buttons["Share report"].waitForExistence(timeout: 2))
 
         step("Settings: set a home station and verify the Map home button")
         app.tabBars.buttons["Settings"].tap(); sleep(2)

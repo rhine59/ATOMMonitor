@@ -90,6 +90,10 @@ open ATOMMonitor.xcodeproj
 
 Build in Xcode and install on the iPhone. The verified normal remote service is `https://granvillehouse.synology.me:8445/`. Until the compiled default is changed and regression-tested, Settings can be used to configure/test that endpoint. The LAN address `http://192.168.1.99:8088/` is retained as a diagnostic route only.
 
+### Build checkpoints
+
+**17 September 2026 — current iOS source:** user confirmed the build run was good after the configurable map-icon colours, back-level PilotAware-version presentation, compact Stations headings/station-count status line, connection-test station count, and yellow No-recent-heartbeat aggregate changes were committed. This advances the affected iOS features to **Build passed — runtime test pending**. It does not by itself prove map colour/cluster behaviour, Settings persistence, network behaviour or other runtime acceptance checks.
+
 ### Automated Simulator feature tour
 
 From the repository root:
@@ -114,18 +118,21 @@ ATOM_DERIVED_DATA="$HOME/Library/Developer/Xcode/DerivedData/ATOMMonitor-Demo" .
 
 1. Configure/test `https://granvillehouse.synology.me:8445/`; for a true external-path test disable Wi-Fi and use cellular data.
 2. Launch ATOM Monitor and confirm Stations loads server-provided stations rather than fixture data.
-3. Confirm stations with coordinates appear on Map and clustering works.
-4. Confirm Map manual refresh works and Last updated advances only after a successful snapshot.
-5. Exercise Standard, Satellite + Labels and Satellite map layers.
-6. With no home station configured, tap Home and confirm `No home station set`; then configure a home station and confirm Home returns the map to it.
-7. Open a station detail and confirm **Record date & time** displays an absolute local date/time for `lastSeen`; confirm Last heartbeat, Last seen, Last position and Last technical status remain relative-age values. For a missing timestamp, confirm `Not reported`.
-8. Add a station to Favourites from Map and from Stations.
-9. Disconnect the server/network temporarily and relaunch/refresh; the last station cache should remain available and Map should report `No Network` for the failed current request.
-10. Confirm favourite records remain available from the durable local favourites cache after a successful server refresh.
-11. Restore connectivity and verify fresh server data replaces the general cache.
-12. Remove a favourite in Settings and verify the preference is retained.
-13. Open Help → User Guide and verify the station timestamp behaviour is documented locally/offline.
-14. Confirm no aircraft movement/identity UI or data appears anywhere.
+3. Confirm stations with coordinates appear on Map and clustering works. Confirm individual defaults: Healthy green, Back-level software purple, No recent heartbeat blue, Inactive red, Warning orange and Unknown grey. Confirm an aggregate containing No recent heartbeat is yellow by default, and a Healthy + Inactive aggregate is yellow.
+4. In Settings → Map icon colours, change representative colours, return to Map and confirm the individual markers change; relaunch and confirm the choices persist; use Restore default colours and confirm the documented defaults return.
+5. Confirm Map manual refresh works and Last updated advances only after a successful snapshot, with the station count shown on the same status line.
+6. Confirm the Map and Stations headings read `Stations` rather than `ATOM Stations`.
+7. In Settings, run Test Connection and confirm a successful response shows `OK — <count> stations`.
+8. Exercise Standard, Satellite + Labels and Satellite map layers.
+9. With no home station configured, tap Home and confirm `No home station set`; then configure a home station and confirm Home returns the map to it.
+10. Open a station detail and confirm **Record date & time** displays an absolute local date/time for `lastSeen`; confirm Last heartbeat, Last seen, Last position and Last technical status remain relative-age values. For a missing timestamp, confirm `Not reported`.
+11. Add a station to Favourites from Map and from Stations.
+12. Disconnect the server/network temporarily and relaunch/refresh; the last station cache should remain available and Map should report `No Network` for the failed current request, including the cached station count.
+13. Confirm favourite records remain available from the durable local favourites cache after a successful server refresh.
+14. Restore connectivity and verify fresh server data replaces the general cache.
+15. Remove a favourite in Settings and verify the preference is retained.
+16. Open Help → User Guide and verify the current station status, timestamp and map-colour behaviour is documented locally/offline.
+17. Confirm no aircraft movement/identity UI or data appears anywhere.
 
 ## What constitutes an end-to-end pass
 

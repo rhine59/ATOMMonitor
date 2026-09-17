@@ -121,7 +121,7 @@ The Google Maps satellite/pin result must be checked on the physical device beca
 
 ## Android build
 
-The Android client is Kotlin/Jetpack Compose, minimum API 26. It uses the same public server and station-only scope.
+The Android client is Kotlin/Jetpack Compose, minimum API 26 and compile/target API 37. The verified build toolchain is Android Gradle Plugin 9.4.0, Gradle 9.6.0 and Java 17. It uses the same public server and station-only scope.
 
 ```bash
 cd ~/Documents/Xcode/ATOMMonitor/android
@@ -133,7 +133,11 @@ Expected debug APK location:
 
 `app/build/outputs/apk/debug/app-debug.apk`
 
-The Gradle wrapper JAR is binary and may require local provisioning if it is not present in Git; do not claim an Android build passed until Gradle actually completes successfully.
+The Gradle wrapper has now been generated and verified locally, including the wrapper JAR, and is maintained with the project for reproducible command-line builds.
+
+### Android build checkpoint — 17 September 2026
+
+The first confirmed Android debug APK build passed using API 37, Android Gradle Plugin 9.4.0, Gradle 9.6.0 and Java 17. The generated APK was approximately 16 MB. Build evidence is retained in `artifacts/ATOMMonitor-Android-build.log` and `artifacts/ATOMMonitor-Android-kotlin-build.log`. This proves compilation and APK packaging; Android runtime/regression testing remains pending.
 
 Android runtime regression should cover the same six product areas as iPhone and the same Station Detail information contract. In particular verify the new Android detail icon/explanation, telemetry sections, omitted unused fields, and Google Maps satellite/pin intent.
 

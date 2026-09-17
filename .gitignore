@@ -36,3 +36,9 @@ artifacts/*-raw*.mp4
 
 # Local secrets
 server/.env
+
+# Android local/build files
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties

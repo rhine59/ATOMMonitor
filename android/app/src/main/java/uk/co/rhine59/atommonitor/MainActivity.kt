@@ -43,34 +43,575 @@ import java.time.format.DateTimeFormatter
 
 private const val DEFAULT_SERVER = "https://granvillehouse.synology.me:8445/"
 
-data class Station(val id:String,val name:String,val latitude:Double?,val longitude:Double?,val altitudeMetres:Double?,val health:String,val lastPosition:Instant?,val lastHeartbeat:Instant?,val lastTechnicalStatus:Instant?,val pilotAwareVersion:String?,val softwareVersion:String?,val cpuLoadPercent:Double?,val ramUsedMB:Double?,val ramTotalMB:Double?,val cpuTemperatureC:Double?,val ntpOffsetMS:Double?,val ntpCorrectionPPM:Double?,val frequencyCorrectionKHz:Double?,val rfCorrectionPPM:Double?,val signalQualityDB:Double?,val voltageV:Double?,val uptimeMinutes:Int?,val lastSeen:Instant?)
+data class Station(
+    val id: String,
+    val name: String,
+    val latitude: Double?,
+    val longitude: Double?,
+    val altitudeMetres: Double?,
+    val health: String,
+    val lastPosition: Instant?,
+    val lastHeartbeat: Instant?,
+    val lastTechnicalStatus: Instant?,
+    val pilotAwareVersion: String?,
+    val softwareVersion: String?,
+    val cpuLoadPercent: Double?,
+    val ramUsedMB: Double?,
+    val ramTotalMB: Double?,
+    val cpuTemperatureC: Double?,
+    val ntpOffsetMS: Double?,
+    val ntpCorrectionPPM: Double?,
+    val frequencyCorrectionKHz: Double?,
+    val rfCorrectionPPM: Double?,
+    val signalQualityDB: Double?,
+    val voltageV: Double?,
+    val uptimeMinutes: Int?,
+    val lastSeen: Instant?
+)
 
-private fun JSONArray.stations():List<Station>=(0 until length()).map{i->val o=getJSONObject(i);fun d(k:String)=if(o.isNull(k))null else o.optDouble(k);fun s(k:String)=if(o.isNull(k))null else o.optString(k).takeIf{it.isNotBlank()};fun t(k:String)=s(k)?.let{runCatching{Instant.parse(it)}.getOrNull()};Station(o.getString("id"),o.optString("name",o.getString("id")),d("latitude"),d("longitude"),d("altitudeMetres"),o.optString("health","unknown"),t("lastPosition"),t("lastHeartbeat"),t("lastTechnicalStatus"),s("pilotAwareVersion"),s("softwareVersion"),d("cpuLoadPercent"),d("ramUsedMB"),d("ramTotalMB"),d("cpuTemperatureC"),d("ntpOffsetMS"),d("ntpCorrectionPPM"),d("frequencyCorrectionKHz"),d("rfCorrectionPPM"),d("signalQualityDB"),d("voltageV"),if(o.isNull("uptimeMinutes"))null else o.optInt("uptimeMinutes"),t("lastSeen"))}
+private fun JSONArray.stations(): List<Station> =
+    (0 until length()).map { index ->
+        val o = getJSONObject(index)
 
-class StationVM(app:Application):AndroidViewModel(app){
- private val prefs=app.getSharedPreferences("atom",Context.MODE_PRIVATE);var stations by mutableStateOf<List<Station>>(emptyList());private set;var error by mutableStateOf<String?>(null);private set;var refreshing by mutableStateOf(false);private set;var lastUpdated by mutableStateOf<Instant?>(null);private set;var selectedHealth by mutableStateOf<Set<String>>(emptySet());private set;var selectedVersions by mutableStateOf<Set<String>>(emptySet());private set
- var server:String get()=prefs.getString("server",DEFAULT_SERVER)?:DEFAULT_SERVER;set(v){prefs.edit().putString("server",v).apply()};var refreshMinutes:Int get()=prefs.getInt("refresh",5);set(v){prefs.edit().putInt("refresh",v).apply()};var home:String get()=prefs.getString("home","")?:"";set(v){prefs.edit().putString("home",v).apply()};var inactiveAfterDays:Int get()=prefs.getInt("inactiveDays",2).coerceIn(1,30);set(v){prefs.edit().putInt("inactiveDays",v.coerceIn(1,30)).apply()}
- fun displayHealth(s:Station,now:Instant=Instant.now()):String{val seen=s.lastSeen?:return s.health;return if(Duration.between(seen,now).toDays()>=inactiveAfterDays)"inactive" else s.health}
- fun favourites()=prefs.getStringSet("favourites",emptySet())?:emptySet();fun toggleFavourite(id:String){val x=favourites().toMutableSet();if(!x.add(id))x.remove(id);prefs.edit().putStringSet("favourites",x).apply()}
- val availableHealth get()=stations.map{displayHealth(it)}.distinct().sortedBy{healthOrder(it)};val availableVersions get()=stations.mapNotNull{it.pilotAwareVersion?.trim()?.takeIf(String::isNotEmpty)}.distinct().sorted();val hasFilters get()=selectedHealth.isNotEmpty()||selectedVersions.isNotEmpty()
- fun isBackLevel(s:Station):Boolean{val v=s.pilotAwareVersion?.trim()?.takeIf{it.isNotEmpty()}?:return false;val newest=stations.mapNotNull{it.pilotAwareVersion?.trim()?.takeIf(String::isNotEmpty)}.maxWithOrNull(::compareVersions)?:return false;return compareVersions(v,newest)<0}
- fun toggleHealth(v:String){selectedHealth=selectedHealth.toMutableSet().apply{if(!add(v))remove(v)}};fun toggleVersion(v:String){selectedVersions=selectedVersions.toMutableSet().apply{if(!add(v))remove(v)}};fun clearFilters(){selectedHealth=emptySet();selectedVersions=emptySet()};fun thresholdChanged(){selectedHealth=selectedHealth.intersect(availableHealth.toSet())}
- fun filtered(source:List<Station>=stations,query:String="")=source.filter{s->(query.isBlank()||s.name.contains(query,true))&&(selectedHealth.isEmpty()||displayHealth(s) in selectedHealth)&&(selectedVersions.isEmpty()||(s.pilotAwareVersion?.let{it in selectedVersions}==true))}
- private val cache=File(app.cacheDir,"atom-stations-cache.json");init{runCatching{stations=JSONArray(cache.readText()).stations()};refresh();viewModelScope.launch{while(true){delay(refreshMinutes.coerceIn(1,10)*60_000L);refresh()}}}
- fun refresh(){if(refreshing)return;viewModelScope.launch{refreshing=true;runCatching{val base=server.trim().let{if(it.endsWith('/'))it else "$it/"};val c=URI(base+"api/v1/stations").toURL().openConnection() as HttpURLConnection;c.connectTimeout=10000;c.readTimeout=12000;if(c.responseCode !in 200..299)error("HTTP ${c.responseCode}");val text=c.inputStream.bufferedReader().use{it.readText()};stations=JSONArray(text).stations();selectedHealth=selectedHealth.intersect(availableHealth.toSet());selectedVersions=selectedVersions.intersect(availableVersions.toSet());cache.writeText(text);lastUpdated=Instant.now();error=null}.onFailure{error=it.message?:"No Network"};refreshing=false}}
+        fun doubleValue(key: String): Double? =
+            if (o.isNull(key)) null else o.optDouble(key)
+
+        fun stringValue(key: String): String? =
+            if (o.isNull(key)) null
+            else o.optString(key).takeIf { it.isNotBlank() }
+
+        fun instantValue(key: String): Instant? =
+            stringValue(key)?.let {
+                runCatching { Instant.parse(it) }.getOrNull()
+            }
+
+        Station(
+            id = o.getString("id"),
+            name = o.optString("name", o.getString("id")),
+            latitude = doubleValue("latitude"),
+            longitude = doubleValue("longitude"),
+            altitudeMetres = doubleValue("altitudeMetres"),
+            health = o.optString("health", "unknown"),
+            lastPosition = instantValue("lastPosition"),
+            lastHeartbeat = instantValue("lastHeartbeat"),
+            lastTechnicalStatus = instantValue("lastTechnicalStatus"),
+            pilotAwareVersion = stringValue("pilotAwareVersion"),
+            softwareVersion = stringValue("softwareVersion"),
+            cpuLoadPercent = doubleValue("cpuLoadPercent"),
+            ramUsedMB = doubleValue("ramUsedMB"),
+            ramTotalMB = doubleValue("ramTotalMB"),
+            cpuTemperatureC = doubleValue("cpuTemperatureC"),
+            ntpOffsetMS = doubleValue("ntpOffsetMS"),
+            ntpCorrectionPPM = doubleValue("ntpCorrectionPPM"),
+            frequencyCorrectionKHz = doubleValue("frequencyCorrectionKHz"),
+            rfCorrectionPPM = doubleValue("rfCorrectionPPM"),
+            signalQualityDB = doubleValue("signalQualityDB"),
+            voltageV = doubleValue("voltageV"),
+            uptimeMinutes =
+                if (o.isNull("uptimeMinutes")) null
+                else o.optInt("uptimeMinutes"),
+            lastSeen = instantValue("lastSeen")
+        )
+    }
+
+class StationVM(app: Application) : AndroidViewModel(app) {
+    private val prefs =
+        app.getSharedPreferences("atom", Context.MODE_PRIVATE)
+
+    var stations by mutableStateOf<List<Station>>(emptyList())
+        private set
+    var error by mutableStateOf<String?>(null)
+        private set
+    var refreshing by mutableStateOf(false)
+        private set
+    var lastUpdated by mutableStateOf<Instant?>(null)
+        private set
+    var selectedHealth by mutableStateOf<Set<String>>(emptySet())
+        private set
+    var selectedVersions by mutableStateOf<Set<String>>(emptySet())
+        private set
+
+    var server: String
+        get() = prefs.getString("server", DEFAULT_SERVER) ?: DEFAULT_SERVER
+        set(value) { prefs.edit().putString("server", value).apply() }
+
+    var refreshMinutes: Int
+        get() = prefs.getInt("refresh", 5)
+        set(value) { prefs.edit().putInt("refresh", value).apply() }
+
+    var home: String
+        get() = prefs.getString("home", "") ?: ""
+        set(value) { prefs.edit().putString("home", value).apply() }
+
+    var inactiveAfterDays: Int
+        get() = prefs.getInt("inactiveDays", 2).coerceIn(1, 30)
+        set(value) {
+            prefs.edit().putInt(
+                "inactiveDays",
+                value.coerceIn(1, 30)
+            ).apply()
+        }
+
+    fun displayHealth(
+        station: Station,
+        now: Instant = Instant.now()
+    ): String {
+        val seen = station.lastSeen ?: return station.health
+        return if (
+            Duration.between(seen, now).toDays() >= inactiveAfterDays
+        ) "inactive" else station.health
+    }
+
+    fun favourites(): Set<String> =
+        prefs.getStringSet("favourites", emptySet()) ?: emptySet()
+
+    fun toggleFavourite(id: String) {
+        val values = favourites().toMutableSet()
+        if (!values.add(id)) values.remove(id)
+        prefs.edit().putStringSet("favourites", values).apply()
+    }
+
+    val availableHealth: List<String>
+        get() = stations
+            .map { displayHealth(it) }
+            .distinct()
+            .sortedBy { healthOrder(it) }
+
+    val availableVersions: List<String>
+        get() = stations
+            .mapNotNull {
+                it.pilotAwareVersion?.trim()
+                    ?.takeIf(String::isNotEmpty)
+            }
+            .distinct()
+            .sorted()
+
+    val hasFilters: Boolean
+        get() = selectedHealth.isNotEmpty() ||
+                selectedVersions.isNotEmpty()
+
+    fun isBackLevel(station: Station): Boolean {
+        val version = station.pilotAwareVersion
+            ?.trim()?.takeIf { it.isNotEmpty() }
+            ?: return false
+
+        val newest = stations
+            .mapNotNull {
+                it.pilotAwareVersion?.trim()
+                    ?.takeIf(String::isNotEmpty)
+            }
+            .maxWithOrNull(::compareVersions)
+            ?: return false
+
+        return compareVersions(version, newest) < 0
+    }
+
+    fun toggleHealth(value: String) {
+        selectedHealth = selectedHealth.toMutableSet().apply {
+            if (!add(value)) remove(value)
+        }
+    }
+
+    fun toggleVersion(value: String) {
+        selectedVersions = selectedVersions.toMutableSet().apply {
+            if (!add(value)) remove(value)
+        }
+    }
+
+    fun clearFilters() {
+        selectedHealth = emptySet()
+        selectedVersions = emptySet()
+    }
+
+    fun thresholdChanged() {
+        selectedHealth =
+            selectedHealth.intersect(availableHealth.toSet())
+    }
+
+    fun filtered(
+        source: List<Station> = stations,
+        query: String = ""
+    ): List<Station> =
+        source.filter { station ->
+            val matchesQuery =
+                query.isBlank() ||
+                station.name.contains(query, ignoreCase = true)
+
+            val matchesHealth =
+                selectedHealth.isEmpty() ||
+                displayHealth(station) in selectedHealth
+
+            val matchesVersion =
+                selectedVersions.isEmpty() ||
+                station.pilotAwareVersion?.let {
+                    it in selectedVersions
+                } == true
+
+            matchesQuery && matchesHealth && matchesVersion
+        }
+
+    private val cache =
+        File(app.cacheDir, "atom-stations-cache.json")
+
+    init {
+        runCatching {
+            stations = JSONArray(cache.readText()).stations()
+        }
+
+        refresh()
+
+        viewModelScope.launch {
+            while (true) {
+                delay(refreshMinutes.coerceIn(1, 10) * 60_000L)
+                refresh()
+            }
+        }
+    }
+
+    fun refresh() {
+        if (refreshing) return
+
+        viewModelScope.launch {
+            refreshing = true
+
+            runCatching {
+                val base = server.trim().let {
+                    if (it.endsWith('/')) it else "$it/"
+                }
+
+                val connection =
+                    URI(base + "api/v1/stations")
+                        .toURL()
+                        .openConnection() as HttpURLConnection
+
+                connection.connectTimeout = 10_000
+                connection.readTimeout = 12_000
+
+                if (connection.responseCode !in 200..299) {
+                    error("HTTP ${connection.responseCode}")
+                }
+
+                val response =
+                    connection.inputStream
+                        .bufferedReader()
+                        .use { it.readText() }
+
+                stations = JSONArray(response).stations()
+
+                selectedHealth =
+                    selectedHealth.intersect(availableHealth.toSet())
+
+                selectedVersions =
+                    selectedVersions.intersect(availableVersions.toSet())
+
+                cache.writeText(response)
+                lastUpdated = Instant.now()
+                error = null
+            }.onFailure {
+                error = it.message ?: "No Network"
+            }
+
+            refreshing = false
+        }
+    }
 }
 
-class MainActivity:ComponentActivity(){override fun onCreate(s:Bundle?){super.onCreate(s);Configuration.getInstance().userAgentValue=packageName;setContent{MaterialTheme{App()}}}}
-enum class Tab(val title:String){Map("Map"),Stations("Stations"),Favourites("Favourites"),Report("Report"),Settings("Settings"),Help("Help")}
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Configuration.getInstance().userAgentValue = packageName
 
-@Composable fun App(vm:StationVM=viewModel()){var tab by remember{mutableStateOf(Tab.Map)};var detail by remember{mutableStateOf<Station?>(null)};Scaffold(bottomBar={NavigationBar{Tab.entries.forEach{t->NavigationBarItem(tab==t,{tab=t},{Icon(when(t){Tab.Map->Icons.Default.Map;Tab.Stations->Icons.Default.List;Tab.Favourites->Icons.Default.Star;Tab.Report->Icons.Default.Assessment;Tab.Settings->Icons.Default.Settings;Tab.Help->Icons.Default.Help},null)},{Text(t.title)})}}}){p->Box(Modifier.padding(p)){when(tab){Tab.Map->MapScreen(vm){detail=it};Tab.Stations->StationList(vm.stations,vm){detail=it};Tab.Favourites->StationList(vm.stations.filter{vm.favourites().contains(it.id)},vm){detail=it};Tab.Report->ReportScreen(vm);Tab.Settings->Settings(vm);Tab.Help->Help()}}};detail?.let{s->ModalBottomSheet({detail=null}){Detail(s,vm.displayHealth(s),vm.isBackLevel(s),vm.favourites().contains(s.id)){vm.toggleFavourite(s.id)}}}}
+        setContent {
+            MaterialTheme {
+                App()
+            }
+        }
+    }
+}
 
-@Composable fun FilterButton(vm:StationVM){var open by remember{mutableStateOf(false)};IconButton({open=true}){Icon(Icons.Default.FilterAlt,"Filter")};if(open)AlertDialog({open=false},{TextButton({open=false}){Text("Done")}},{TextButton(vm::clearFilters){Text("Clear")}},title={Text("Filter stations")},text={LazyColumn{item{Text("Status")};items(vm.availableHealth){v->FilterRow(healthTitle(v),v in vm.selectedHealth){vm.toggleHealth(v)}};item{Text("PilotAware version")};items(vm.availableVersions){v->FilterRow(v,v in vm.selectedVersions){vm.toggleVersion(v)}}}})}
-@Composable fun FilterRow(label:String,checked:Boolean,toggle:()->Unit){Row(Modifier.fillMaxWidth().clickable(onClick=toggle),verticalAlignment=Alignment.CenterVertically){Checkbox(checked,{toggle()});Text(label)}}
+enum class Tab(val title: String) {
+    Map("Map"),
+    Stations("Stations"),
+    Favourites("Favourites"),
+    Report("Report"),
+    Settings("Settings"),
+    Help("Help")
+}
 
-@Composable fun MapScreen(vm:StationVM,onStation:(Station)->Unit){var q by remember{mutableStateOf("")};Column{Row(Modifier.padding(12.dp)){Text("Stations",style=MaterialTheme.typography.titleLarge,modifier=Modifier.weight(1f));FilterButton(vm);IconButton(vm::refresh){Icon(Icons.Default.Refresh,null)}};Text(if(vm.error!=null)"No Network • ${vm.stations.size} stations" else "Last updated: ${fmtTime(vm.lastUpdated)} • ${vm.stations.size} stations",modifier=Modifier.padding(horizontal=12.dp),color=if(vm.error!=null)Color.Red else LocalContentColor.current);OutlinedTextField(q,{q=it},label={Text("Find")},modifier=Modifier.fillMaxWidth().padding(12.dp));val shown=vm.filtered(query=q);AndroidView(factory={ctx->MapView(ctx).apply{setTileSource(TileSourceFactory.MAPNIK);setMultiTouchControls(true);controller.setZoom(6.0);controller.setCenter(GeoPoint(54.5,-3.0))}},update={map->map.overlays.removeAll{it is Marker};shown.forEach{s->if(s.latitude!=null&&s.longitude!=null)map.overlays.add(Marker(map).apply{position=GeoPoint(s.latitude,s.longitude);title=s.name;snippet="${healthTitle(vm.displayHealth(s))} • ${s.pilotAwareVersion?:"Version not reported"}";icon=setMarkerIcon(context,vm.displayHealth(s));setOnMarkerClickListener{_,_->onStation(s);true}}};map.invalidate()},modifier=Modifier.fillMaxSize())}}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun App(vm: StationVM = viewModel()) {
+    var tab by remember { mutableStateOf(Tab.Map) }
+    var detail by remember { mutableStateOf<Station?>(null) }
 
-@Composable fun StationList(list:List<Station>,vm:StationVM,onStation:(Station)->Unit){var q by remember{mutableStateOf("")};Column{Row(Modifier.padding(12.dp)){OutlinedTextField(q,{q=it},label={Text("Find")},modifier=Modifier.weight(1f));FilterButton(vm)};LazyColumn{items(vm.filtered(list,q),key={it.id}){s->ListItem({Text(s.name)},supportingContent={Text("${healthTitle(vm.displayHealth(s))} • ${s.pilotAwareVersion?:"Version not reported"}")},modifier=Modifier.clickable{onStation(s)});HorizontalDivider()}}}}
+    Scaffold(
+        bottomBar = {
+            NavigationBar {
+                Tab.entries.forEach { item ->
+                    NavigationBarItem(
+                        selected = tab == item,
+                        onClick = { tab = item },
+                        icon = {
+                            Icon(
+                                imageVector = when (item) {
+                                    Tab.Map -> Icons.Default.Map
+                                    Tab.Stations -> Icons.Default.List
+                                    Tab.Favourites -> Icons.Default.Star
+                                    Tab.Report -> Icons.Default.Assessment
+                                    Tab.Settings -> Icons.Default.Settings
+                                    Tab.Help -> Icons.Default.Help
+                                },
+                                contentDescription = null
+                            )
+                        },
+                        label = { Text(item.title) }
+                    )
+                }
+            }
+        }
+    ) { padding ->
+        Box(Modifier.padding(padding)) {
+            when (tab) {
+                Tab.Map -> MapScreen(vm) { detail = it }
+                Tab.Stations ->
+                    StationList(vm.stations, vm) { detail = it }
+                Tab.Favourites ->
+                    StationList(
+                        vm.stations.filter {
+                            vm.favourites().contains(it.id)
+                        },
+                        vm
+                    ) { detail = it }
+                Tab.Report -> ReportScreen(vm)
+                Tab.Settings -> Settings(vm)
+                Tab.Help -> Help()
+            }
+        }
+    }
+
+    detail?.let { station ->
+        ModalBottomSheet(
+            onDismissRequest = { detail = null }
+        ) {
+            Detail(
+                station,
+                vm.displayHealth(station),
+                vm.isBackLevel(station),
+                vm.favourites().contains(station.id)
+            ) {
+                vm.toggleFavourite(station.id)
+            }
+        }
+    }
+}
+
+@Composable
+fun FilterButton(vm: StationVM) {
+    var open by remember { mutableStateOf(false) }
+
+    IconButton(onClick = { open = true }) {
+        Icon(Icons.Default.FilterAlt, "Filter")
+    }
+
+    if (open) {
+        AlertDialog(
+            onDismissRequest = { open = false },
+            confirmButton = {
+                TextButton(onClick = { open = false }) {
+                    Text("Done")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = vm::clearFilters) {
+                    Text("Clear")
+                }
+            },
+            title = { Text("Filter stations") },
+            text = {
+                LazyColumn {
+                    item { Text("Status") }
+
+                    items(vm.availableHealth) { value ->
+                        FilterRow(
+                            healthTitle(value),
+                            value in vm.selectedHealth
+                        ) {
+                            vm.toggleHealth(value)
+                        }
+                    }
+
+                    item { Text("PilotAware version") }
+
+                    items(vm.availableVersions) { value ->
+                        FilterRow(
+                            value,
+                            value in vm.selectedVersions
+                        ) {
+                            vm.toggleVersion(value)
+                        }
+                    }
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun FilterRow(
+    label: String,
+    checked: Boolean,
+    toggle: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = toggle),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = { toggle() }
+        )
+        Text(label)
+    }
+}
+
+@Composable
+fun MapScreen(
+    vm: StationVM,
+    onStation: (Station) -> Unit
+) {
+    var query by remember { mutableStateOf("") }
+
+    Column {
+        Row(Modifier.padding(12.dp)) {
+            Text(
+                "Stations",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.weight(1f)
+            )
+            FilterButton(vm)
+            IconButton(onClick = vm::refresh) {
+                Icon(Icons.Default.Refresh, "Refresh")
+            }
+        }
+
+        Text(
+            text = if (vm.error != null) {
+                "No Network • ${vm.stations.size} stations"
+            } else {
+                "Last updated: ${fmtTime(vm.lastUpdated)} • ${vm.stations.size} stations"
+            },
+            modifier = Modifier.padding(horizontal = 12.dp),
+            color = if (vm.error != null)
+                Color.Red
+            else
+                LocalContentColor.current
+        )
+
+        OutlinedTextField(
+            value = query,
+            onValueChange = { query = it },
+            label = { Text("Find") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        )
+
+        val shown = vm.filtered(query = query)
+
+        AndroidView(
+            factory = { context ->
+                MapView(context).apply {
+                    setTileSource(TileSourceFactory.MAPNIK)
+                    setMultiTouchControls(true)
+                    controller.setZoom(6.0)
+                    controller.setCenter(GeoPoint(54.5, -3.0))
+                }
+            },
+            update = { map ->
+                map.overlays.removeAll { it is Marker }
+
+                shown.forEach { station ->
+                    val latitude = station.latitude
+                    val longitude = station.longitude
+
+                    if (latitude != null && longitude != null) {
+                        map.overlays.add(
+                            Marker(map).apply {
+                                position = GeoPoint(
+                                    latitude,
+                                    longitude
+                                )
+                                title = station.name
+                                snippet =
+                                    "${healthTitle(vm.displayHealth(station))} • " +
+                                    (station.pilotAwareVersion
+                                        ?: "Version not reported")
+                                icon = setMarkerIcon(
+                                    map.context,
+                                    vm.displayHealth(station)
+                                )
+                                setOnMarkerClickListener { _, _ ->
+                                    onStation(station)
+                                    true
+                                }
+                            }
+                        )
+                    }
+                }
+
+                map.invalidate()
+            },
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+@Composable
+fun StationList(
+    list: List<Station>,
+    vm: StationVM,
+    onStation: (Station) -> Unit
+) {
+    var query by remember { mutableStateOf("") }
+
+    Column {
+        Row(Modifier.padding(12.dp)) {
+            OutlinedTextField(
+                value = query,
+                onValueChange = { query = it },
+                label = { Text("Find") },
+                modifier = Modifier.weight(1f)
+            )
+            FilterButton(vm)
+        }
+
+        LazyColumn {
+            items(
+                items = vm.filtered(list, query),
+                key = { it.id }
+            ) { station ->
+                ListItem(
+                    headlineContent = {
+                        Text(station.name)
+                    },
+                    supportingContent = {
+                        Text(
+                            "${healthTitle(vm.displayHealth(station))} • " +
+                            (station.pilotAwareVersion
+                                ?: "Version not reported")
+                        )
+                    },
+                    modifier = Modifier.clickable {
+                        onStation(station)
+                    }
+                )
+                HorizontalDivider()
+            }
+        }
+    }
+}
 
 @Composable fun ReportScreen(vm:StationVM){
  val context=LocalContext.current
@@ -131,7 +672,19 @@ private fun number(v:Double?,suffix:String,decimals:Int)=v?.let{String.format(ja
 private fun memory(s:Station)=if(s.ramUsedMB!=null&&s.ramTotalMB!=null)String.format(java.util.Locale.US,"%.0f / %.0f MB",s.ramUsedMB,s.ramTotalMB) else "Not reported"
 private fun absolute(v:Instant?)=v?.atZone(ZoneId.systemDefault())?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm:ss"))?:"Not reported"
 private fun fmtTime(v:Instant?)=v?.atZone(ZoneId.systemDefault())?.format(DateTimeFormatter.ofPattern("HH:mm"))?:"Not yet"
-private fun relative(v:Instant?):String{if(v==null)return"Not reported";val s=(Instant.now().epochSecond-v.epochSecond).coerceAtLeast(0);return if(s<3600)"${s/60} min ago" else if(s<86400)"${s/3600} h ago" else "${s/86400} d ago"}
+private fun relative(v: Instant?): String {
+    if (v == null) return "Not reported"
+
+    val seconds = (Instant.now().epochSecond - v.epochSecond).coerceAtLeast(0)
+
+    return if (seconds < 3600) {
+        "${seconds / 60} min ago"
+    } else if (seconds < 86400) {
+        "${seconds / 3600} h ago"
+    } else {
+        "${seconds / 86400} d ago"
+    }
+}
 private fun iso(v:Instant?)=v?.toString()?:"Not reported"
 private fun csvEscape(v:String)="\"${v.replace("\"","\"\"")}\""
 private fun htmlEscape(v:String)=v.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;").replace("\"","&quot;")

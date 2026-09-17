@@ -24,7 +24,7 @@ targets:
         INFOPLIST_KEY_UIRequiresFullScreen: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
         CODE_SIGN_STYLE: Automatic
-        DEVELOPMENT_TEAM: 2PZQ8F5N4X
+        DEVELOPMENT_TEAM: H57M8SWM47
   ATOMMonitorUITests:
     type: bundle.ui-testing
     platform: iOS
@@ -38,7 +38,7 @@ targets:
         TEST_TARGET_NAME: ATOMMonitor
         GENERATE_INFOPLIST_FILE: YES
         CODE_SIGN_STYLE: Automatic
-        DEVELOPMENT_TEAM: 2PZQ8F5N4X
+        DEVELOPMENT_TEAM: H57M8SWM47
 schemes:
   ATOMMonitor:
     build:

@@ -12,7 +12,7 @@ struct ContentView: View {
     var body: some View {
         TabView {
             StationMapView(store: store, homeStationID: homeStationID, favouriteStationIDs: $favouriteStationIDs).tabItem { Label("Map", systemImage: "map.fill") }
-            NavigationStack { StationListView(store: store, favouriteStationIDs: $favouriteStationIDs).navigationTitle("ATOM Stations").navigationBarTitleDisplayMode(.inline) }.tabItem { Label("Stations", systemImage: "list.bullet") }
+            NavigationStack { StationListView(store: store, favouriteStationIDs: $favouriteStationIDs).navigationTitle("Stations").navigationBarTitleDisplayMode(.inline) }.tabItem { Label("Stations", systemImage: "list.bullet") }
             NavigationStack { FavouritesView(store: store, favouriteStationIDs: favouriteStationIDs).navigationTitle("Favourites").navigationBarTitleDisplayMode(.inline) }.tabItem { Label("Favourites", systemImage: "star.fill") }
             NavigationStack { SettingsView(store: store, homeStationID: $homeStationID, favouriteStationIDs: $favouriteStationIDs, stationRefreshMinutes: $stationRefreshMinutes, inactiveAfterDays: $inactiveAfterDays).navigationTitle("Settings").navigationBarTitleDisplayMode(.inline) }.tabItem { Label("Settings", systemImage: "gearshape.fill") }
             NavigationStack { HelpView().navigationTitle("Help").navigationBarTitleDisplayMode(.inline) }.tabItem { Label("Help", systemImage: "questionmark.circle.fill") }

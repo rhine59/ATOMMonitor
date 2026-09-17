@@ -2,9 +2,10 @@
 """Persistent ATOM ground-station registry/API. No aircraft data is accepted or stored."""
 from __future__ import annotations
 import hmac,os,sqlite3
-from datetime import datetime,timezone
+from datetime import datetime,timezone,timedelta
 from flask import Flask,jsonify,request
 DB_PATH=os.getenv("ATOM_DB","/data/atommonitor.sqlite3"); INGEST_TOKEN=os.getenv("ATOM_INGEST_TOKEN",""); app=Flask(__name__)
+MAX_FUTURE_SKEW=timedelta(minutes=5)
 def db():
  os.makedirs(os.path.dirname(DB_PATH),exist_ok=True);c=sqlite3.connect(DB_PATH);c.row_factory=sqlite3.Row
  c.execute("""CREATE TABLE IF NOT EXISTS stations(id TEXT PRIMARY KEY,name TEXT NOT NULL,isPilotAware INTEGER NOT NULL DEFAULT 0,latitude REAL,longitude REAL,altitudeMetres REAL,lastPosition TEXT,lastHeartbeat TEXT,lastTechnicalStatus TEXT,pilotAwareVersion TEXT,softwareVersion TEXT,cpuLoadPercent REAL,ramUsedMB REAL,ramTotalMB REAL,cpuTemperatureC REAL,ntpOffsetMS REAL,ntpCorrectionPPM REAL,frequencyCorrectionKHz REAL,rfCorrectionPPM REAL,signalQualityDB REAL,voltageV REAL,uptimeMinutes INTEGER,lastSeen TEXT NOT NULL)""")
@@ -18,16 +19,18 @@ def parse_time(value):
 def upsert(o):
  station=o.get("station");kind=o.get("kind")
  if not station or kind not in {"position","status","pilotaware_heartbeat"}:return False
- now=o.get("received_at") or datetime.now(timezone.utc).isoformat();when=o.get("packet_time_utc") or now
+ now=o.get("received_at") or datetime.now(timezone.utc).isoformat();received=parse_time(now)
+ if not received:return False
+ packet_value=o.get("packet_time_utc");incoming=parse_time(packet_value) if packet_value else received
+ # A bad station/packet clock must never poison ordering for later legitimate observations.
+ if not incoming or incoming > received + MAX_FUTURE_SKEW:return False
+ when=packet_value if packet_value else now
  category={"position":"lastPosition","status":"lastTechnicalStatus","pilotaware_heartbeat":"lastHeartbeat"}[kind]
- incoming=parse_time(when)
  with db() as c:
   existing=c.execute("SELECT * FROM stations WHERE id=?",(station,)).fetchone()
   if existing:
    current=parse_time(existing[category])
-   # Never allow an older packet in the same observation category to replace newer state.
-   # If either timestamp is malformed, preserve the existing category state rather than guessing.
-   if current and (not incoming or incoming < current):return True
+   if current and incoming < current:return True
   v={"id":station,"name":station,"lastSeen":now}
   mp={"latitude":"latitude","longitude":"longitude","altitude_m":"altitudeMetres","software_version":"softwareVersion","cpu_load":"cpuLoadPercent","ram_used_mb":"ramUsedMB","ram_total_mb":"ramTotalMB","temperature_c":"cpuTemperatureC","ntp_offset_ms":"ntpOffsetMS","ntp_correction_ppm":"ntpCorrectionPPM","rf_correction_ppm":"rfCorrectionPPM","rf_quality_db":"signalQualityDB","voltage_v":"voltageV","uptime_minutes":"uptimeMinutes","pilotaware_version":"pilotAwareVersion"}
   for s,d in mp.items():
@@ -50,8 +53,7 @@ def health():return jsonify({"status":"ok","service":"atommonitor-api"})
 @app.get('/ready')
 def ready():
  try:
-  with db() as c:
-   c.execute("SELECT 1").fetchone();n=c.execute("SELECT COUNT(*) FROM stations WHERE isPilotAware=1").fetchone()[0]
+  with db() as c:c.execute("SELECT 1").fetchone();n=c.execute("SELECT COUNT(*) FROM stations WHERE isPilotAware=1").fetchone()[0]
   return jsonify({"status":"ready","service":"atommonitor-api","database":"ok","confirmedStations":n})
  except Exception:
   app.logger.exception("readiness database check failed");return jsonify({"status":"not_ready","service":"atommonitor-api","database":"unavailable"}),503

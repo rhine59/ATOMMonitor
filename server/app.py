@@ -34,8 +34,19 @@ def health_for(r):
 def row_json(r):d=dict(r);d["health"]=health_for(r);return d
 @app.get('/health')
 def health():
- with db() as c:n=c.execute("SELECT COUNT(*) FROM stations WHERE isPilotAware=1").fetchone()[0]
- return jsonify({"status":"ok","confirmedStations":n})
+ """Cheap process liveness check; deliberately does not depend on the database."""
+ return jsonify({"status":"ok","service":"atommonitor-api"})
+@app.get('/ready')
+def ready():
+ """Dependency-aware readiness check used before routing work to this API."""
+ try:
+  with db() as c:
+   c.execute("SELECT 1").fetchone()
+   n=c.execute("SELECT COUNT(*) FROM stations WHERE isPilotAware=1").fetchone()[0]
+  return jsonify({"status":"ready","service":"atommonitor-api","database":"ok","confirmedStations":n})
+ except Exception:
+  app.logger.exception("readiness database check failed")
+  return jsonify({"status":"not_ready","service":"atommonitor-api","database":"unavailable"}),503
 @app.post('/api/v1/observations')
 def observation():
  if not upsert(request.get_json(silent=True) or {}):return jsonify({"error":"invalid ground-station observation"}),400

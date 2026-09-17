@@ -92,7 +92,9 @@ Build in Xcode and install on the iPhone. The verified normal remote service is 
 
 ### Build checkpoints
 
-**17 September 2026 — current iOS source:** user confirmed the build run was good after the configurable map-icon colours, back-level PilotAware-version presentation, compact Stations headings/station-count status line, connection-test station count, and yellow No-recent-heartbeat aggregate changes were committed. This advances the affected iOS features to **Build passed — runtime test pending**. It does not by itself prove map colour/cluster behaviour, Settings persistence, network behaviour or other runtime acceptance checks.
+**17 September 2026 — Report feature corrective build:** the first Report build failed while compiling `ReportView.swift`. After corrective commit `3850e99`, the user reran the iOS build and confirmed `** BUILD SUCCEEDED **`. The Report feature and updated local User Guide therefore advance to **Build passed — runtime test pending**. This confirms compilation only; report counts, generated HTML/CSV, native sharing and attachment behaviour still require physical/runtime verification.
+
+**17 September 2026 — map/status source checkpoint:** user confirmed the build run was good after the configurable map-icon colours, back-level PilotAware-version presentation, compact Stations headings/station-count status line, connection-test station count, and yellow No-recent-heartbeat aggregate changes were committed. This advances the affected iOS features to **Build passed — runtime test pending**. It does not by itself prove map colour/cluster behaviour, Settings persistence, network behaviour or other runtime acceptance checks.
 
 ### Automated Simulator feature tour
 
@@ -126,13 +128,16 @@ ATOM_DERIVED_DATA="$HOME/Library/Developer/Xcode/DerivedData/ATOMMonitor-Demo" .
 8. Exercise Standard, Satellite + Labels and Satellite map layers.
 9. With no home station configured, tap Home and confirm `No home station set`; then configure a home station and confirm Home returns the map to it.
 10. Open a station detail and confirm **Record date & time** displays an absolute local date/time for `lastSeen`; confirm Last heartbeat, Last seen, Last position and Last technical status remain relative-age values. For a missing timestamp, confirm `Not reported`.
-11. Add a station to Favourites from Map and from Stations.
-12. Disconnect the server/network temporarily and relaunch/refresh; the last station cache should remain available and Map should report `No Network` for the failed current request, including the cached station count.
-13. Confirm favourite records remain available from the durable local favourites cache after a successful server refresh.
-14. Restore connectivity and verify fresh server data replaces the general cache.
-15. Remove a favourite in Settings and verify the preference is retained.
-16. Open Help → User Guide and verify the current station status, timestamp and map-colour behaviour is documented locally/offline.
-17. Confirm no aircraft movement/identity UI or data appears anywhere.
+11. Open Report and confirm Total stations equals the loaded station count; verify the Status counts sum to the total and the PilotAware-version counts sum to the total including `Not reported` where applicable.
+12. Tap **Share report** on a physical iPhone. Confirm the standard iOS share sheet appears and offers installed capabilities such as Mail, Messages, AirDrop and Files as available.
+13. Share/save the generated HTML and CSV. Open the HTML and confirm the formatted summary, status counts, version counts, generation time and data-update time are readable on phone and desktop. Open the CSV and confirm station name, displayed status, PilotAware version, station timestamps and latitude/longitude are correctly escaped and represented. Confirm neither output contains aircraft identities, positions, movements or tracks.
+14. Add a station to Favourites from Map and from Stations.
+15. Disconnect the server/network temporarily and relaunch/refresh; the last station cache should remain available and Map should report `No Network` for the failed current request, including the cached station count.
+16. Confirm favourite records remain available from the durable local favourites cache after a successful server refresh.
+17. Restore connectivity and verify fresh server data replaces the general cache.
+18. Remove a favourite in Settings and verify the preference is retained.
+19. Open Help → User Guide and verify the current station status, timestamp, map-colour and Report behaviour is documented locally/offline.
+20. Confirm no aircraft movement/identity UI or data appears anywhere.
 
 ## What constitutes an end-to-end pass
 

@@ -3,14 +3,18 @@ import UIKit
 
 struct ReportView: View {
     @ObservedObject var store: StationStore
-    @State private var shareItems: [Any] = []
-    @State private var showingShareSheet = false
+    @State private var sharePayload: SharePayload?
     @State private var reportError: String?
 
     private struct CountRow: Identifiable {
         let id: String
         let title: String
         let count: Int
+    }
+
+    private struct SharePayload: Identifiable {
+        let id = UUID()
+        let items: [Any]
     }
 
     private var statusCounts: [CountRow] {
@@ -57,7 +61,9 @@ struct ReportView: View {
         }
         .navigationTitle("Report")
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showingShareSheet) { ActivityView(activityItems: shareItems) }
+        .sheet(item: $sharePayload) { payload in
+            ActivityView(activityItems: payload.items)
+        }
         .alert("Unable to create report", isPresented: Binding(get: { reportError != nil }, set: { if !$0 { reportError = nil } })) {
             Button("OK") { reportError = nil }
         } message: { Text(reportError ?? "Unknown error") }
@@ -70,8 +76,9 @@ struct ReportView: View {
     private func prepareAndShare() {
         do {
             let files = try StationReportGenerator.makeReport(store: store)
-            shareItems = [files.html, files.csv]
-            showingShareSheet = true
+            // Present from the payload itself so the first UIActivityViewController is
+            // created only after both generated file URLs are available.
+            sharePayload = SharePayload(items: [files.html, files.csv])
         } catch { reportError = error.localizedDescription }
     }
 }

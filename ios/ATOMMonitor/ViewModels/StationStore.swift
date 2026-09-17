@@ -36,7 +36,20 @@ final class StationStore: ObservableObject {
     }
 
     var availablePilotAwareVersions: [String] {
-        Array(Set(stations.compactMap { $0.pilotAwareVersion?.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty })).sorted { $0.localizedStandardCompare($1) == .orderedAscending }
+        Array(Set(stations.compactMap { $0.pilotAwareVersion?.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty })).sorted { compareVersions($0, $1) == .orderedAscending }
+    }
+
+    var newestPilotAwareVersion: String? { availablePilotAwareVersions.last }
+
+    func isBackLevelSoftware(_ station: ATOMStation) -> Bool {
+        guard displayHealth(for: station) == .healthy,
+              let version = station.pilotAwareVersion?.trimmingCharacters(in: .whitespacesAndNewlines), !version.isEmpty,
+              let newest = newestPilotAwareVersion else { return false }
+        return compareVersions(version, newest) == .orderedAscending
+    }
+
+    private func compareVersions(_ lhs: String, _ rhs: String) -> ComparisonResult {
+        lhs.compare(rhs, options: [.numeric, .caseInsensitive])
     }
 
     var hasActiveFilters: Bool { !selectedHealthFilters.isEmpty || !selectedPilotAwareVersions.isEmpty }
@@ -46,7 +59,8 @@ final class StationStore: ObservableObject {
         return stations.filter { station in
             let matchesSearch = query.isEmpty || station.name.localizedCaseInsensitiveContains(query)
             let matchesHealth = selectedHealthFilters.isEmpty || selectedHealthFilters.contains(displayHealth(for: station))
-            let matchesVersion = selectedPilotAwareVersions.isEmpty || (station.pilotAwareVersion.map { selectedPilotAwareVersions.contains($0) } ?? false)
+            let version = station.pilotAwareVersion?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let matchesVersion = selectedPilotAwareVersions.isEmpty || (version.map { selectedPilotAwareVersions.contains($0) } ?? false)
             return matchesSearch && matchesHealth && matchesVersion
         }
     }

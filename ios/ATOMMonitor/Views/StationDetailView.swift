@@ -18,8 +18,6 @@ struct StationDetailView: View {
                 LabeledContent("Station ID", value: station.id)
                 LabeledContent("PilotAware version", value: station.pilotAwareVersion ?? "Not reported")
                 LabeledContent("Receiver software", value: station.softwareVersion ?? "Not reported")
-                LabeledContent("Uptime", value: uptime)
-                LabeledContent("Supply voltage", value: text(station.voltageV, suffix: " V", decimals: 2))
             }
 
             Section("Location") {
@@ -40,7 +38,6 @@ struct StationDetailView: View {
             }
 
             Section("Radio") {
-                LabeledContent("Frequency correction", value: text(station.frequencyCorrectionKHz, suffix: " kHz", decimals: 1))
                 LabeledContent("RF correction", value: text(station.rfCorrectionPPM, suffix: " ppm", decimals: 1))
                 LabeledContent("Signal quality", value: text(station.signalQualityDB, suffix: " dB", decimals: 1))
             }
@@ -52,16 +49,6 @@ struct StationDetailView: View {
     private var memory: String {
         guard let used = station.ramUsedMB, let total = station.ramTotalMB else { return "Not reported" }
         return String(format: "%.0f / %.0f MB", used, total)
-    }
-
-    private var uptime: String {
-        guard let minutes = station.uptimeMinutes else { return "Not reported" }
-        let days = minutes / 1440
-        let hours = (minutes % 1440) / 60
-        let mins = minutes % 60
-        if days > 0 { return "\(days)d \(hours)h \(mins)m" }
-        if hours > 0 { return "\(hours)h \(mins)m" }
-        return "\(mins)m"
     }
 
     private func coordinate(_ value: Double?) -> String {

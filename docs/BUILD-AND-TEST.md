@@ -56,6 +56,7 @@ sudo docker compose build --no-cache
 sudo docker compose up -d
 sudo docker compose ps
 curl http://localhost:8088/health
+curl http://localhost:8088/ready
 curl http://localhost:8088/api/v1/stations
 sudo docker compose logs --tail=100 atom-api ogn-station-probe
 ```
@@ -64,6 +65,7 @@ From another machine on the LAN:
 
 ```sh
 curl http://192.168.1.99:8088/health
+curl http://192.168.1.99:8088/ready
 curl http://192.168.1.99:8088/api/v1/stations
 ```
 
@@ -71,10 +73,17 @@ Public-path checks:
 
 ```sh
 curl -v https://granvillehouse.synology.me:8445/health
+curl -v https://granvillehouse.synology.me:8445/ready
 curl -v https://granvillehouse.synology.me:8445/api/v1/stations
 ```
 
 The public test must validate the certificate normally; do not use `-k` as a production workaround.
+
+### Server resilience checkpoints
+
+**17 September 2026 — Phase 1 health/readiness and restart checkpoint:** the rebuilt Compose deployment reported the API healthy, `/ready` successfully checked SQLite, the persistent registry contained 305 confirmed stations, and the collector resumed accepted ground-station observations after API restart. The registry remained at 305 across the controlled container replacement/restart, confirming persistence outside the API container.
+
+**17 September 2026 — production WSGI checkpoint:** the API image was rebuilt without cache and the running container was replaced. `docker inspect` confirmed the container command is Gunicorn with two workers and two threads; the container reported Gunicorn 23.0.0. Gunicorn logged `Starting gunicorn 23.0.0`, bound to `0.0.0.0:8080`, selected the gthread worker and booted two worker processes. `/ready` returned database `ok` with 305 confirmed stations, `/api/v1/stations` returned 305 stations, and live collector POSTs continued receiving HTTP 202. This replaces Flask's development server while retaining the same SQLite registry and Compose health model. Public HTTPS-path validation remains required before Phase 1 is marked Tested.
 
 ## iPhone application
 
@@ -143,6 +152,6 @@ ATOM_DERIVED_DATA="$HOME/Library/Developer/Xcode/DerivedData/ATOMMonitor-Demo" .
 
 ## What constitutes an end-to-end pass
 
-An end-to-end pass requires: collector unit tests passing; both Docker services running; `/health` returning success on host port 8088; `/api/v1/stations` returning PilotAware-confirmed persistent station records; public HTTPS access through `granvillehouse.synology.me:8445`; iPhone decoding/displaying those records including the absolute station record timestamp; and local caching/favourites behaviour working as described above.
+An end-to-end pass requires: collector unit tests passing; both Docker services running; `/health` returning success on host port 8088; `/ready` confirming its database dependency; `/api/v1/stations` returning PilotAware-confirmed persistent station records; public HTTPS access through `granvillehouse.synology.me:8445`; iPhone decoding/displaying those records including the absolute station record timestamp; and local caching/favourites behaviour working as described above.
 
 Runtime logs are evidence of a particular build, not source code. Commit a `build-test.log` when a milestone or fault investigation needs a permanent record; routine repeated logs need not be committed indefinitely.

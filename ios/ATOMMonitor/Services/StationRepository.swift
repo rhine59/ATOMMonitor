@@ -61,13 +61,13 @@ struct APIStationRepository: StationRepository {
 
     static func testConnection(to value: String) async throws -> ServerConnectionResult {
         let base = try ServerConfiguration.normalizedURL(from: value)
-        var request = URLRequest(url: base.appending(path: "health")); request.timeoutInterval = 10
+        var request = URLRequest(url: base.appending(path: "ready")); request.timeoutInterval = 10
         let (data,response) = try await URLSession.shared.data(for: request)
         guard let http=response as? HTTPURLResponse,(200..<300).contains(http.statusCode) else { throw RepositoryError.badResponse }
-        struct Health: Decodable { let confirmedStations: Int?; let status: String? }
-        let health = try JSONDecoder().decode(Health.self, from: data)
-        guard health.status?.lowercased() == "ok" else { throw RepositoryError.unhealthyServer }
-        return ServerConnectionResult(confirmedStations: health.confirmedStations, status: health.status ?? "ok")
+        struct Readiness: Decodable { let confirmedStations: Int?; let status: String? }
+        let readiness = try JSONDecoder().decode(Readiness.self, from: data)
+        guard readiness.status?.lowercased() == "ready" else { throw RepositoryError.unhealthyServer }
+        return ServerConnectionResult(confirmedStations: readiness.confirmedStations, status: readiness.status ?? "ready")
     }
 
     private var decoder:JSONDecoder{let d=JSONDecoder();d.dateDecodingStrategy = .iso8601;return d}
@@ -91,6 +91,6 @@ enum RepositoryError:LocalizedError{
     case .missingFixture:return "The bundled ATOM station fixture could not be found."
     case .badResponse:return "The ATOM Monitor server returned an invalid response."
     case .invalidServerURL:return "Enter a valid server address, for example https://atom.example.net/."
-    case .unhealthyServer:return "The server responded but did not report a healthy ATOM Monitor service."
+    case .unhealthyServer:return "The server responded but did not report a ready ATOM Monitor service."
     }}
 }

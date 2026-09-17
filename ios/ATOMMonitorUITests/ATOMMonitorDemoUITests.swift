@@ -7,7 +7,7 @@ final class ATOMMonitorDemoUITests: XCTestCase {
         app.launch()
 
         step("Map: edge-to-edge station health map, last-updated time and manual refresh")
-        XCTAssertTrue(app.tabBars.buttons["Map"].waitForExistence(timeout: 8))
+        selectTab("Map", in: app)
         let mapRefresh = refreshButton(in: app)
         XCTAssertTrue(mapRefresh.waitForExistence(timeout: 3), "Missing Map refresh control")
         sleep(2)
@@ -33,7 +33,7 @@ final class ATOMMonitorDemoUITests: XCTestCase {
         sleep(1)
 
         step("Stations: searchable station registry, manual refresh and pull-to-refresh")
-        app.tabBars.buttons["Stations"].tap()
+        selectTab("Stations", in: app)
         XCTAssertTrue(app.navigationBars["Stations"].waitForExistence(timeout: 3))
         let listRefresh = refreshButton(in: app)
         XCTAssertTrue(listRefresh.waitForExistence(timeout: 2), "Missing Stations refresh control")
@@ -57,10 +57,10 @@ final class ATOMMonitorDemoUITests: XCTestCase {
         if healthy.waitForExistence(timeout: 3) { healthy.tap(); sleep(3); if app.navigationBars.buttons.firstMatch.exists { app.navigationBars.buttons.firstMatch.tap() } }
 
         step("Favourites: selected ground stations")
-        app.tabBars.buttons["Favourites"].tap(); sleep(2)
+        selectTab("Favourites", in: app); sleep(2)
 
         step("Report: station status and PilotAware-version summary")
-        app.tabBars.buttons["Report"].tap(); sleep(2)
+        selectTab("Report", in: app); sleep(2)
         XCTAssertTrue(app.navigationBars["Report"].waitForExistence(timeout: 3))
         XCTAssertTrue(app.staticTexts["Total stations"].waitForExistence(timeout: 2))
         XCTAssertTrue(app.staticTexts["Status"].waitForExistence(timeout: 2))
@@ -68,19 +68,19 @@ final class ATOMMonitorDemoUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Share report"].waitForExistence(timeout: 2))
 
         step("Settings: set a home station and verify the Map home button")
-        app.tabBars.buttons["Settings"].tap(); sleep(2)
+        selectTab("Settings", in: app); sleep(2)
         let homePicker = app.buttons["Home station"]
         if homePicker.waitForExistence(timeout: 2) {
             homePicker.tap()
             let demoHome = app.buttons["PW Demo Healthy"]
             if demoHome.waitForExistence(timeout: 2) { demoHome.tap() }
         }
-        app.tabBars.buttons["Map"].tap(); sleep(2)
+        selectTab("Map", in: app); sleep(2)
         XCTAssertTrue(app.buttons["Go to home station"].waitForExistence(timeout: 2))
         app.buttons["Go to home station"].tap(); sleep(2)
 
         step("Settings: server connection and configurable 1-10 minute refresh interval")
-        app.tabBars.buttons["Settings"].tap(); sleep(2)
+        selectTab("Settings", in: app); sleep(2)
         let refreshLabel = app.staticTexts["Refresh interval"]
         if !refreshLabel.exists { app.swipeUp(); sleep(1) }
         XCTAssertTrue(refreshLabel.waitForExistence(timeout: 2))
@@ -88,10 +88,26 @@ final class ATOMMonitorDemoUITests: XCTestCase {
         if increment.exists { increment.tap(); increment.tap(); sleep(1) }
 
         step("Help: project purpose and user guide")
-        app.tabBars.buttons["Help"].tap(); sleep(2)
+        selectTab("Help", in: app); sleep(2)
 
         step("Map: cached snapshot, persisted layer and last-updated indicator remain available")
-        app.tabBars.buttons["Map"].tap(); sleep(3)
+        selectTab("Map", in: app); sleep(3)
+    }
+
+    private func selectTab(_ name: String, in app: XCUIApplication) {
+        let direct = app.tabBars.buttons[name]
+        if direct.waitForExistence(timeout: 1) {
+            direct.tap()
+            return
+        }
+
+        let more = app.tabBars.buttons["More"]
+        XCTAssertTrue(more.waitForExistence(timeout: 2), "Missing tab '\(name)' and More tab")
+        more.tap()
+
+        let destination = app.staticTexts[name].firstMatch
+        XCTAssertTrue(destination.waitForExistence(timeout: 3), "Missing '\(name)' in More")
+        destination.tap()
     }
 
     private func refreshButton(in app: XCUIApplication) -> XCUIElement {

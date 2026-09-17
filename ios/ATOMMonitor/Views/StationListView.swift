@@ -11,7 +11,7 @@ struct StationListView: View {
             if store.hasActiveFilters { HStack { Label("\(store.filteredStations.count) of \(store.stations.count) stations", systemImage:"line.3.horizontal.decrease.circle.fill").font(.caption).foregroundStyle(.secondary);Spacer();Button("Clear"){store.clearFilters()}.font(.caption) } }
             ForEach(store.filteredStations) { station in
                 let health=store.displayHealth(for:station)
-                HStack(spacing:10){NavigationLink{StationDetailView(station:station)}label:{HStack{Image(systemName:health.symbol).foregroundStyle(colour(health));VStack(alignment:.leading){Text(station.name).font(.headline);Text("\(health.title) • \(station.pilotAwareVersion ?? "Version not reported")").font(.caption).foregroundStyle(.secondary)}}};Button{addFavourite(station.id)}label:{Image(systemName:favouriteIDs.contains(station.id) ? "star.fill":"star").foregroundStyle(favouriteIDs.contains(station.id) ? .yellow:.secondary).font(.title3)}.buttonStyle(.borderless).disabled(favouriteIDs.contains(station.id))}
+                HStack(spacing:10){NavigationLink{StationDetailView(station:station,displayHealth:health,isBackLevelSoftware:store.isBackLevelSoftware(station))}label:{HStack{Image(systemName:health.symbol).foregroundStyle(colour(health));VStack(alignment:.leading){Text(station.name).font(.headline);Text("\(health.title) • \(station.pilotAwareVersion ?? "Version not reported")").font(.caption).foregroundStyle(.secondary)}}};Button{addFavourite(station.id)}label:{Image(systemName:favouriteIDs.contains(station.id) ? "star.fill":"star").foregroundStyle(favouriteIDs.contains(station.id) ? .yellow:.secondary).font(.title3)}.buttonStyle(.borderless).disabled(favouriteIDs.contains(station.id))}
             }
         }
         .searchable(text:$store.searchText,prompt:"Find an ATOM station").refreshable{await store.load()}
@@ -19,7 +19,7 @@ struct StationListView: View {
         .sheet(isPresented:$showingFilters){StationFilterView(store:store)}
     }
     private func addFavourite(_ id:String){var ids=favouriteIDs;ids.insert(id);favouriteStationIDs=ids.sorted().joined(separator:",")}
-    private func colour(_ h:StationHealth)->Color{switch h{case .healthy:return .green;case .warning:return .orange;case .noRecentHeartbeat,.inactive:return .red;case .unknown:return .gray}}
+    private func colour(_ h:StationHealth)->Color{switch h{case .healthy:return .green;case .warning:return .orange;case .noRecentHeartbeat:return .blue;case .inactive:return .red;case .unknown:return .gray}}
 }
 
 struct StationFilterView: View {

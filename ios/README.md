@@ -1,24 +1,18 @@
 # ATOM Monitor iOS
 
-Native SwiftUI iPhone client for browsing PilotAware ATOM ground-station health.
+Native SwiftUI iPhone client for monitoring PilotAware ATOM ground-station operational health and technical status.
 
-## Prototype 0.1
+> ATOM Monitor does not display, record or retain aircraft movements, tracks or aircraft identities.
 
-Implemented:
+## Current functionality — 17 September 2026
 
-- SwiftUI application shell and tab navigation.
-- MapKit map as the home screen.
-- Health-coded station markers with symbols as well as colour.
-- Map station selection and summary card.
-- Search by station name.
-- Searchable station list.
-- Detailed Health, Location, System, Time and Radio sections.
-- `Not reported` handling for absent telemetry.
-- Async observable station store with loading/error state.
-- Replaceable `StationRepository` abstraction.
-- Bundled JSON fixture provider for development before the REST API is live.
+The iPhone client provides **Map, Stations, Favourites, Report, Settings and Help**. It reads the persistent station registry from the configured ATOM Monitor REST service, caches the latest successful snapshot and keeps favourites/preferences locally.
 
-No aircraft map, aircraft tracking, traffic display or flight playback belongs in this application.
+Map includes Find, station selection, clustering, selectable Apple map layers, Home station, manual refresh, station count and configurable marker colours. Display status includes the client-derived **Inactive** state using a configurable threshold (default 2 days). Back-level PilotAware software can be presented separately when the station is otherwise Healthy.
+
+Report summarises the current station dataset by displayed status and PilotAware software version. **Share report** creates a responsive HTML report with horizontal bar graphs and exact count tables plus a station-level CSV, then opens the standard iOS share sheet. The first-presentation share timing fix has been verified on the physical iPhone.
+
+Station detail includes the absolute local **Record date & time** derived from `lastSeen` plus relative observation ages. Missing telemetry displays **Not reported**.
 
 ## Requirements
 
@@ -36,42 +30,58 @@ brew install xcodegen
 Then:
 
 ```bash
-git clone https://github.com/rhine59/ATOMMonitor.git
-cd ATOMMonitor/ios
+cd ~/Documents/Xcode/ATOMMonitor
+git pull
+cd ios
 xcodegen generate
 open ATOMMonitor.xcodeproj
 ```
 
-Select an iPhone simulator or signing team/device and build normally.
+`project.yml` configures automatic signing with Development Team `VNQTGCW476` for the app and UI-test targets. On the configured development Mac, regenerating the project should therefore retain **Richard Hine (Personal Team)** without manually selecting Team again.
 
-## Structure
+## Command-line build
+
+Keep DerivedData outside the repository/Documents File Provider path:
+
+```bash
+rm -rf /tmp/ATOMMonitor-DerivedData
+xcodebuild build \
+  -project ATOMMonitor.xcodeproj \
+  -scheme ATOMMonitor \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+  -derivedDataPath /tmp/ATOMMonitor-DerivedData
+```
+
+## Simulator feature tour
+
+From the repository root:
+
+```bash
+./scripts/record-demo.sh
+```
+
+The UI tour covers Map, Stations, Favourites, Report, Settings and Help. The 17 September source update adds Report summary/share-control checks and the current compact `Stations` navigation title. Rerun the tour before marking that test update Tested.
+
+## Source structure
 
 ```text
 ATOMMonitor/
 ├── ATOMMonitorApp.swift
+├── Assets.xcassets/
 ├── Models/
-│   └── ATOMStation.swift
+├── Resources/
 ├── Services/
-│   └── StationRepository.swift
 ├── ViewModels/
-│   └── StationStore.swift
-├── Views/
-│   ├── ContentView.swift
-│   ├── StationMapView.swift
-│   ├── StationListView.swift
-│   └── StationDetailView.swift
-└── Resources/
-    └── stations.json
+└── Views/
+    ├── ContentView.swift
+    ├── ReportView.swift
+    ├── StationDetailView.swift
+    ├── StationListView.swift
+    └── StationMapView.swift
 ```
 
-## Fixture-data warning
+`project.yml` is the authoritative XcodeGen project definition. If a locally regenerated `ATOMMonitor.xcodeproj` changes, commit the generated project artefact as part of the same checkpoint so source and generated project stay synchronized.
 
-`stations.json` exists to exercise the application architecture. PWMalham uses the limited reference information established during project research. Other fixture station coordinates are development placeholders and their health is intentionally `Unknown`; they are not an authoritative ATOM registry.
+## UI and data principles
 
-## Next integration
-
-Implement `APIStationRepository` against the planned ATOMMonitor REST API without changing the views. The production server will supply the persistent station registry and current health snapshots.
-
-## UI principles
-
-The map remains the primary navigation surface. Stations must remain visible when their heartbeat disappears. Health must never depend on colour alone, missing telemetry is `Not reported`, Dynamic Type and safe areas should be respected, and device location remains optional.
+The map remains the primary operational navigation surface. Stations remain available when heartbeat/position data is absent. Health does not depend on colour alone, missing telemetry is `Not reported`, cached station data is a latest snapshot rather than history, and aircraft data remains outside the application and report formats.

@@ -116,7 +116,6 @@ private fun ResponsiveMapScreen(vm: StationVM, onStation: (Station) -> Unit) {
     var query by remember { mutableStateOf("") }
     var mapRef by remember { mutableStateOf<MapView?>(null) }
     var homeMessage by remember { mutableStateOf<String?>(null) }
-    var initialHomeApplied by remember { mutableStateOf(false) }
     val shown = vm.filtered(query = query)
 
     fun focusHome(filtered: Boolean) {
@@ -140,24 +139,25 @@ private fun ResponsiveMapScreen(vm: StationVM, onStation: (Station) -> Unit) {
         val lon = target?.longitude
         if (lat == null || lon == null) {
             map.controller.setZoom(6.0)
-            map.controller.animateTo(GeoPoint(54.5, -3.0))
+            map.controller.setCenter(GeoPoint(54.5, -3.0))
         } else {
             map.controller.setZoom(9.0)
-            map.controller.animateTo(GeoPoint(lat, lon))
+            map.controller.setCenter(GeoPoint(lat, lon))
         }
+        map.invalidate()
     }
 
-    LaunchedEffect(vm.stations.size, vm.home) {
-        if (!initialHomeApplied && vm.stations.isNotEmpty()) {
-            initialHomeApplied = true
-            if (vm.home.isNotBlank()) focusHome(false)
-        }
+    LaunchedEffect(mapRef, vm.stations.size, vm.home) {
+        if (mapRef != null && vm.stations.isNotEmpty() && vm.home.isNotBlank()) focusHome(false)
     }
-    LaunchedEffect(vm.selectedHealth, vm.selectedVersions) {
-        if (vm.hasFilters && vm.stations.isNotEmpty()) focusHome(true)
-        else if (vm.stations.isNotEmpty() && mapRef != null) {
+    LaunchedEffect(mapRef, vm.selectedHealth, vm.selectedVersions) {
+        if (mapRef == null || vm.stations.isEmpty()) return@LaunchedEffect
+        if (vm.hasFilters) focusHome(true)
+        else if (vm.home.isNotBlank()) focusHome(false)
+        else {
             mapRef?.controller?.setZoom(6.0)
-            mapRef?.controller?.animateTo(GeoPoint(54.5, -3.0))
+            mapRef?.controller?.setCenter(GeoPoint(54.5, -3.0))
+            mapRef?.invalidate()
         }
     }
 
@@ -166,7 +166,6 @@ private fun ResponsiveMapScreen(vm: StationVM, onStation: (Station) -> Unit) {
             modifier = Modifier.fillMaxSize(),
             factory = { context ->
                 MapView(context).apply {
-                    mapRef = this
                     setTileSource(TileSourceFactory.MAPNIK)
                     setMultiTouchControls(true)
                     controller.setZoom(6.0)
@@ -247,13 +246,12 @@ private fun ResponsiveMapScreen(vm: StationVM, onStation: (Station) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ResponsiveSettings(vm: StationVM) {
     var server by remember { mutableStateOf(vm.server) }
     var refresh by remember { mutableIntStateOf(vm.refreshMinutes) }
     var inactive by remember { mutableIntStateOf(vm.inactiveAfterDays) }
-    var homeMenu by remember { mutableStateOf(false) }
+    var showHomePicker by remember { mutableStateOf(false) }
     var testResult by remember { mutableStateOf<String?>(null) }
     var testing by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -291,21 +289,9 @@ private fun ResponsiveSettings(vm: StationVM) {
         testResult?.let { result -> item { Text(result, style = MaterialTheme.typography.bodySmall) } }
         item { HorizontalDivider(); Text("Home station", style = MaterialTheme.typography.titleMedium) }
         item {
-            ExposedDropdownMenuBox(expanded = homeMenu, onExpandedChange = { homeMenu = !homeMenu }) {
-                OutlinedTextField(
-                    value = selectedHome?.name ?: if (vm.home.isBlank()) "Not set" else vm.home,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Home ATOM station") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = homeMenu) },
-                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth()
-                )
-                ExposedDropdownMenu(expanded = homeMenu, onDismissRequest = { homeMenu = false }) {
-                    DropdownMenuItem(text = { Text("Not set") }, onClick = { vm.home = ""; homeMenu = false })
-                    vm.stations.sortedBy { it.name.lowercase() }.forEach { station ->
-                        DropdownMenuItem(text = { Text(station.name) }, onClick = { vm.home = station.id; homeMenu = false })
-                    }
-                }
+            OutlinedButton(onClick = { showHomePicker = true }, modifier = Modifier.fillMaxWidth()) {
+                Text(selectedHome?.name ?: if (vm.home.isBlank()) "Not set" else vm.home, modifier = Modifier.weight(1f))
+                Icon(Icons.Default.ArrowDropDown, "Choose Home ATOM station")
             }
         }
         item { Text("Home is used by the map Home control and as the origin for filtered map focus. Device location is not required.", style = MaterialTheme.typography.bodySmall) }
@@ -315,6 +301,65 @@ private fun ResponsiveSettings(vm: StationVM) {
         item { Slider(inactive.toFloat(), { inactive = it.toInt().coerceIn(1, 30); vm.inactiveAfterDays = inactive; vm.thresholdChanged() }, valueRange = 1f..30f, steps = 28) }
         item { Text("Stations not seen for this many days are shown Inactive. Default 2 days.", style = MaterialTheme.typography.bodySmall) }
     }
+
+    if (showHomePicker) {
+        HomeStationPicker(
+            stations = vm.stations,
+            selectedID = vm.home,
+            onSelect = { vm.home = it; showHomePicker = false },
+            onDismiss = { showHomePicker = false }
+        )
+    }
+}
+
+@Composable
+private fun HomeStationPicker(
+    stations: List<Station>,
+    selectedID: String,
+    onSelect: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var query by remember { mutableStateOf("") }
+    val filtered = remember(stations, query) {
+        stations.sortedBy { it.name.lowercase() }.filter {
+            query.isBlank() || it.name.contains(query, ignoreCase = true) || it.id.contains(query, ignoreCase = true)
+        }
+    }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+        title = { Text("Choose Home ATOM station") },
+        text = {
+            Column(Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    placeholder = { Text("Find station") },
+                    leadingIcon = { Icon(Icons.Default.Search, null) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(8.dp))
+                LazyColumn(Modifier.fillMaxWidth().heightIn(max = 420.dp)) {
+                    item {
+                        ListItem(
+                            headlineContent = { Text("Not set") },
+                            trailingContent = { if (selectedID.isBlank()) Icon(Icons.Default.Check, "Selected") },
+                            modifier = Modifier.clickable { onSelect("") }
+                        )
+                    }
+                    items(filtered, key = { it.id }) { station ->
+                        ListItem(
+                            headlineContent = { Text(station.name) },
+                            supportingContent = { if (station.id != station.name) Text(station.id) },
+                            trailingContent = { if (station.id == selectedID) Icon(Icons.Default.Check, "Selected") },
+                            modifier = Modifier.clickable { onSelect(station.id) }
+                        )
+                    }
+                }
+            }
+        }
+    )
 }
 
 private suspend fun testReady(server: String): Int = withContext(Dispatchers.IO) {

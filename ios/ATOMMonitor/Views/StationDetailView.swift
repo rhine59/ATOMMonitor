@@ -49,9 +49,9 @@ struct StationDetailView: View {
                 LabeledContent("Latitude", value: coordinate(station.latitude))
                 LabeledContent("Longitude", value: coordinate(station.longitude))
                 LabeledContent("Altitude", value: text(station.altitudeMetres, suffix: " m", decimals: 0))
-                if let googleEarthURL {
-                    Link(destination: googleEarthURL) {
-                        Label("View satellite location in Google Earth", systemImage: "globe.americas.fill")
+                if let googleMapsSatelliteURL {
+                    Link(destination: googleMapsSatelliteURL) {
+                        Label("View satellite location in Google Maps", systemImage: "map.fill")
                     }
                 }
             }
@@ -108,9 +108,9 @@ struct StationDetailView: View {
         (MapIconColour(rawValue: raw) ?? fallback).color
     }
 
-    private var googleEarthURL: URL? {
+    private var googleMapsSatelliteURL: URL? {
         guard let latitude = station.latitude, let longitude = station.longitude else { return nil }
-        return URL(string: "https://earth.google.com/web/@\(latitude),\(longitude),500a,1000d,35y,0h,0t,0r")
+        return URL(string: "https://www.google.com/maps/@?api=1&map_action=map&center=\(latitude),\(longitude)&zoom=18&basemap=satellite")
     }
 
     private var memory: String {

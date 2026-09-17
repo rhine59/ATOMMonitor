@@ -8,11 +8,11 @@ This document is the authoritative setup/build/install guide for the Android cli
 
 Technology and project settings:
 
-- Kotlin 2.1.0
+- Kotlin/Compose compiler plugin 2.3.20
 - Jetpack Compose / Material 3
-- Android Gradle Plugin 8.7.3
-- compile SDK 35
-- target SDK 35
+- Android Gradle Plugin 9.4.0
+- compile SDK 37
+- target SDK 37
 - minimum Android API 26 (Android 8.0)
 - application ID / namespace `uk.co.rhine59.atommonitor`
 - version code 1
@@ -36,8 +36,8 @@ Install Android Studio from the official Android developer distribution. During 
 
 For this project ensure the SDK Manager has:
 
-- Android SDK Platform 35;
-- Android SDK Build-Tools appropriate for API 35;
+- Android SDK Platform 37;
+- Android SDK Build-Tools compatible with API 37;
 - Android SDK Platform-Tools (`adb`);
 - Android SDK Command-line Tools (latest);
 - Android Emulator if you want to use a virtual phone.

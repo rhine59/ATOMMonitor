@@ -22,8 +22,17 @@ final class StationStore: ObservableObject {
         }
     }
 
+    var inactiveAfterDays: Int {
+        let value = UserDefaults.standard.object(forKey: "inactiveAfterDays") as? Int ?? 2
+        return max(value, 1)
+    }
+
+    func displayHealth(for station: ATOMStation) -> StationHealth {
+        station.displayHealth(inactiveAfterDays: inactiveAfterDays)
+    }
+
     var availableHealthValues: [StationHealth] {
-        StationHealth.allCases.filter { health in stations.contains { $0.health == health } }
+        StationHealth.allCases.filter { health in stations.contains { displayHealth(for: $0) == health } }
     }
 
     var availablePilotAwareVersions: [String] {
@@ -36,7 +45,7 @@ final class StationStore: ObservableObject {
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         return stations.filter { station in
             let matchesSearch = query.isEmpty || station.name.localizedCaseInsensitiveContains(query)
-            let matchesHealth = selectedHealthFilters.isEmpty || selectedHealthFilters.contains(station.health)
+            let matchesHealth = selectedHealthFilters.isEmpty || selectedHealthFilters.contains(displayHealth(for: station))
             let matchesVersion = selectedPilotAwareVersions.isEmpty || (station.pilotAwareVersion.map { selectedPilotAwareVersions.contains($0) } ?? false)
             return matchesSearch && matchesHealth && matchesVersion
         }
@@ -45,6 +54,12 @@ final class StationStore: ObservableObject {
     func clearFilters() {
         selectedHealthFilters.removeAll()
         selectedPilotAwareVersions.removeAll()
+    }
+
+    func inactiveThresholdChanged() {
+        let validHealth = Set(availableHealthValues)
+        selectedHealthFilters.formIntersection(validHealth)
+        objectWillChange.send()
     }
 
     func load() async {

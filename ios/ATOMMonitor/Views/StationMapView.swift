@@ -11,6 +11,7 @@ struct StationMapView: View {
     @State private var hasAppliedInitialHome = false
     @State private var detailStation: ATOMStation?
     @State private var homeMessage: String?
+    @State private var showingFilters = false
 
     private static let defaultRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude:54.2,longitude:-2.5),span:MKCoordinateSpan(latitudeDelta:7.5,longitudeDelta:7.5))
     private var positionedStations:[ATOMStation]{store.filteredStations.filter{$0.coordinate != nil}}
@@ -28,6 +29,7 @@ struct StationMapView: View {
         .ignoresSafeArea(.container,edges:.all)
         .overlay{if store.isLoading{ProgressView("Loading stations…").padding().background(.regularMaterial,in:RoundedRectangle(cornerRadius:14))}}
         .sheet(item:$detailStation){station in NavigationStack{StationDetailView(station:station).toolbar{ToolbarItem(placement:.topBarTrailing){Button("Done"){detailStation=nil}}}}.presentationDetents([.medium,.large]).presentationDragIndicator(.visible)}
+        .sheet(isPresented:$showingFilters){StationFilterView(store:store)}
         .alert("Unable to load stations",isPresented:errorPresented){Button("OK"){store.clearError()}}message:{Text(store.errorMessage ?? "Unknown error")}
         .alert("Home station",isPresented:homeMessagePresented){Button("OK"){homeMessage=nil}}message:{Text(homeMessage ?? "")}
     }
@@ -38,40 +40,20 @@ struct StationMapView: View {
                 Text("ATOM Stations").font(.title2.bold()).foregroundStyle(.primary).lineLimit(1).minimumScaleFactor(0.75)
                 Spacer(minLength:4)
                 mapLayerMenu
+                chromeButton(systemName:store.hasActiveFilters ? "line.3.horizontal.decrease.circle.fill":"line.3.horizontal.decrease.circle",accessibilityLabel:"Filter stations",disabled:false){showingFilters=true}
                 chromeButton(systemName:"house.fill",accessibilityLabel:"Go to home station",disabled:false){goHome()}
                 Button{Task{await store.load()}}label:{if store.isLoading{ProgressView().controlSize(.small).frame(width:28,height:28)}else{Image(systemName:"arrow.clockwise").font(.subheadline.weight(.semibold)).frame(width:28,height:28)}}.buttonStyle(.bordered).buttonBorderShape(.circle).disabled(store.isLoading).accessibilityLabel("Refresh stations")
             }.padding(.horizontal,2)
             connectionStatus
+            if store.hasActiveFilters { HStack { Text("Filtered: \(store.filteredStations.count) of \(store.stations.count)").font(.caption).foregroundStyle(.secondary); Spacer(); Button("Clear filters"){store.clearFilters()}.font(.caption) }.padding(.horizontal,2) }
             searchBar
         }.padding(.horizontal,adaptiveHorizontalPadding(for:width)).padding(.top,max(topInset,50)+6)
     }
 
-    private var connectionStatus:some View{
-        Group{
-            if store.errorMessage != nil {
-                Text("No Network").foregroundStyle(.red).accessibilityLabel("No Network")
-            } else if let updated=store.lastSuccessfulRefresh {
-                Text("Last updated: \(updated.formatted(date:.omitted,time:.shortened))").foregroundStyle(.secondary).accessibilityLabel("Last updated \(updated.formatted(date:.abbreviated,time:.shortened))")
-            } else {
-                Text("Last updated: —").foregroundStyle(.secondary)
-            }
-        }
-        .font(.caption)
-        .lineLimit(1)
-        .padding(.horizontal,2)
-    }
-
-    private var mapLayerMenu:some View{
-        Menu{ForEach(StationMapLayer.allCases){layer in Button{mapLayerRawValue=layer.rawValue}label:{Label(layer.title,systemImage:mapLayer==layer ? "checkmark":"map")}}}label:{Image(systemName:"square.3.layers.3d").font(.subheadline.weight(.semibold)).frame(width:28,height:28)}
-        .buttonStyle(.bordered).buttonBorderShape(.circle).accessibilityLabel("Map layers")
-    }
-
+    private var connectionStatus:some View{Group{if store.errorMessage != nil {Text("No Network").foregroundStyle(.red).accessibilityLabel("No Network")}else if let updated=store.lastSuccessfulRefresh {Text("Last updated: \(updated.formatted(date:.omitted,time:.shortened))").foregroundStyle(.secondary).accessibilityLabel("Last updated \(updated.formatted(date:.abbreviated,time:.shortened))")}else{Text("Last updated: —").foregroundStyle(.secondary)}}.font(.caption).lineLimit(1).padding(.horizontal,2)}
+    private var mapLayerMenu:some View{Menu{ForEach(StationMapLayer.allCases){layer in Button{mapLayerRawValue=layer.rawValue}label:{Label(layer.title,systemImage:mapLayer==layer ? "checkmark":"map")}}}label:{Image(systemName:"square.3.layers.3d").font(.subheadline.weight(.semibold)).frame(width:28,height:28)}.buttonStyle(.bordered).buttonBorderShape(.circle).accessibilityLabel("Map layers")}
     private func chromeButton(systemName:String,accessibilityLabel:String,disabled:Bool,action:@escaping()->Void)->some View{Button(action:action){Image(systemName:systemName).font(.subheadline.weight(.semibold)).frame(width:28,height:28)}.buttonStyle(.bordered).buttonBorderShape(.circle).disabled(disabled).accessibilityLabel(accessibilityLabel)}
-    private func goHome(){
-        guard !homeStationID.isEmpty else{homeMessage="No home station set";return}
-        guard let station=store.stations.first(where:{$0.id==homeStationID}),let coordinate=station.coordinate else{homeMessage="Home station location not reported";return}
-        let region=MKCoordinateRegion(center:coordinate,span:MKCoordinateSpan(latitudeDelta:0.8,longitudeDelta:0.8));visibleRegion=region;withAnimation{position = .region(region)}
-    }
+    private func goHome(){guard !homeStationID.isEmpty else{homeMessage="No home station set";return};guard let station=store.stations.first(where:{$0.id==homeStationID}),let coordinate=station.coordinate else{homeMessage="Home station location not reported";return};let region=MKCoordinateRegion(center:coordinate,span:MKCoordinateSpan(latitudeDelta:0.8,longitudeDelta:0.8));visibleRegion=region;withAnimation{position = .region(region)}}
     private func adaptiveHorizontalPadding(for width:CGFloat)->CGFloat{width<390 ? 8:12}
     private var mapItems:[StationMapItem]{cluster(positionedStations,in:visibleRegion)}
     private func cluster(_ stations:[ATOMStation],in region:MKCoordinateRegion)->[StationMapItem]{guard stations.count>1 else{return stations.map{.station($0)}};let a=max(region.span.latitudeDelta/7,0.0008),b=max(region.span.longitudeDelta/5,0.0008);let groups=Dictionary(grouping:stations){s->GridKey in let c=s.coordinate!;return GridKey(latitude:Int(floor(c.latitude/a)),longitude:Int(floor(c.longitude/b)))};return groups.values.map{$0.count==1 ? .station($0[0]):.cluster(StationCluster(stations:$0))}}

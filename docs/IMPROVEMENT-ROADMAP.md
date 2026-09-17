@@ -1,8 +1,10 @@
 # ATOM Monitor — Improvement Roadmap
 
-Checkpoint: 16 September 2026
+Checkpoint: 17 September 2026
 
 This document records the engineering improvements identified at the current stable checkpoint. The emphasis is now on reliability, correctness, security and reproducibility rather than adding unrelated features.
+
+The authoritative feature/change objective and implementation/test state is maintained in `docs/FEATURE-STATUS.md`. **Every implementation change must update that register in the same development cycle.**
 
 ## Scope invariant
 
@@ -138,4 +140,4 @@ These remain useful after the main sequence above:
 
 Do not add significant unrelated functionality before the public endpoint, refresh concurrency, stale-packet protection and public API security work are complete. The current application has enough functional breadth that correctness and operational resilience now provide more value than feature count.
 
-When any roadmap item is implemented, update the relevant repository documentation, the local in-app User Guide where user-visible behaviour changes, build/test evidence where appropriate, and commit the synchronized change to GitHub.
+When any roadmap item or other implementation change is made, update `docs/FEATURE-STATUS.md`, the relevant repository documentation, the local in-app User Guide where user-visible behaviour changes, build/test evidence where appropriate, and commit the synchronized change to GitHub. A source-code commit is not a tested feature: status advances only when the corresponding build and runtime checks have actually passed.

@@ -30,16 +30,23 @@ struct ATOMStation: Identifiable, Codable, Hashable {
         guard let latitude, let longitude else { return nil }
         return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
+
+    func displayHealth(inactiveAfterDays: Int, now: Date = Date()) -> StationHealth {
+        guard let lastSeen else { return health }
+        let threshold = TimeInterval(max(inactiveAfterDays, 1) * 24 * 60 * 60)
+        return now.timeIntervalSince(lastSeen) >= threshold ? .inactive : health
+    }
 }
 
 enum StationHealth: String, Codable, CaseIterable {
-    case healthy, warning, noRecentHeartbeat, unknown
+    case healthy, warning, noRecentHeartbeat, inactive, unknown
 
     var title: String {
         switch self {
         case .healthy: return "Healthy"
         case .warning: return "Warning"
         case .noRecentHeartbeat: return "No recent heartbeat"
+        case .inactive: return "Inactive"
         case .unknown: return "Unknown"
         }
     }
@@ -49,6 +56,7 @@ enum StationHealth: String, Codable, CaseIterable {
         case .healthy: return "checkmark.circle.fill"
         case .warning: return "exclamationmark.triangle.fill"
         case .noRecentHeartbeat: return "xmark.circle.fill"
+        case .inactive: return "minus.circle.fill"
         case .unknown: return "questionmark.circle.fill"
         }
     }

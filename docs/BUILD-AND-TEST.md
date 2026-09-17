@@ -1,157 +1,163 @@
-# ATOM Monitor — Build and Test
+# ATOM Monitor — Build and Test Guide
 
-This document is the reproducible build/test record for the Synology server and iPhone application. The project intentionally handles ATOM ground-station health only; aircraft identity, position, movement and track data are excluded.
+Last updated: 17 September 2026
 
-## Synology server
+This is the repeatable build/test guide for the server, iPhone and Android clients. Meaningful build/runtime evidence must be captured in Git and `docs/FEATURE-STATUS.md` must be updated as features progress through Implemented, Build passed and Tested.
 
-Repository location on the DS918: `/volume1/docker/ATOMMonitor`.
+## Scope invariant
 
-Git commands are run as the normal user. Docker/Compose commands on this Synology are run with `sudo`. The complete clean-install, backup, reverse-proxy and recovery procedure is in `SYNOLOGY-HOSTING-RUNBOOK.md`.
+All tests must preserve the product boundary: ATOM Monitor monitors PilotAware ATOM ground-station health only. Do not introduce, capture or persist aircraft identities, positions, tracks or aircraft packet history.
 
-### Network ports
+## Repository
 
-Synology DSM nginx already listens on host TCP port 8080. ATOM Monitor therefore publishes its REST API on **host port 8088**. Inside the Docker network the API continues to listen on port 8080, so the collector posts to `http://atom-api:8080/api/v1/observations`.
+Mac development checkout:
 
-Port 8088 is internal/LAN diagnostic access. Normal remote access is HTTPS through DSM Reverse Proxy at:
-
-```text
-https://granvillehouse.synology.me:8445/
+```bash
+cd ~/Documents/Xcode/ATOMMonitor
+git pull
+git status --short
 ```
 
-DSM forwards that HTTPS service internally to `http://localhost:8088`. Do not directly Internet-forward port 8088.
+Synology deployment checkout:
 
-### Automated server build/test
-
-From the repository root:
-
-```sh
+```bash
 cd /volume1/docker/ATOMMonitor
 git pull
-chmod +x scripts/synology-build-test.sh
-./scripts/synology-build-test.sh 2>&1 | tee server/diagnostic/build-test.log
+git status --short
 ```
 
-The script records the UTC time and Git revision, runs the collector unit tests, rebuilds both Docker services without cache, starts the stack, displays container state, waits for the API health endpoint on host port 8088, queries the station API, prints a station sample and captures recent container logs.
+Use `sudo` for Docker/Compose commands on Synology. Do not use `sudo` for Git.
 
-A successful run ends with `PASS: unit tests, Docker build/start and local REST API checks completed.`
+## Server / Synology
 
-To preserve a particular test run in Git:
+Production Compose publishes the API on host port 8088. DSM reverse proxy exposes HTTPS on `granvillehouse.synology.me:8445`; do not expose 8088 directly to the Internet.
 
-```sh
-git add server/diagnostic/build-test.log
-git commit -m "Record Synology build and test"
-git push
-```
+The API runs under Gunicorn. `/health` tests process liveness and `/ready` tests database readiness. The collector is health-gated on `/ready`.
 
-Do not use `sudo` for those Git commands.
+Before recreating the production server, take a consistent SQLite backup using the SQLite backup API or another consistency-safe method; do not blindly copy a live database file.
 
-### Individual checks
+Deploy/rebuild:
 
-```sh
-cd /volume1/docker/ATOMMonitor/server/diagnostic
-python3 -m unittest -v
-
-cd ..
-sudo docker compose build --no-cache
+```bash
+cd /volume1/docker/ATOMMonitor/server
+sudo docker compose build
 sudo docker compose up -d
 sudo docker compose ps
-curl http://localhost:8088/health
-curl http://localhost:8088/ready
-curl http://localhost:8088/api/v1/stations
-sudo docker compose logs --tail=100 atom-api ogn-station-probe
 ```
 
-From another machine on the LAN:
+Do not print the contents of `server/.env`, and avoid commands/output that expand the private `ATOM_INGEST_TOKEN` into logs or documentation.
 
-```sh
-curl http://192.168.1.99:8088/health
-curl http://192.168.1.99:8088/ready
-curl http://192.168.1.99:8088/api/v1/stations
+LAN checks:
+
+```bash
+curl -fsS http://127.0.0.1:8088/health
+curl -fsS http://127.0.0.1:8088/ready
+curl -fsS http://127.0.0.1:8088/api/v1/stations | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))'
 ```
 
-Public-path checks:
+Public read checks:
 
-```sh
-curl -v https://granvillehouse.synology.me:8445/health
-curl -v https://granvillehouse.synology.me:8445/ready
-curl -v https://granvillehouse.synology.me:8445/api/v1/stations
+```bash
+curl -fsS https://granvillehouse.synology.me:8445/health
+curl -fsS https://granvillehouse.synology.me:8445/ready
+curl -fsS https://granvillehouse.synology.me:8445/api/v1/stations | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))'
 ```
 
-The public test must validate the certificate normally; do not use `-k` as a production workaround.
+The station count is live and can change; compare consistency rather than expecting a hard-coded value.
 
-### Server resilience checkpoints
+Public write-boundary regression:
 
-**17 September 2026 — Phase 1 health/readiness and restart checkpoint:** the rebuilt Compose deployment reported the API healthy, `/ready` successfully checked SQLite, the persistent registry contained 305 confirmed stations, and the collector resumed accepted ground-station observations after API restart. The registry remained at 305 across the controlled container replacement/restart, confirming persistence outside the API container.
-
-**17 September 2026 — production WSGI checkpoint:** the API image was rebuilt without cache and the running container was replaced. `docker inspect` confirmed the container command is Gunicorn with two workers and two threads; the container reported Gunicorn 23.0.0. Gunicorn logged `Starting gunicorn 23.0.0`, bound to `0.0.0.0:8080`, selected the gthread worker and booted two worker processes. `/ready` returned database `ok` with 305 confirmed stations, `/api/v1/stations` returned 305 stations, and live collector POSTs continued receiving HTTP 202. This replaces Flask's development server while retaining the same SQLite registry and Compose health model. Public HTTPS-path validation remains required before Phase 1 is marked Tested.
-
-## iPhone application
-
-Local Mac repository: `~/Documents/Xcode/ATOMMonitor`.
-
-```sh
-cd ~/Documents/Xcode/ATOMMonitor
-git pull
-cd ios
-xcodegen generate
-open ATOMMonitor.xcodeproj
+```bash
+curl -s -o /dev/null \
+  -w 'PUBLIC WRITE WITHOUT TOKEN: HTTP %{http_code}\n' \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{}' \
+  https://granvillehouse.synology.me:8445/api/v1/observations
 ```
 
-Build in Xcode and install on the iPhone. The verified normal remote service is `https://granvillehouse.synology.me:8445/`. Until the compiled default is changed and regression-tested, Settings can be used to configure/test that endpoint. The LAN address `http://192.168.1.99:8088/` is retained as a diagnostic route only.
+Expected: HTTP 401. Separately inspect API logs to confirm intended collector POSTs are returning 202. Never paste the bearer token into test evidence.
 
-### Build checkpoints
+### Server ordering tests
 
-**17 September 2026 — Simulator feature-tour pass:** after the initial refresh-selector failure was corrected and a second failure exposed compact-width `TabView` behaviour (Settings and Help moved under **More**), commit `6158901` updated the tour to select tabs either directly or through More. The user reran `./scripts/record-demo.sh` and reported `PASS: automated ATOM Monitor feature tour completed.` The run generated `artifacts/ATOMMonitor-Demo.mp4` and `artifacts/ATOMMonitor-Demo-test.log`; the raw recording remains `artifacts/ATOMMonitor-Demo-raw.mp4` and is not intended as the retained milestone artifact. Simulator Report coverage is therefore **Tested**. This is automated Simulator evidence, not a substitute for the remaining physical-iPhone/network acceptance checks.
+Run the unit suite inside the API image while mounting the test module:
 
-**17 September 2026 — Report feature corrective build:** the first Report build failed while compiling `ReportView.swift`. After corrective commit `3850e99`, the user reran the iOS build and confirmed `** BUILD SUCCEEDED **`. The Report feature was subsequently exercised on the physical iPhone and confirmed good, including first-attempt native sharing and the HTML bar-graph enhancement.
-
-**17 September 2026 — map/status source checkpoint:** user confirmed the build run was good after the configurable map-icon colours, back-level PilotAware-version presentation, compact Stations headings/station-count status line, connection-test station count, and yellow No-recent-heartbeat aggregate changes were committed. This advances the affected iOS features to **Build passed — runtime test pending**. It does not by itself prove map colour/cluster behaviour, Settings persistence, network behaviour or other runtime acceptance checks.
-
-### Automated Simulator feature tour
-
-From the repository root:
-
-```sh
-cd ~/Documents/Xcode/ATOMMonitor
-git pull
-./scripts/record-demo.sh
+```bash
+cd /volume1/docker/ATOMMonitor/server
+sudo docker compose run --rm \
+  -e ATOM_DB=/tmp/atommonitor-test.sqlite3 \
+  -v "$PWD/test_app.py:/app/test_app.py:ro" \
+  --entrypoint python \
+  atom-api \
+  -m unittest -v test_app.py
 ```
 
-The script generates the Xcode project, selects an available iPhone Simulator, runs `ATOMMonitorDemoUITests/testRecordedFeatureTour`, records the Simulator and retains the UI-test log under `artifacts/`.
+Current suite covers stale status/position ordering, valid newer updates, category independence, large-future timestamp rejection, tolerated small future skew and malformed packet-time rejection. Record the actual test count/result rather than hard-coding it into future expectations.
 
-**DerivedData must not be written beneath this repository's `~/Documents` path on the current Mac.** During the 16 September 2026 regression run, an app built under `artifacts/DerivedData` acquired File Provider metadata and Xcode failed CodeSign with `resource fork, Finder information, or similar detritus not allowed`. Rebuilding with DerivedData at `/tmp/ATOMMonitor-DerivedData` succeeded, with a clean app bundle and valid code signature.
+### Restart resilience checkpoint
 
-`record-demo.sh` therefore defaults to `/tmp/ATOMMonitor-DerivedData` and removes that directory before each automated tour. To use another clean location:
+Record station count and `/ready`, restart/recreate the API in a controlled way, then verify database readiness, station persistence and resumed collector 202 responses. Check `sudo docker stats --no-stream` when evaluating resource behaviour. Do not infer a memory leak or impose arbitrary limits from one sample.
 
-```sh
-ATOM_DERIVED_DATA="$HOME/Library/Developer/Xcode/DerivedData/ATOMMonitor-Demo" ./scripts/record-demo.sh
+## iPhone build
+
+The iOS project is generated/configured for iOS 17+, iPhone only, automatic signing and Development Team `VNQTGCW476`. Use external DerivedData because File Provider metadata in the repository path has previously caused code-signing problems.
+
+From the repository, regenerate the Xcode project if `project.yml` changed, then build in Xcode or with the established external DerivedData workflow. A source commit is not a passed build.
+
+Physical-iPhone regression should cover Map, Stations, Favourites, Report/share, Settings/Test Connection, Help/User Guide, cached/no-network presentation and Station Detail.
+
+Current Station Detail checks on iPhone:
+
+- effective health icon and matching explanation
+- Healthy/back-level presentation where applicable
+- record absolute date/time and relative heartbeat/seen/position/technical ages
+- station/software, location, system, time and radio sections
+- no displayed Uptime, Supply voltage or Frequency correction
+- RF correction remains separate
+- Google Maps link opens the exact station location with a pin and satellite imagery requested at zoom 18
+- normal no-filter refresh does not undo Home map focus
+
+The Google Maps satellite/pin result must be checked on the physical device because final handling can depend on the installed Google Maps app/browser.
+
+## Android build
+
+The Android client is Kotlin/Jetpack Compose, minimum API 26. It uses the same public server and station-only scope.
+
+```bash
+cd ~/Documents/Xcode/ATOMMonitor/android
+./gradlew clean
+./gradlew assembleDebug
 ```
 
-### iPhone acceptance test
+Expected debug APK location:
 
-1. Configure/test `https://granvillehouse.synology.me:8445/`; for a true external-path test disable Wi-Fi and use cellular data.
-2. Launch ATOM Monitor and confirm Stations loads server-provided stations rather than fixture data.
-3. Confirm stations with coordinates appear on Map and clustering works. Confirm individual defaults: Healthy green, Back-level software purple, No recent heartbeat blue, Inactive red, Warning orange and Unknown grey. Confirm an aggregate containing No recent heartbeat is yellow by default, and a Healthy + Inactive aggregate is yellow.
-4. In Settings → Map icon colours, change representative colours, return to Map and confirm the individual markers change; relaunch and confirm the choices persist; use Restore default colours and confirm the documented defaults return.
-5. Confirm Map manual refresh works and Last updated advances only after a successful snapshot, with the station count shown on the same status line.
-6. Confirm the Map and Stations headings read `Stations` rather than `ATOM Stations`.
-7. In Settings, run Test Connection and confirm a successful response shows `OK — <count> stations`.
-8. Exercise Standard, Satellite + Labels and Satellite map layers.
-9. With no home station configured, tap Home and confirm `No home station set`; then configure a home station and confirm Home returns the map to it.
-10. Open a station detail and confirm **Record date & time** displays an absolute local date/time for `lastSeen`; confirm Last heartbeat, Last seen, Last position and Last technical status remain relative-age values. For a missing timestamp, confirm `Not reported`.
-11. Open Report and confirm Total stations equals the loaded station count; verify the Status counts sum to the total and the PilotAware-version counts sum to the total including `Not reported` where applicable.
-12. Tap **Share report** on a physical iPhone. Confirm the standard iOS share sheet appears and offers installed capabilities such as Mail, Messages, AirDrop and Files as available.
-13. Share/save the generated HTML and CSV. Open the HTML and confirm the formatted summary, status counts, version counts, generation time and data-update time are readable on phone and desktop. Open the CSV and confirm station name, displayed status, PilotAware version, station timestamps and latitude/longitude are correctly escaped and represented. Confirm neither output contains aircraft identities, positions, movements or tracks.
-14. Add a station to Favourites from Map and from Stations.
-15. Disconnect the server/network temporarily and relaunch/refresh; the last station cache should remain available and Map should report `No Network` for the failed current request, including the cached station count.
-16. Confirm favourite records remain available from the durable local favourites cache after a successful server refresh.
-17. Restore connectivity and verify fresh server data replaces the general cache.
-18. Remove a favourite in Settings and verify the preference is retained.
-19. Open Help → User Guide and verify the current station status, timestamp, map-colour and Report behaviour is documented locally/offline.
-20. Confirm no aircraft movement/identity UI or data appears anywhere.
+`app/build/outputs/apk/debug/app-debug.apk`
 
-## What constitutes an end-to-end pass
+The Gradle wrapper JAR is binary and may require local provisioning if it is not present in Git; do not claim an Android build passed until Gradle actually completes successfully.
 
-An end-to-end pass requires: collector unit tests passing; both Docker services running; `/health` returning success on host port 8088; `/ready` confirming its database dependency; `/api/v1/stations` returning PilotAware-confirmed persistent station records; public HTTPS access through `granvillehouse.synology.me:8445`; iPhone decoding/displaying those records including the absolute station record timestamp; and local caching/favourites behaviour working as described above.
+Android runtime regression should cover the same six product areas as iPhone and the same Station Detail information contract. In particular verify the new Android detail icon/explanation, telemetry sections, omitted unused fields, and Google Maps satellite/pin intent.
 
-Runtime logs are evidence of a particular build, not source code. Commit a `build-test.log` when a milestone or fault investigation needs a permanent record; routine repeated logs need not be committed indefinitely.
+Known Android parity work still outstanding as of 17 September 2026: map clustering/mixed cluster presentation, configurable map-icon colours, and Home-relative filtered-map focus. These are tracked explicitly in `FEATURE-STATUS.md` and are not to be treated as complete merely because iOS passes.
+
+## Cross-platform parity rule
+
+Every user-facing phone feature or behaviour change is implemented on both iOS and Android in the same development cycle unless a documented platform-specific reason prevents it. The implementation may use native platform mechanisms, but the user-visible objective should match. Build and runtime status remain independent.
+
+## Evidence and status workflow
+
+For every implementation change:
+
+1. Update `docs/FEATURE-STATUS.md` and affected guides/documentation.
+2. Commit implementation/documentation.
+3. Build the affected platform(s).
+4. Record meaningful build evidence in Git and move status only to `Build passed — runtime test pending`.
+5. Run required runtime/regression checks.
+6. Record evidence and only then mark the feature `Tested`.
+
+If a later change touches a previously Tested behaviour, return the affected feature to a pending state until the relevant regression check passes again.
+
+Simulator recordings/logs that are final evidence may be tracked. Raw intermediate `*-raw*.mp4` and DerivedData must remain ignored.
+
+## Current evidence
+
+Phase 1 Synology resilience/security evidence is recorded in `docs/PHASE1-TEST-EVIDENCE-2026-09-17.md`. The feature register is the authoritative current status source; historical checkpoint documents are snapshots and should not be interpreted as overriding it.

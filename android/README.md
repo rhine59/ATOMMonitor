@@ -11,6 +11,8 @@ Technology and project settings:
 - Kotlin/Compose compiler plugin 2.3.20
 - Jetpack Compose / Material 3
 - Android Gradle Plugin 9.4.0
+- Gradle 9.6.0 wrapper
+- Java 17 verified build runtime
 - compile SDK 37
 - target SDK 37
 - minimum Android API 26 (Android 8.0)
@@ -42,7 +44,7 @@ For this project ensure the SDK Manager has:
 - Android SDK Command-line Tools (latest);
 - Android Emulator if you want to use a virtual phone.
 
-Use Android Studio's bundled JDK unless Gradle reports a specific incompatibility. AGP 8.7.x requires Java 17; Android Studio's current embedded runtime is normally the simplest choice. In Android Studio check **Settings/Preferences → Build, Execution, Deployment → Build Tools → Gradle → Gradle JDK** and select the embedded JDK/JBR compatible with Java 17 or later.
+The verified command-line build uses Java 17. In Android Studio check **Settings/Preferences → Build, Execution, Deployment → Build Tools → Gradle → Gradle JDK** and select an embedded JDK/JBR compatible with Java 17, or another Java 17 installation known to work with the project.
 
 You do not need Xcode, CocoaPods or an Apple developer account to build the Android app.
 
@@ -76,42 +78,32 @@ Android Studio should recognise `settings.gradle.kts` and import the Gradle proj
 
 Allow Gradle Sync to complete. The first sync can take several minutes because Android/Compose/osmdroid dependencies must be downloaded.
 
-If Android Studio asks which JDK to use, select its embedded JDK/JBR rather than an unrelated system Java installation.
+If Android Studio asks which JDK to use, select a Java 17-compatible JDK/JBR.
 
-## 5. Gradle wrapper status
+## 5. Gradle wrapper
 
-At the initial Android checkpoint, a Gradle wrapper binary was not committed because the GitHub text connector cannot create the wrapper JAR. Therefore a fresh checkout may not initially contain `gradlew`, `gradlew.bat` and `gradle/wrapper/gradle-wrapper.jar`.
+The Gradle wrapper has now been generated and verified locally. The project uses **Gradle 9.6.0**, and the wrapper scripts, properties and wrapper JAR are intended to be committed with the project so a fresh checkout can use the same Gradle version.
 
-Android Studio can import/sync the Gradle project using its installed Gradle/JDK tooling. Once the project has synced successfully, generate a normal Gradle wrapper locally so command-line builds are reproducible.
-
-From Android Studio's Terminal, inside `android/`, if the `gradle` command is available:
-
-```bash
-gradle wrapper
-```
-
-If it is not available as a shell command, use Android Studio/Gradle tooling for the first build and install a compatible Gradle locally before generating the wrapper. For AGP 8.7.3 use the Gradle version recommended by Android Studio's AGP compatibility check rather than guessing an older version.
-
-After the wrapper exists, verify:
+Verify the wrapper from `android/` with:
 
 ```bash
 ls -l gradlew gradlew.bat gradle/wrapper/
 ./gradlew --version
 ```
 
-The wrapper scripts, properties and wrapper JAR are normal project files and should then be committed to Git so future builds use exactly the same Gradle version.
+The verified output should identify Gradle 9.6.0 and Java 17. Do not regenerate the wrapper simply because Android Studio has another Gradle version installed; change it only as a deliberate toolchain upgrade.
 
 ## 6. First Gradle sync problems
 
-If Android Studio reports that SDK 35 is missing:
+If Android Studio reports that SDK 37 is missing:
 
 1. Open **Tools → SDK Manager**.
-2. Under SDK Platforms select **Android 15 / API 35**.
-3. Under SDK Tools ensure Platform-Tools and Build-Tools are installed.
+2. Under SDK Platforms select/install **API 37**.
+3. Under SDK Tools ensure Platform-Tools and compatible Build-Tools are installed.
 4. Apply the changes.
 5. Select **File → Sync Project with Gradle Files**.
 
-If the error concerns the Java/Gradle runtime, select Android Studio's embedded JDK in Gradle settings and sync again.
+If the error concerns the Java/Gradle runtime, select a Java 17-compatible JDK in Gradle settings and sync again.
 
 If dependency resolution fails, confirm the Mac has Internet access. The project repositories are Google Maven, Maven Central and Gradle Plugin Portal.
 
@@ -141,9 +133,9 @@ android/app/build/outputs/apk/debug/app-debug.apk
 
 A debug APK is automatically signed with the Android debug key and is suitable for development/emulator/your own physical-device testing. It is not a Play Store release package.
 
-## 8. Command-line build
+## 8. Command-line build and confirmed checkpoint
 
-Once the Gradle wrapper has been generated, the preferred repeatable build is:
+The preferred repeatable build is:
 
 ```bash
 cd ~/Documents/Xcode/ATOMMonitor/android
@@ -151,13 +143,30 @@ cd ~/Documents/Xcode/ATOMMonitor/android
 ./gradlew assembleDebug
 ```
 
-Expected output ends with `BUILD SUCCESSFUL`.
+The first confirmed Android debug APK build passed on **17 September 2026** using:
 
-The APK should then be:
+- Android SDK compile/target API 37
+- Android Gradle Plugin 9.4.0
+- Gradle 9.6.0
+- Java 17
+- Kotlin/Compose compiler plugin 2.3.20
+
+The successful build produced:
 
 ```text
 app/build/outputs/apk/debug/app-debug.apk
 ```
+
+The APK was approximately 16 MB. The build emitted a non-fatal native-library stripping warning for `libandroidx.graphics.path.so`; packaging nevertheless completed with `BUILD SUCCESSFUL`.
+
+Build evidence is retained in:
+
+```text
+artifacts/ATOMMonitor-Android-build.log
+artifacts/ATOMMonitor-Android-kotlin-build.log
+```
+
+This checkpoint proves compilation and APK packaging. **Android runtime/regression testing is still pending and must not be recorded as Tested until the app has been exercised on an emulator or physical Android device.**
 
 For more diagnostic output:
 
@@ -171,13 +180,13 @@ or:
 ./gradlew assembleDebug --info
 ```
 
-Before committing build evidence, do not add the `build/` directories themselves to Git.
+Do not commit the generated `build/` directories or debug APK to Git. Commit source, wrapper/toolchain files, documentation and relevant build/test evidence instead.
 
 ## 9. Create an Android emulator
 
 In Android Studio open **Tools → Device Manager** and choose **Create Virtual Device**.
 
-A Pixel phone profile is a sensible first test target. Select an Android system image compatible with API 35, download it if required, complete the virtual-device wizard and start the emulator.
+A Pixel phone profile is a sensible first test target. Select an Android system image compatible with the project's API 37 toolchain, download it if required, complete the virtual-device wizard and start the emulator.
 
 When the emulator has fully booted, select it in Android Studio's device selector and press **Run** for the `app` configuration.
 
@@ -278,18 +287,22 @@ After installation, perform this sequence:
 3. Open **Map** and confirm only ATOM ground stations appear.
 4. Use **Find** to search for part of a station name.
 5. Select a station and inspect the full detail.
-6. Confirm **Record date & time** shows an absolute local timestamp derived from `lastSeen`.
-7. Confirm Last heartbeat, Last seen, Last position and Last technical status are relative-age displays.
-8. Confirm missing optional values say **Not reported** rather than zero.
-9. Open **Stations** and verify station navigation.
-10. Add a station to **Favourites**, leave/relaunch the app and confirm the preference persists.
-11. Set the **Home station** in Settings and confirm the preference persists.
-12. Change the refresh interval; valid range is 1–10 minutes and default is 5 minutes.
-13. Confirm the server is `https://granvillehouse.synology.me:8445/`.
-14. Disable network access and refresh. Existing cached stations should remain visible and the app should indicate **No Network**.
-15. Restore connectivity and refresh; current server data should replace the cached snapshot.
-16. Open **Help** and verify the guide is local to the application.
-17. Check that there is no aircraft movement, aircraft identity, aircraft position or aircraft-track functionality anywhere.
+6. Confirm the Station Detail status icon represents the effective station health and that its explanation is understandable.
+7. Confirm back-level status is presented correctly where applicable.
+8. Confirm **Record date & time** shows an absolute local timestamp derived from `lastSeen`.
+9. Confirm Last heartbeat, Last seen, Last position and Last technical status are relative-age displays.
+10. Confirm missing optional values say **Not reported** rather than zero and that intentionally omitted/unused telemetry fields do not reappear.
+11. From Station Detail, verify the Google Maps action opens the exact station latitude/longitude using satellite imagery and a location pin.
+12. Open **Stations** and verify station navigation and shared filtering behaviour.
+13. Add a station to **Favourites**, leave/relaunch the app and confirm the preference persists.
+14. Set the **Home station** in Settings and confirm the preference persists.
+15. Change the refresh interval; valid range is 1–10 minutes and default is 5 minutes.
+16. Confirm the server is `https://granvillehouse.synology.me:8445/`.
+17. Disable network access and refresh. Existing cached stations should remain visible and the app should indicate **No Network**.
+18. Restore connectivity and refresh; current server data should replace the cached snapshot.
+19. Generate a station report and verify its content, bar graphs and native Android sharing path.
+20. Open **Help** and verify the guide is local to the application and consistent with current behaviour.
+21. Check that there is no aircraft movement, aircraft identity, aircraft position or aircraft-track functionality anywhere.
 
 ## 15. Test the real public path
 
@@ -366,35 +379,38 @@ A release build is therefore intentionally **not** part of the present first-ins
 
 ## 18. Map implementation note
 
-The iPhone application uses Apple MapKit with Standard, Satellite + Labels and Satellite modes. The current Android implementation uses OpenStreetMap/osmdroid and therefore does not yet reproduce those three Apple-specific base-map choices. Station mapping, searching and station selection are present; Android-equivalent layer choices are a follow-up parity item.
+The iPhone application uses Apple MapKit with Standard, Satellite + Labels and Satellite modes. The current Android implementation uses OpenStreetMap/osmdroid and therefore does not yet reproduce those three Apple-specific base-map choices. Station mapping, searching and station selection are present; Android-equivalent layer choices remain a follow-up parity item.
 
 OpenStreetMap tiles require network access and must be used in accordance with the tile provider's usage requirements. For normal development/testing the current osmdroid implementation is sufficient; a production distribution review should confirm the final tile-provider arrangement.
 
 ## 19. Current known parity/hardening work
 
-- Add Android-equivalent selectable map layers and a visible Home-map control.
-- Add marker clustering and health-coloured marker artwork equivalent to iOS.
-- Improve station-list row navigation so the whole row is tappable.
-- Add explicit server Test Connection using `/health` rather than relying on a station refresh.
-- Make automatic refresh react immediately when its interval changes and remain foreground/lifecycle-aware.
-- Make cache ownership server-specific.
-- Add Android unit/UI tests and a repeatable emulator regression workflow.
-- Add adaptive phone/tablet layout testing while retaining phone-first behaviour.
-- Add the approved ATOM application icon resources.
-- Add the Gradle wrapper to Git after it has been generated locally and verified.
+The successful APK build does not close the remaining Android parity work. Current known items are:
 
-## 20. What to send when a build fails
+- map clustering and mixed-colour cluster presentation;
+- configurable map-icon colours;
+- Home-relative filtered-map focus;
+- Android-equivalent selectable map layers/Home-map presentation where needed for iPhone-equivalent behaviour;
+- broader station-list/navigation polish;
+- explicit server Test Connection using `/health` rather than relying on a station refresh;
+- automatic-refresh lifecycle/interval hardening;
+- server-specific cache ownership;
+- Android unit/UI tests and a repeatable emulator regression workflow;
+- adaptive phone/tablet layout testing while retaining phone-first behaviour;
+- approved ATOM application icon resources.
 
-Do not repeatedly alter Gradle files after a failed first build. Capture the failure so it can be fixed deterministically.
+These items must remain synchronized with `docs/FEATURE-STATUS.md`. A successful build is not evidence that an untested runtime feature is complete.
 
-From Android Studio, copy the first meaningful Gradle/compiler error and the lines immediately around it. Once the wrapper exists, also run:
+## 20. What to send when a build or runtime test fails
+
+For a build failure, capture the exact failure before changing dependency or Gradle versions. Run:
 
 ```bash
 cd ~/Documents/Xcode/ATOMMonitor/android
 ./gradlew assembleDebug --stacktrace
 ```
 
-Send the error beginning at `FAILURE: Build failed with an exception` together with the first `Caused by:` section.
+Retain the error beginning at `FAILURE: Build failed with an exception` together with the first relevant `Caused by:` section.
 
 For an app that builds but crashes or fails to load stations, reproduce it with:
 
@@ -405,7 +421,7 @@ adb logcat
 
 and retain the relevant ATOM Monitor exception/network lines.
 
-## 21. Source-control workflow
+## 21. Source-control and parity workflow
 
 Android source is maintained alongside iOS and the Synology server in `rhine59/ATOMMonitor`.
 
@@ -417,6 +433,8 @@ git pull
 git status
 ```
 
-After a verified Android change, update Android/shared documentation and commit the implementation plus relevant build/test evidence. Do not commit generated `build/` directories, local Android Studio state, signing keys, secrets or runtime caches.
+For every user-facing implementation change, update the corresponding entry in `docs/FEATURE-STATUS.md` in the same development cycle. iPhone and Android functional behaviour should remain synchronized unless a platform-specific difference is explicitly documented.
 
-The Android app should evolve alongside iOS: shared behaviour, data semantics and user documentation should remain synchronized across platforms.
+After a verified Android change, commit the implementation, affected documentation and relevant build/test evidence. Do not commit generated `build/` directories, local Android Studio state, signing keys, secrets, runtime caches or the generated debug APK.
+
+Build and runtime status are independent: record **Build passed — runtime test pending** after a successful compile/package checkpoint, and only advance to **Tested** after the relevant emulator/physical-device regression checks have actually passed.

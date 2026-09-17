@@ -6,6 +6,12 @@ struct StationMapView: View {
     let homeStationID: String
     @Binding var favouriteStationIDs: String
     @AppStorage("stationMapLayer") private var mapLayerRawValue = StationMapLayer.standard.rawValue
+    @AppStorage(MapIconColourPreferences.healthyKey) private var healthyColour = MapIconColour.green.rawValue
+    @AppStorage(MapIconColourPreferences.backLevelKey) private var backLevelColour = MapIconColour.purple.rawValue
+    @AppStorage(MapIconColourPreferences.noRecentHeartbeatKey) private var noRecentHeartbeatColour = MapIconColour.blue.rawValue
+    @AppStorage(MapIconColourPreferences.inactiveKey) private var inactiveColour = MapIconColour.red.rawValue
+    @AppStorage(MapIconColourPreferences.warningKey) private var warningColour = MapIconColour.orange.rawValue
+    @AppStorage(MapIconColourPreferences.unknownKey) private var unknownColour = MapIconColour.gray.rawValue
     @State private var position: MapCameraPosition = .region(Self.defaultRegion)
     @State private var visibleRegion = Self.defaultRegion
     @State private var hasAppliedInitialHome = false
@@ -20,7 +26,7 @@ struct StationMapView: View {
     var body:some View{
         GeometryReader{geometry in ZStack(alignment:.top){
             Map(position:$position){ForEach(mapItems){item in switch item{
-            case .station(let station): if let coordinate=station.coordinate{let health=store.displayHealth(for:station);Annotation(station.name,coordinate:coordinate){Button{detailStation=station}label:{Image(systemName:health.symbol).font(.title2.weight(.bold)).foregroundStyle(.white).frame(width:42,height:42).background(tint(for:health),in:Circle()).overlay(Circle().stroke(.white,lineWidth:3))}.buttonStyle(.plain)}}
+            case .station(let station): if let coordinate=station.coordinate{let health=store.displayHealth(for:station);Annotation(station.name,coordinate:coordinate){Button{detailStation=station}label:{Image(systemName:health.symbol).font(.title2.weight(.bold)).foregroundStyle(.white).frame(width:42,height:42).background(tint(for:station),in:Circle()).overlay(Circle().stroke(.white,lineWidth:3))}.buttonStyle(.plain)}}
             case .cluster(let cluster):Annotation("stations",coordinate:cluster.coordinate){Button{zoomInto(cluster)}label:{Text(String(cluster.stations.count)).font(.headline.bold()).foregroundStyle(.white).frame(width:48,height:48).background(clusterTint(cluster),in:Circle())}.buttonStyle(.plain)}
             }}}
             .mapStyle(mapLayer.style).frame(width:geometry.size.width,height:geometry.size.height).ignoresSafeArea(.container,edges:.all).onMapCameraChange(frequency:.onEnd){visibleRegion=$0.region}.onAppear{applyHomeIfNeeded()}.onChange(of:store.stations){_,_ in applyHomeIfNeeded()}.onChange(of:homeStationID){_,_ in hasAppliedInitialHome=false;applyHomeIfNeeded()}.mapControls{MapCompass();MapScaleView()}
@@ -50,13 +56,14 @@ struct StationMapView: View {
     private func adaptiveHorizontalPadding(for width:CGFloat)->CGFloat{width<390 ? 8:12}
     private var mapItems:[StationMapItem]{cluster(positionedStations,in:visibleRegion)}
     private func cluster(_ stations:[ATOMStation],in region:MKCoordinateRegion)->[StationMapItem]{guard stations.count>1 else{return stations.map{.station($0)}};let a=max(region.span.latitudeDelta/7,0.0008),b=max(region.span.longitudeDelta/5,0.0008);let groups=Dictionary(grouping:stations){s->GridKey in let c=s.coordinate!;return GridKey(latitude:Int(floor(c.latitude/a)),longitude:Int(floor(c.longitude/b)))};return groups.values.map{$0.count==1 ? .station($0[0]):.cluster(StationCluster(stations:$0))}}
-    private func clusterTint(_ cluster:StationCluster)->Color{let healths=Set(cluster.stations.map{store.displayHealth(for:$0)});if healths.contains(.inactive)&&healths.contains(.healthy){return .yellow};if healths.contains(.inactive){return .red};if healths.contains(.warning){return .orange};if healths.contains(.healthy){return .green};if healths.contains(.noRecentHeartbeat){return .red};return .gray}
+    private func clusterTint(_ cluster:StationCluster)->Color{let healths=Set(cluster.stations.map{store.displayHealth(for:$0)});if healths.contains(.inactive)&&healths.contains(.healthy){return .yellow};if healths.contains(.inactive){return selected(inactiveColour,.red)};if healths.contains(.warning){return selected(warningColour,.orange)};if healths.contains(.noRecentHeartbeat){return selected(noRecentHeartbeatColour,.blue)};if healths.contains(.healthy){return selected(healthyColour,.green)};return selected(unknownColour,.gray)}
     private func zoomInto(_ cluster:StationCluster){let c=cluster.stations.compactMap(\.coordinate),a=c.map(\.latitude),o=c.map(\.longitude);guard let amin=a.min(),let amax=a.max(),let omin=o.min(),let omax=o.max() else{return};let lat=max(max((amax-amin)*2.5,visibleRegion.span.latitudeDelta/3),0.01),lon=max(max((omax-omin)*2.5,visibleRegion.span.longitudeDelta/3),0.01);withAnimation{position = .region(MKCoordinateRegion(center:cluster.coordinate,span:MKCoordinateSpan(latitudeDelta:lat,longitudeDelta:lon)))}}
     private func applyHomeIfNeeded(){guard !hasAppliedInitialHome,!store.stations.isEmpty else{return};hasAppliedInitialHome=true;guard !homeStationID.isEmpty,let h=store.stations.first(where:{$0.id==homeStationID}),let c=h.coordinate else{return};let r=MKCoordinateRegion(center:c,span:MKCoordinateSpan(latitudeDelta:0.8,longitudeDelta:0.8));visibleRegion=r;position = .region(r)}
     private var searchBar:some View{HStack(spacing:10){Image(systemName:"magnifyingglass").foregroundStyle(.secondary);TextField("Find",text:$store.searchText).textInputAutocapitalization(.never).autocorrectionDisabled();if !store.searchText.isEmpty{Button{store.searchText=""}label:{Image(systemName:"xmark.circle.fill").foregroundStyle(.secondary)}.buttonStyle(.plain)}}.padding(.horizontal,16).frame(height:46).background(.regularMaterial,in:Capsule())}
     private var errorPresented:Binding<Bool>{Binding(get:{store.errorMessage != nil},set:{if !$0{store.clearError()}})}
     private var homeMessagePresented:Binding<Bool>{Binding(get:{homeMessage != nil},set:{if !$0{homeMessage=nil}})}
-    private func tint(for h:StationHealth)->Color{switch h{case .healthy:return .green;case .warning:return .orange;case .noRecentHeartbeat,.inactive:return .red;case .unknown:return .gray}}
+    private func selected(_ raw:String,_ fallback:MapIconColour)->Color{(MapIconColour(rawValue:raw) ?? fallback).color}
+    private func tint(for station:ATOMStation)->Color{let h=store.displayHealth(for:station);switch h{case .inactive:return selected(inactiveColour,.red);case .noRecentHeartbeat:return selected(noRecentHeartbeatColour,.blue);case .warning:return selected(warningColour,.orange);case .unknown:return selected(unknownColour,.gray);case .healthy:return store.isBackLevelSoftware(station) ? selected(backLevelColour,.purple):selected(healthyColour,.green)}}
 }
 
 private enum StationMapLayer:String,CaseIterable,Identifiable{case standard,hybrid,imagery;var id:String{rawValue};var title:String{switch self{case .standard:return "Standard";case .hybrid:return "Satellite + Labels";case .imagery:return "Satellite"}};var style:MapStyle{switch self{case .standard:return .standard(elevation:.realistic);case .hybrid:return .hybrid(elevation:.realistic);case .imagery:return .imagery(elevation:.realistic)}}}

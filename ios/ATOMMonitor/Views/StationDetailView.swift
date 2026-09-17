@@ -24,6 +24,11 @@ struct StationDetailView: View {
                 LabeledContent("Latitude", value: coordinate(station.latitude))
                 LabeledContent("Longitude", value: coordinate(station.longitude))
                 LabeledContent("Altitude", value: text(station.altitudeMetres, suffix: " m", decimals: 0))
+                if let googleEarthURL {
+                    Link(destination: googleEarthURL) {
+                        Label("View satellite location in Google Earth", systemImage: "globe.americas.fill")
+                    }
+                }
             }
 
             Section("System") {
@@ -44,6 +49,12 @@ struct StationDetailView: View {
         }
         .navigationTitle(station.name)
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var googleEarthURL: URL? {
+        guard let latitude = station.latitude, let longitude = station.longitude else { return nil }
+        let url = String(format: "https://earth.google.com/web/search/%.6f,%.6f", latitude, longitude)
+        return URL(string: url)
     }
 
     private var memory: String {

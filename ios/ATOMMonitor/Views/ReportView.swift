@@ -7,21 +7,27 @@ struct ReportView: View {
     @State private var showingShareSheet = false
     @State private var reportError: String?
 
-    private var statusCounts: [(StationHealth, Int)] {
+    private struct CountRow: Identifiable {
+        let id: String
+        let title: String
+        let count: Int
+    }
+
+    private var statusCounts: [CountRow] {
         StationHealth.allCases.map { health in
-            (health, store.stations.filter { store.displayHealth(for: $0) == health }.count)
+            CountRow(id: health.rawValue, title: health.title, count: store.stations.filter { store.displayHealth(for: $0) == health }.count)
         }
     }
 
-    private var versionCounts: [(String, Int)] {
+    private var versionCounts: [CountRow] {
         let groups = Dictionary(grouping: store.stations) { station in
             let value = station.pilotAwareVersion?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             return value.isEmpty ? "Not reported" : value
         }
-        return groups.map { ($0.key, $0.value.count) }.sorted {
-            if $0.0 == "Not reported" { return false }
-            if $1.0 == "Not reported" { return true }
-            return $0.0.compare($1.0, options: [.numeric, .caseInsensitive]) == .orderedDescending
+        return groups.map { CountRow(id: $0.key, title: $0.key, count: $0.value.count) }.sorted {
+            if $0.title == "Not reported" { return false }
+            if $1.title == "Not reported" { return true }
+            return $0.title.compare($1.title, options: [.numeric, .caseInsensitive]) == .orderedDescending
         }
     }
 
@@ -35,38 +41,26 @@ struct ReportView: View {
             }
 
             Section("Status") {
-                ForEach(statusCounts, id: \.0) { health, count in
-                    reportRow(health.title, value: count)
-                }
+                ForEach(statusCounts) { row in reportRow(row.title, value: row.count) }
             }
 
             Section("PilotAware versions") {
-                ForEach(versionCounts, id: \.0) { version, count in
-                    reportRow(version, value: count)
-                }
+                ForEach(versionCounts) { row in reportRow(row.title, value: row.count) }
             }
 
             Section {
-                Button {
-                    prepareAndShare()
-                } label: {
-                    Label("Share report", systemImage: "square.and.arrow.up")
-                }
-                .disabled(store.stations.isEmpty)
+                Button { prepareAndShare() } label: { Label("Share report", systemImage: "square.and.arrow.up") }
+                    .disabled(store.stations.isEmpty)
             } footer: {
                 Text("Creates a formatted HTML report and a CSV station-data attachment, then opens the standard iPhone share sheet for Mail, Messages, AirDrop, Files and other available services.")
             }
         }
         .navigationTitle("Report")
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showingShareSheet) {
-            ActivityView(activityItems: shareItems)
-        }
+        .sheet(isPresented: $showingShareSheet) { ActivityView(activityItems: shareItems) }
         .alert("Unable to create report", isPresented: Binding(get: { reportError != nil }, set: { if !$0 { reportError = nil } })) {
             Button("OK") { reportError = nil }
-        } message: {
-            Text(reportError ?? "Unknown error")
-        }
+        } message: { Text(reportError ?? "Unknown error") }
     }
 
     private func reportRow(_ title: String, value: Int) -> some View {
@@ -78,9 +72,7 @@ struct ReportView: View {
             let files = try StationReportGenerator.makeReport(store: store)
             shareItems = [files.html, files.csv]
             showingShareSheet = true
-        } catch {
-            reportError = error.localizedDescription
-        }
+        } catch { reportError = error.localizedDescription }
     }
 }
 
@@ -122,12 +114,13 @@ private enum StationReportGenerator {
 
         var csv = "Station,Status,PilotAware Version,Last Seen,Last Heartbeat,Last Position,Last Technical Status,Latitude,Longitude\r\n"
         for station in store.stations.sorted(by: { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }) {
-            let values = [
+            let values: [String] = [
                 station.name,
                 store.displayHealth(for: station).title,
                 station.pilotAwareVersion ?? "Not reported",
                 csvDate(station.lastSeen), csvDate(station.lastHeartbeat), csvDate(station.lastPosition), csvDate(station.lastTechnicalStatus),
-                station.latitude.map(String.init) ?? "", station.longitude.map(String.init) ?? ""
+                station.latitude.map { String($0) } ?? "",
+                station.longitude.map { String($0) } ?? ""
             ]
             csv += values.map(csvEscape).joined(separator: ",") + "\r\n"
         }

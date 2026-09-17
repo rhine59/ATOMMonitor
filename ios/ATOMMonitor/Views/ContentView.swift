@@ -48,74 +48,35 @@ private struct SettingsView: View {
     @State private var isTesting = false
     @State private var connectionMessage:String?
     @State private var connectionSucceeded = false
-
     private var ids:Set<String>{Set(favouriteStationIDs.split(separator:",").map(String.init))}
     private var sortedStations:[ATOMStation]{store.stations.sorted{$0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending}}
     private var favourites:[ATOMStation]{sortedStations.filter{ids.contains($0.id)}}
-
-    var body:some View{
-        Form{
-            Section("Server") {
-                TextField("https://atom.example.net/", text:$serverURL)
-                    .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
-                HStack {
-                    Button("Save") { saveServer() }.disabled(serverURL.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty)
-                    Spacer()
-                    Button { Task { await testServer() } } label: { if isTesting { ProgressView() } else { Label("Test Connection",systemImage:"network") } }.disabled(isTesting)
-                }
-                if let message=connectionMessage { Label(message,systemImage:connectionSucceeded ? "checkmark.circle.fill":"xmark.circle.fill").foregroundStyle(connectionSucceeded ? .green:.red).font(.footnote) }
-                Text("Use the public HTTPS DNS name for normal operation. A local HTTP address may be retained temporarily for LAN diagnostics.").font(.footnote).foregroundStyle(.secondary)
-            }
-            Section("Data refresh") {
-                Stepper(value:$stationRefreshMinutes,in:1...10,step:1) {
-                    HStack { Text("Refresh interval"); Spacer(); Text("\(stationRefreshMinutes) min").foregroundStyle(.secondary) }
-                }
-                Text("Station data is fetched once when ATOM Monitor starts, then automatically every \(stationRefreshMinutes) minute\(stationRefreshMinutes == 1 ? "" : "s"). The default is 5 minutes; the interval can be set from 1 to 10 minutes and is remembered on this iPhone.").font(.footnote).foregroundStyle(.secondary)
-            }
-            Section("Map") { Picker("Home station",selection:$homeStationID){Text("Default UK view").tag("");ForEach(sortedStations.filter{$0.coordinate != nil}){Text($0.name).tag($0.id)}};Text("The Map tab opens centred and zoomed around the selected home station.").font(.footnote).foregroundStyle(.secondary) }
-            Section("Favourite stations") { if favourites.isEmpty{Text("No favourites selected. Add them from Map or Stations.").foregroundStyle(.secondary)}else{ForEach(favourites){s in HStack{VStack(alignment:.leading){Text(s.name);Text(s.health.title).font(.caption).foregroundStyle(.secondary)};Spacer();Button(role:.destructive){remove(s.id)}label:{Image(systemName:"minus.circle.fill")}.buttonStyle(.borderless)}}};Text("Add favourites from Map or Stations. Remove them here in Settings.").font(.footnote).foregroundStyle(.secondary) }
-        }
-    }
-
+    var body:some View{Form{
+        Section("Server"){TextField("https://atom.example.net/",text:$serverURL).textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL);HStack{Button("Save"){saveServer()}.disabled(serverURL.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty);Spacer();Button{Task{await testServer()}}label:{if isTesting{ProgressView()}else{Label("Test Connection",systemImage:"network")}}.disabled(isTesting)};if let message=connectionMessage{Label(message,systemImage:connectionSucceeded ? "checkmark.circle.fill":"xmark.circle.fill").foregroundStyle(connectionSucceeded ? .green:.red).font(.footnote)};Text("Use the public HTTPS DNS name for normal operation. A local HTTP address may be retained temporarily for LAN diagnostics.").font(.footnote).foregroundStyle(.secondary)}
+        Section("Data refresh"){Stepper(value:$stationRefreshMinutes,in:1...10,step:1){HStack{Text("Refresh interval");Spacer();Text("\(stationRefreshMinutes) min").foregroundStyle(.secondary)}};Text("Station data is fetched once when ATOM Monitor starts, then automatically every \(stationRefreshMinutes) minute\(stationRefreshMinutes == 1 ? "" : "s"). The default is 5 minutes; the interval can be set from 1 to 10 minutes and is remembered on this iPhone.").font(.footnote).foregroundStyle(.secondary)}
+        Section("Map"){Picker("Home station",selection:$homeStationID){Text("Default UK view").tag("");ForEach(sortedStations.filter{$0.coordinate != nil}){Text($0.name).tag($0.id)}};Text("The Map tab opens centred and zoomed around the selected home station.").font(.footnote).foregroundStyle(.secondary)}
+        Section("Favourite stations"){if favourites.isEmpty{Text("No favourites selected. Add them from Map or Stations.").foregroundStyle(.secondary)}else{ForEach(favourites){s in HStack{VStack(alignment:.leading){Text(s.name);Text(s.health.title).font(.caption).foregroundStyle(.secondary)};Spacer();Button(role:.destructive){remove(s.id)}label:{Image(systemName:"minus.circle.fill")}.buttonStyle(.borderless)}}};Text("Add favourites from Map or Stations. Remove them here in Settings.").font(.footnote).foregroundStyle(.secondary)}
+    }}
     private func saveServer(){do{let url=try ServerConfiguration.normalizedURL(from:serverURL);serverURL=url.absoluteString;savedServerURL=url.absoluteString;connectionMessage="Saved. Reloading stations from the new server…";connectionSucceeded=true;Task{await store.load()}}catch{connectionMessage=error.localizedDescription;connectionSucceeded=false}}
     private func testServer() async {isTesting=true;defer{isTesting=false};do{let result=try await APIStationRepository.testConnection(to:serverURL);let count=result.confirmedStations.map{" — \($0) confirmed stations"} ?? "";connectionMessage="Connected: \(result.status)\(count)";connectionSucceeded=true}catch{connectionMessage=error.localizedDescription;connectionSucceeded=false}}
     private func remove(_ id:String){var u=ids;u.remove(id);favouriteStationIDs=u.sorted().joined(separator:",")}
 }
 
-private struct HelpView:View{
-    var body:some View{
-        List{
-            Section{
-                NavigationLink{UserGuideView()}label:{Label("User Guide",systemImage:"book.fill")}
-            }
-            Section("About"){
-                Text("ATOM Monitor displays the operational health and technical status of PilotAware ATOM ground stations. It does not display or record aircraft movements.")
-            }
-        }
-    }
-}
+private struct HelpView:View{var body:some View{List{Section{NavigationLink{UserGuideView()}label:{Label("User Guide",systemImage:"book.fill")}};Section("About"){Text("ATOM Monitor displays the operational health and technical status of PilotAware ATOM ground stations. It does not display or record aircraft movements.")}}}}
 
 private struct UserGuideView:View{
-    var body:some View{
-        ScrollView{
-            VStack(alignment:.leading,spacing:18){
-                guideSection("What ATOM Monitor does","ATOM Monitor is an iPhone application for viewing the operational health and technical status of PilotAware ATOM ground stations. It does not display, record or retain aircraft movements, tracks or aircraft identities.")
-                guideSection("Map","The map adapts to the iPhone display. Clusters separate as the map is zoomed. Tap a station to open its complete detail. Green means Healthy, amber Warning, red No recent heartbeat and grey Unknown. The initial view centres on the Home station selected in Settings, or uses the default wider UK view. The status below the title shows the last successful update; if the server cannot be reached it shows No Network while cached station data remains visible.")
-                guideSection("Stations","Stations shows the persistent station registry. Selecting a station opens its detailed operational and technical status.")
-                guideSection("Favourites","Favourites provides a quick view of selected stations. Favourites are stored locally on the iPhone and do not change server collection.")
-                guideSection("Server","The server address can be edited and saved in Settings. Test Connection checks the configured service. Normal remote operation should use the public HTTPS DNS address.")
-                guideSection("Data refresh","ATOM Monitor fetches station data immediately when the app starts and then at the configured interval. The default is 5 minutes. Settings allows a whole-minute interval from 1 to 10 minutes, remembered on this iPhone. Automatic refresh operates while the app is active; iOS may suspend it in the background.")
-                guideSection("Cached data","The most recent successful station snapshot is cached locally. If the network or server is unavailable, the previous station data remains visible. The cache is a latest snapshot only, not a history database, and contains no aircraft data.")
-                guideSection("Home station","Choose Home station in Settings to define where the Map initially centres. The Home button returns to that station. If none is configured, the app reports No home station set.")
-                guideSection("Station details","The Health section shows Record date & time as the exact local date and time of the station's latest record, while Last heartbeat, Last seen, Last position and Last technical status remain relative age indicators. Depending on source data, details can also include station name, coordinates and altitude, software versions, CPU load and temperature, RAM, NTP timing, RF information, uptime and supply voltage. Unsupported data displays Not reported.")
-                guideSection("Privacy","Aircraft traffic is outside ATOM Monitor's scope. The app and server are intended to monitor ground-station health and must not store aircraft tracks, identities or movement history.")
-            }.padding()
-        }
-        .navigationTitle("User Guide")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-
-    private func guideSection(_ title:String,_ text:String)->some View{
-        VStack(alignment:.leading,spacing:6){Text(title).font(.headline);Text(text).foregroundStyle(.secondary).fixedSize(horizontal:false,vertical:true)}
-    }
+    var body:some View{ScrollView{VStack(alignment:.leading,spacing:18){
+        guideSection("What ATOM Monitor does","ATOM Monitor is an iPhone application for viewing the operational health and technical status of PilotAware ATOM ground stations. It does not display, record or retain aircraft movements, tracks or aircraft identities.")
+        guideSection("Map","The map adapts to the iPhone display. Clusters separate as the map is zoomed. Tap a station to open its complete detail. Green means Healthy, amber Warning, red No recent heartbeat and grey Unknown. The initial view centres on the Home station selected in Settings, or uses the default wider UK view. The status below the title shows the last successful update; if the server cannot be reached it shows No Network while cached station data remains visible.")
+        guideSection("Filters","Map and Stations share filters for Status and PilotAware version. The available choices are created from values already present in the collected station data rather than a hard-coded version list. Select one or more values in either section; leaving a section empty means all values. If both Status and version are selected, a station must match both. Find/search is combined with the filters. The active-filter indicator shows how many stations remain and Clear filters restores the complete registry.")
+        guideSection("Stations","Stations shows the persistent station registry, subject to the same Find, Status and PilotAware version filters used by Map. Selecting a station opens its detailed operational and technical status.")
+        guideSection("Favourites","Favourites provides a quick view of selected stations. Favourites are stored locally on the iPhone and do not change server collection.")
+        guideSection("Server","The server address can be edited and saved in Settings. Test Connection checks the configured service. Normal remote operation should use the public HTTPS DNS address.")
+        guideSection("Data refresh","ATOM Monitor fetches station data immediately when the app starts and then at the configured interval. The default is 5 minutes. Settings allows a whole-minute interval from 1 to 10 minutes, remembered on this iPhone. Automatic refresh operates while the app is active; iOS may suspend it in the background.")
+        guideSection("Cached data","The most recent successful station snapshot is cached locally. If the network or server is unavailable, the previous station data remains visible. The cache is a latest snapshot only, not a history database, and contains no aircraft data.")
+        guideSection("Home station","Choose Home station in Settings to define where the Map initially centres. The Home button returns to that station. If none is configured, the app reports No home station set.")
+        guideSection("Station details","The Health section shows Record date & time as the exact local date and time of the station's latest record, while Last heartbeat, Last seen, Last position and Last technical status remain relative age indicators. Depending on source data, details can also include station name, coordinates and altitude, software versions, CPU load and temperature, RAM, NTP timing, RF information, uptime and supply voltage. Unsupported data displays Not reported.")
+        guideSection("Privacy","Aircraft traffic is outside ATOM Monitor's scope. The app and server are intended to monitor ground-station health and must not store aircraft tracks, identities or movement history.")
+    }.padding()}.navigationTitle("User Guide").navigationBarTitleDisplayMode(.inline)}
+    private func guideSection(_ title:String,_ text:String)->some View{VStack(alignment:.leading,spacing:6){Text(title).font(.headline);Text(text).foregroundStyle(.secondary).fixedSize(horizontal:false,vertical:true)}}
 }

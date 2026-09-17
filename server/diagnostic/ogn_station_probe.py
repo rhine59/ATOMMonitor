@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Receive-only ATOM ground-station collector. Aircraft packets are discarded."""
 from __future__ import annotations
-import argparse,json,re,socket,sys,time,urllib.request
+import argparse,json,os,re,socket,sys,time,urllib.request
 from collections import Counter
 from dataclasses import asdict,dataclass
 from datetime import datetime,timezone
@@ -18,7 +18,6 @@ class StationObservation:
 def coord(d,m,h):v=float(d)+float(m)/60;return -v if h in('S','W') else v
 def ptime(v):
  n=datetime.now(timezone.utc);candidate=n.replace(hour=int(v[:2]),minute=int(v[2:4]),second=int(v[4:6]),microsecond=0)
- # APRS h timestamps have no date; near midnight choose the closest UTC day.
  if (candidate-n).total_seconds()>43200:candidate=candidate.replace(day=n.day)-__import__('datetime').timedelta(days=1)
  elif (n-candidate).total_seconds()>43200:candidate=candidate+__import__('datetime').timedelta(days=1)
  return candidate.isoformat()
@@ -42,9 +41,11 @@ def parse_receiver_packet(line):
   if q:=DB_RE.search(x['body']):o.rf_quality_db=float(q['v'])
  return o
 def wanted(src,a):return (not a.station or src.casefold()==a.station.casefold()) and (not a.prefix or src.casefold().startswith(a.prefix.casefold()))
-def send(obs,url):
+def send(obs,url,token):
  if not url:return
- data=json.dumps(asdict(obs)).encode();req=urllib.request.Request(url,data=data,headers={'Content-Type':'application/json'},method='POST')
+ headers={'Content-Type':'application/json'}
+ if token:headers['Authorization']=f'Bearer {token}'
+ data=json.dumps(asdict(obs)).encode();req=urllib.request.Request(url,data=data,headers=headers,method='POST')
  try:urllib.request.urlopen(req,timeout=5).read()
  except Exception as e:print(f"API publish error: {e}",file=sys.stderr,flush=True)
 def run(a):
@@ -62,10 +63,10 @@ def run(a):
       if a.discovery and h and wanted(h['src'],a):print(f"CANDIDATE source={h['src']} destination={h['dst']} packet={line}",flush=True)
       obs=parse_receiver_packet(line)
       if obs and wanted(obs.station,a):
-       send(obs,a.api_url)
+       send(obs,a.api_url,a.api_token)
        if not a.discovery:print(json.dumps(asdict(obs),separators=(',',':')),flush=True)
   except KeyboardInterrupt:return
   except Exception as e:print(f"OGN connection error: {e}; retrying in {a.retry}s",file=sys.stderr,flush=True);time.sleep(a.retry)
 def main():
- p=argparse.ArgumentParser();p.add_argument('--host',default=DEFAULT_HOST);p.add_argument('--port',type=int,default=DEFAULT_PORT);p.add_argument('--user',default='ATOMMON');p.add_argument('--station');p.add_argument('--prefix');p.add_argument('--filter');p.add_argument('--api-url');p.add_argument('--retry',type=int,default=10);p.add_argument('--discovery',action='store_true');p.add_argument('--stats-interval',type=int,default=30);run(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--host',default=DEFAULT_HOST);p.add_argument('--port',type=int,default=DEFAULT_PORT);p.add_argument('--user',default='ATOMMON');p.add_argument('--station');p.add_argument('--prefix');p.add_argument('--filter');p.add_argument('--api-url');p.add_argument('--api-token',default=os.getenv('ATOM_INGEST_TOKEN'));p.add_argument('--retry',type=int,default=10);p.add_argument('--discovery',action='store_true');p.add_argument('--stats-interval',type=int,default=30);run(p.parse_args())
 if __name__=='__main__':main()

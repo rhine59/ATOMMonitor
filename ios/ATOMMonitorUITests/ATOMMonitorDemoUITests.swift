@@ -8,9 +8,10 @@ final class ATOMMonitorDemoUITests: XCTestCase {
 
         step("Map: edge-to-edge station health map, last-updated time and manual refresh")
         XCTAssertTrue(app.tabBars.buttons["Map"].waitForExistence(timeout: 8))
-        XCTAssertTrue(app.buttons["Refresh stations"].waitForExistence(timeout: 3))
+        let mapRefresh = refreshButton(in: app)
+        XCTAssertTrue(mapRefresh.waitForExistence(timeout: 3), "Missing Map refresh control")
         sleep(2)
-        app.buttons["Refresh stations"].tap()
+        mapRefresh.tap()
         sleep(2)
 
         step("Map: choose Standard, Satellite + Labels and Satellite layers")
@@ -34,8 +35,8 @@ final class ATOMMonitorDemoUITests: XCTestCase {
         step("Stations: searchable station registry, manual refresh and pull-to-refresh")
         app.tabBars.buttons["Stations"].tap()
         XCTAssertTrue(app.navigationBars["Stations"].waitForExistence(timeout: 3))
-        let listRefresh = app.buttons["Refresh stations"].firstMatch
-        XCTAssertTrue(listRefresh.waitForExistence(timeout: 2))
+        let listRefresh = refreshButton(in: app)
+        XCTAssertTrue(listRefresh.waitForExistence(timeout: 2), "Missing Stations refresh control")
         listRefresh.tap(); sleep(2)
         let list = app.tables.firstMatch
         if list.waitForExistence(timeout: 2) {
@@ -91,6 +92,12 @@ final class ATOMMonitorDemoUITests: XCTestCase {
 
         step("Map: cached snapshot, persisted layer and last-updated indicator remain available")
         app.tabBars.buttons["Map"].tap(); sleep(3)
+    }
+
+    private func refreshButton(in app: XCUIApplication) -> XCUIElement {
+        let labelled = app.buttons["Refresh stations"]
+        if labelled.exists { return labelled.firstMatch }
+        return app.buttons.matching(NSPredicate(format: "label == %@ OR identifier == %@", "Refresh", "Refresh")).firstMatch
     }
 
     private func step(_ text: String) {

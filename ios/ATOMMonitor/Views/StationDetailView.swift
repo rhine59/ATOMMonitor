@@ -49,9 +49,9 @@ struct StationDetailView: View {
                 LabeledContent("Latitude", value: coordinate(station.latitude))
                 LabeledContent("Longitude", value: coordinate(station.longitude))
                 LabeledContent("Altitude", value: text(station.altitudeMetres, suffix: " m", decimals: 0))
-                if let googleMapsSatelliteURL {
-                    Link(destination: googleMapsSatelliteURL) {
-                        Label("View satellite location in Google Maps", systemImage: "map.fill")
+                if let googleMapsURL {
+                    Link(destination: googleMapsURL) {
+                        Label("View location in Google Maps", systemImage: "mappin.and.ellipse")
                     }
                 }
             }
@@ -108,9 +108,14 @@ struct StationDetailView: View {
         (MapIconColour(rawValue: raw) ?? fallback).color
     }
 
-    private var googleMapsSatelliteURL: URL? {
+    private var googleMapsURL: URL? {
         guard let latitude = station.latitude, let longitude = station.longitude else { return nil }
-        return URL(string: "https://www.google.com/maps/@?api=1&map_action=map&center=\(latitude),\(longitude)&zoom=18&basemap=satellite")
+        var components = URLComponents(string: "https://www.google.com/maps/search/")
+        components?.queryItems = [
+            URLQueryItem(name: "api", value: "1"),
+            URLQueryItem(name: "query", value: "\(latitude),\(longitude)")
+        ]
+        return components?.url
     }
 
     private var memory: String {

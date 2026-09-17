@@ -11,19 +11,32 @@ def db():
  cols={r[1] for r in c.execute("PRAGMA table_info(stations)")}
  if "isPilotAware" not in cols:c.execute("ALTER TABLE stations ADD COLUMN isPilotAware INTEGER NOT NULL DEFAULT 0")
  c.commit();return c
+def parse_time(value):
+ if not value:return None
+ try:return datetime.fromisoformat(str(value).replace('Z','+00:00')).astimezone(timezone.utc)
+ except (ValueError,TypeError):return None
 def upsert(o):
  station=o.get("station");kind=o.get("kind")
  if not station or kind not in {"position","status","pilotaware_heartbeat"}:return False
- now=o.get("received_at") or datetime.now(timezone.utc).isoformat();v={"id":station,"name":station,"lastSeen":now}
- mp={"latitude":"latitude","longitude":"longitude","altitude_m":"altitudeMetres","software_version":"softwareVersion","cpu_load":"cpuLoadPercent","ram_used_mb":"ramUsedMB","ram_total_mb":"ramTotalMB","temperature_c":"cpuTemperatureC","ntp_offset_ms":"ntpOffsetMS","ntp_correction_ppm":"ntpCorrectionPPM","rf_correction_ppm":"rfCorrectionPPM","rf_quality_db":"signalQualityDB","voltage_v":"voltageV","uptime_minutes":"uptimeMinutes","pilotaware_version":"pilotAwareVersion"}
- for s,d in mp.items():
-  if o.get(s) is not None:v[d]=o[s]
- when=o.get("packet_time_utc") or now
- if kind=="position":v["lastPosition"]=when
- elif kind=="status":v["lastTechnicalStatus"]=when
- else:v.update(lastHeartbeat=when,isPilotAware=1)
- cols=list(v);updates=','.join(f'{x}=excluded.{x}' for x in cols if x not in {'id','name'})
- with db() as c:c.execute(f"INSERT INTO stations ({','.join(cols)}) VALUES ({','.join('?'*len(cols))}) ON CONFLICT(id) DO UPDATE SET {updates}",[v[x] for x in cols])
+ now=o.get("received_at") or datetime.now(timezone.utc).isoformat();when=o.get("packet_time_utc") or now
+ category={"position":"lastPosition","status":"lastTechnicalStatus","pilotaware_heartbeat":"lastHeartbeat"}[kind]
+ incoming=parse_time(when)
+ with db() as c:
+  existing=c.execute("SELECT * FROM stations WHERE id=?",(station,)).fetchone()
+  if existing:
+   current=parse_time(existing[category])
+   # Never allow an older packet in the same observation category to replace newer state.
+   # If either timestamp is malformed, preserve the existing category state rather than guessing.
+   if current and (not incoming or incoming < current):return True
+  v={"id":station,"name":station,"lastSeen":now}
+  mp={"latitude":"latitude","longitude":"longitude","altitude_m":"altitudeMetres","software_version":"softwareVersion","cpu_load":"cpuLoadPercent","ram_used_mb":"ramUsedMB","ram_total_mb":"ramTotalMB","temperature_c":"cpuTemperatureC","ntp_offset_ms":"ntpOffsetMS","ntp_correction_ppm":"ntpCorrectionPPM","rf_correction_ppm":"rfCorrectionPPM","rf_quality_db":"signalQualityDB","voltage_v":"voltageV","uptime_minutes":"uptimeMinutes","pilotaware_version":"pilotAwareVersion"}
+  for s,d in mp.items():
+   if o.get(s) is not None:v[d]=o[s]
+  if kind=="position":v["lastPosition"]=when
+  elif kind=="status":v["lastTechnicalStatus"]=when
+  else:v.update(lastHeartbeat=when,isPilotAware=1)
+  cols=list(v);updates=','.join(f'{x}=excluded.{x}' for x in cols if x not in {'id','name'})
+  c.execute(f"INSERT INTO stations ({','.join(cols)}) VALUES ({','.join('?'*len(cols))}) ON CONFLICT(id) DO UPDATE SET {updates}",[v[x] for x in cols])
  return True
 def health_for(r):
  if not r["lastHeartbeat"]:return "unknown"
@@ -33,24 +46,18 @@ def health_for(r):
  except Exception:return "unknown"
 def row_json(r):d=dict(r);d["health"]=health_for(r);return d
 @app.get('/health')
-def health():
- """Cheap process liveness check; deliberately does not depend on the database."""
- return jsonify({"status":"ok","service":"atommonitor-api"})
+def health():return jsonify({"status":"ok","service":"atommonitor-api"})
 @app.get('/ready')
 def ready():
- """Dependency-aware readiness check used before routing work to this API."""
  try:
   with db() as c:
-   c.execute("SELECT 1").fetchone()
-   n=c.execute("SELECT COUNT(*) FROM stations WHERE isPilotAware=1").fetchone()[0]
+   c.execute("SELECT 1").fetchone();n=c.execute("SELECT COUNT(*) FROM stations WHERE isPilotAware=1").fetchone()[0]
   return jsonify({"status":"ready","service":"atommonitor-api","database":"ok","confirmedStations":n})
  except Exception:
-  app.logger.exception("readiness database check failed")
-  return jsonify({"status":"not_ready","service":"atommonitor-api","database":"unavailable"}),503
+  app.logger.exception("readiness database check failed");return jsonify({"status":"not_ready","service":"atommonitor-api","database":"unavailable"}),503
 @app.post('/api/v1/observations')
 def observation():
- supplied=request.headers.get("Authorization","")
- expected=f"Bearer {INGEST_TOKEN}" if INGEST_TOKEN else ""
+ supplied=request.headers.get("Authorization","");expected=f"Bearer {INGEST_TOKEN}" if INGEST_TOKEN else ""
  if not expected or not hmac.compare_digest(supplied,expected):return jsonify({"error":"unauthorized"}),401
  if not upsert(request.get_json(silent=True) or {}):return jsonify({"error":"invalid ground-station observation"}),400
  return jsonify({"status":"accepted"}),202

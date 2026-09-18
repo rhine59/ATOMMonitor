@@ -117,3 +117,4 @@ A production recovery is considered viable when a verified backup can be restore
 ## Next architecture phase
 
 After Phase 2 passes, Phase 3 is migration of persistent state from SQLite to PostgreSQL. PostgreSQL is the prerequisite for safely running multiple stateless API replicas behind a load balancer; API replication is not part of Phase 2.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nThe SQLite tooling remains regression-tested for the preserved rollback database, including integrity, temporary backup, checksum verification, retention and controlled restore. SQLite is no longer the active runtime backend; PostgreSQL backup/restore is the current operational backup gap. See `CHECKPOINT-2026-09-18.md`.\n

@@ -17,21 +17,25 @@ import java.net.HttpURLConnection
 import java.net.URI
 
 @Composable
-fun FeedbackDialog(server: String, context: Context, onDismiss: () -> Unit) {
+fun FeedbackScreen(server: String) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    FeedbackContent(server, context)
+}
+
+@Composable
+private fun FeedbackContent(server: String, context: Context) {
     var rating by remember { mutableIntStateOf(0) }
     var comments by remember { mutableStateOf("") }
     var sending by remember { mutableStateOf(false) }
     var result by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
-    AlertDialog(onDismissRequest = onDismiss, title = { Text("Feedback") }, text = {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text("Feedback", style = MaterialTheme.typography.headlineSmall)
             Text("Your rating")
             Row { (1..5).forEach { value -> IconButton(onClick = { rating = value }) { Icon(if (value <= rating) Icons.Default.Star else Icons.Default.StarBorder, "$value stars") } } }
             OutlinedTextField(value = comments, onValueChange = { if (it.length <= 4000) comments = it }, label = { Text("Comments or suggestions") }, minLines = 4, modifier = Modifier.fillMaxWidth())
             Text("Your feedback is sent privately to Richard Hine. The destination email address is not shown by the app.", style = MaterialTheme.typography.bodySmall)
             result?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
-        }
-    }, confirmButton = {
         Button(enabled = rating in 1..5 && !sending, onClick = {
             sending = true; result = null
             scope.launch {
@@ -41,14 +45,15 @@ fun FeedbackDialog(server: String, context: Context, onDismiss: () -> Unit) {
                 sending = false
             }
         }) { if (sending) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp) else Text("Send Feedback") }
-    }, dismissButton = { TextButton(onClick = onDismiss) { Text("Close") } })
+    }
 }
 
 @Composable
-fun AboutDialog(context: Context, onDismiss: () -> Unit) {
+fun AboutScreen() {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val p = remember { context.packageManager.getPackageInfo(context.packageName, 0) }
-    AlertDialog(onDismissRequest = onDismiss, title = { Text("About ATOM Monitor") }, text = {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("About ATOM Monitor", style = MaterialTheme.typography.headlineSmall)
             Text("Monitors the operational health and technical status of PilotAware ATOM ground stations.")
             Text("Version " + (p.versionName ?: "Unknown") + " (" + p.longVersionCode + ")")
             Text("Platform: Android " + Build.VERSION.RELEASE)
@@ -58,8 +63,7 @@ fun AboutDialog(context: Context, onDismiss: () -> Unit) {
             Text("PilotAware and ATOM are acknowledged as the technologies and ground-station network monitored by this application.")
             HorizontalDivider()
             Text("ATOM Monitor does not display, record or retain aircraft movements, tracks or aircraft identities.")
-        }
-    }, confirmButton = { TextButton(onClick = onDismiss) { Text("Close") } })
+    }
 }
 
 private suspend fun sendFeedback(server: String, rating: Int, comments: String, context: Context) = withContext(Dispatchers.IO) {

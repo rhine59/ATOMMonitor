@@ -342,7 +342,9 @@ enum class Tab(val title: String) {
     Favourites("Favourites"),
     Report("Report"),
     Settings("Settings"),
-    Help("Help")
+    Help("Help"),
+    Feedback("Feedback"),
+    About("About")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

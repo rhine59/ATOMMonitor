@@ -96,3 +96,4 @@ This file records decisions and the reasoning behind them. New material changes 
 **Reason:** Third-party open-source components do not require the ATOM Monitor application itself to be released under the same permissive licences.
 
 **Consequence:** Release packaging must preserve required third-party notices and must not commit signing keys, passwords, SMTP secrets or other distribution credentials.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nImplementation checkpoint: PostgreSQL is the live backend; two stateless API replicas run behind Nginx; the collector remains single-active and submits through Nginx. The complete Phase 1–4/service acceptance suite passed. This operational topology and the reproducible-rebuild/acceptance-test discipline are now established project decisions. See `CHECKPOINT-2026-09-18.md`.\n

@@ -2,5 +2,6 @@ FROM python:3.12-slim
 WORKDIR /app
 RUN pip install --no-cache-dir flask==3.1.2 gunicorn==23.0.0 "psycopg[binary]==3.2.10"
 COPY app.py /app/app.py
+COPY migrate_sqlite_to_postgres.py /app/migrate_sqlite_to_postgres.py
 EXPOSE 8080
 CMD ["gunicorn","--bind","0.0.0.0:8080","--workers","2","--threads","2","--timeout","30","--graceful-timeout","20","--access-logfile","-","--error-logfile","-","app:app"]

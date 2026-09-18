@@ -178,3 +178,13 @@ sudo docker compose up -d --scale atom-api=2 --force-recreate atom-api
 Compose recreated both `server-atom-api-1` and `server-atom-api-2` while PostgreSQL remained healthy. Both replacement API containers subsequently reached healthy state. The unchanged Nginx entry point on host port 8088 successfully served `GET /ready` after recreation, demonstrating runtime Docker-DNS rediscovery of the replacement backends. API logs then showed numerous live collector `POST /api/v1/observations` requests returning HTTP 202.
 
 Result: PASS for API container recreation, backend rediscovery, read recovery and live collector-write recovery. This command intentionally recreates the whole scaled `atom-api` service on this Compose version; it is therefore a recovery/recreation test rather than a zero-overlap rolling-update mechanism.
+
+## Collector load-balancer routing implementation
+
+The Compose definition now makes the single-active `ogn-station-probe` depend on the healthy `atom-lb` service and submit observations to:
+
+```text
+http://atom-lb:8080/api/v1/observations
+```
+
+rather than addressing `atom-api` directly. This preserves a single collector while ensuring ingestion uses the same replicated API entry layer as other traffic. Runtime deployment/verification of this routing change remains required before it is marked tested.

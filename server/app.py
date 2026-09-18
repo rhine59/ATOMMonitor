@@ -2,20 +2,40 @@
 """Persistent ATOM ground-station registry/API. No aircraft data is accepted or stored."""
 from __future__ import annotations
 import hmac,os,sqlite3,smtplib
+from contextlib import contextmanager
+
+try:
+ import psycopg
+ from psycopg.rows import dict_row
+except ImportError:
+ psycopg=None
 from email.message import EmailMessage
 from datetime import datetime,timezone,timedelta
 from flask import Flask,jsonify,request
-DB_PATH=os.getenv("ATOM_DB","/data/atommonitor.sqlite3"); INGEST_TOKEN=os.getenv("ATOM_INGEST_TOKEN",""); app=Flask(__name__)
+DB_PATH=os.getenv("ATOM_DB","/data/atommonitor.sqlite3"); DATABASE_URL=os.getenv("ATOM_DATABASE_URL","").strip(); INGEST_TOKEN=os.getenv("ATOM_INGEST_TOKEN",""); app=Flask(__name__)
 MAX_FUTURE_SKEW=timedelta(minutes=5)
 FEEDBACK_TO_NAME=os.getenv("FEEDBACK_TO_NAME","Richard Hine")
 FEEDBACK_TO_EMAIL=os.getenv("FEEDBACK_TO_EMAIL","")
 SMTP_HOST=os.getenv("SMTP_HOST",""); SMTP_PORT=int(os.getenv("SMTP_PORT","587")); SMTP_USER=os.getenv("SMTP_USER",""); SMTP_PASSWORD=os.getenv("SMTP_PASSWORD","")
+STATION_SCHEMA="""CREATE TABLE IF NOT EXISTS stations(id TEXT PRIMARY KEY,name TEXT NOT NULL,isPilotAware INTEGER NOT NULL DEFAULT 0,latitude REAL,longitude REAL,altitudeMetres REAL,lastPosition TEXT,lastHeartbeat TEXT,lastTechnicalStatus TEXT,pilotAwareVersion TEXT,softwareVersion TEXT,cpuLoadPercent REAL,ramUsedMB REAL,ramTotalMB REAL,cpuTemperatureC REAL,ntpOffsetMS REAL,ntpCorrectionPPM REAL,frequencyCorrectionKHz REAL,rfCorrectionPPM REAL,signalQualityDB REAL,voltageV REAL,uptimeMinutes INTEGER,lastSeen TEXT NOT NULL)"""
+def backend():return "postgresql" if DATABASE_URL else "sqlite"
+@contextmanager
 def db():
- os.makedirs(os.path.dirname(DB_PATH),exist_ok=True);c=sqlite3.connect(DB_PATH);c.row_factory=sqlite3.Row
- c.execute("""CREATE TABLE IF NOT EXISTS stations(id TEXT PRIMARY KEY,name TEXT NOT NULL,isPilotAware INTEGER NOT NULL DEFAULT 0,latitude REAL,longitude REAL,altitudeMetres REAL,lastPosition TEXT,lastHeartbeat TEXT,lastTechnicalStatus TEXT,pilotAwareVersion TEXT,softwareVersion TEXT,cpuLoadPercent REAL,ramUsedMB REAL,ramTotalMB REAL,cpuTemperatureC REAL,ntpOffsetMS REAL,ntpCorrectionPPM REAL,frequencyCorrectionKHz REAL,rfCorrectionPPM REAL,signalQualityDB REAL,voltageV REAL,uptimeMinutes INTEGER,lastSeen TEXT NOT NULL)""")
- cols={r[1] for r in c.execute("PRAGMA table_info(stations)")}
- if "isPilotAware" not in cols:c.execute("ALTER TABLE stations ADD COLUMN isPilotAware INTEGER NOT NULL DEFAULT 0")
- c.commit();return c
+ if DATABASE_URL:
+  if psycopg is None:raise RuntimeError("psycopg is required for PostgreSQL")
+  c=psycopg.connect(DATABASE_URL,row_factory=dict_row)
+  try:
+   c.execute(STATION_SCHEMA);c.commit();yield c
+  finally:c.close()
+ else:
+  os.makedirs(os.path.dirname(DB_PATH),exist_ok=True);c=sqlite3.connect(DB_PATH);c.row_factory=sqlite3.Row
+  try:
+   c.execute(STATION_SCHEMA)
+   cols={r[1] for r in c.execute("PRAGMA table_info(stations)")}
+   if "isPilotAware" not in cols:c.execute("ALTER TABLE stations ADD COLUMN isPilotAware INTEGER NOT NULL DEFAULT 0")
+   c.commit();yield c
+  finally:c.close()
+def sql(q):return q.replace("?", "%s") if DATABASE_URL else q
 def parse_time(value):
  if not value:return None
  try:return datetime.fromisoformat(str(value).replace('Z','+00:00')).astimezone(timezone.utc)
@@ -31,7 +51,7 @@ def upsert(o):
  when=packet_value if packet_value else now
  category={"position":"lastPosition","status":"lastTechnicalStatus","pilotaware_heartbeat":"lastHeartbeat"}[kind]
  with db() as c:
-  existing=c.execute("SELECT * FROM stations WHERE id=?",(station,)).fetchone()
+  existing=c.execute(sql("SELECT * FROM stations WHERE id=?"),(station,)).fetchone()
   if existing:
    current=parse_time(existing[category])
    if current and incoming < current:return True
@@ -43,7 +63,8 @@ def upsert(o):
   elif kind=="status":v["lastTechnicalStatus"]=when
   else:v.update(lastHeartbeat=when,isPilotAware=1)
   cols=list(v);updates=','.join(f'{x}=excluded.{x}' for x in cols if x not in {'id','name'})
-  c.execute(f"INSERT INTO stations ({','.join(cols)}) VALUES ({','.join('?'*len(cols))}) ON CONFLICT(id) DO UPDATE SET {updates}",[v[x] for x in cols])
+  placeholders=",".join(["?"]*len(cols))
+  c.execute(sql(f"INSERT INTO stations ({','.join(cols)}) VALUES ({placeholders}) ON CONFLICT(id) DO UPDATE SET {updates}"),[v[x] for x in cols])
  return True
 def health_for(r):
  if not r["lastHeartbeat"]:return "unknown"
@@ -58,7 +79,7 @@ def health():return jsonify({"status":"ok","service":"atommonitor-api"})
 def ready():
  try:
   with db() as c:c.execute("SELECT 1").fetchone();n=c.execute("SELECT COUNT(*) FROM stations WHERE isPilotAware=1").fetchone()[0]
-  return jsonify({"status":"ready","service":"atommonitor-api","database":"ok","confirmedStations":n})
+  return jsonify({"status":"ready","service":"atommonitor-api","database":"ok","databaseBackend":backend(),"confirmedStations":n})
  except Exception:
   app.logger.exception("readiness database check failed");return jsonify({"status":"not_ready","service":"atommonitor-api","database":"unavailable"}),503
 @app.post('/api/v1/observations')
@@ -97,6 +118,6 @@ def stations():
  return jsonify([row_json(r) for r in rows])
 @app.get('/api/v1/stations/<station_id>')
 def station(station_id):
- with db() as c:r=c.execute("SELECT * FROM stations WHERE id=? AND isPilotAware=1",(station_id,)).fetchone()
+ with db() as c:r=c.execute(sql("SELECT * FROM stations WHERE id=? AND isPilotAware=1"),(station_id,)).fetchone()
  return (jsonify(row_json(r)),200) if r else (jsonify({"error":"not found"}),404)
 if __name__=='__main__':app.run(host='0.0.0.0',port=int(os.getenv('PORT','8080')))

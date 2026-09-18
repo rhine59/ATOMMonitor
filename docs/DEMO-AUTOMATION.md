@@ -77,3 +77,4 @@ Demo/XCUITest complements server/parser tests, Synology live OGN/API integration
 
 ## Version control
 Commit fixtures, tests, scripts, annotation definitions, build/test instructions and meaningful failure diagnoses. Do not commit generated MP4s, DerivedData or disposable build products. `artifacts/` remains ignored.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nThe current server acceptance mechanism is the committed Phase 1–4 plus service/API suite, which has passed on the Synology. Demo automation remains supplementary presentation/testing material and must not be treated as a substitute for the acceptance runners. See `CHECKPOINT-2026-09-18.md`.\n

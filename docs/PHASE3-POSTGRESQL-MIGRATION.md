@@ -59,6 +59,10 @@ Rollback does not copy PostgreSQL back into SQLite. Stop the PostgreSQL-backed s
 
 Phase 3 is **Tested** only after the PostgreSQL service is healthy; schema creation succeeds; SQLite-to-PostgreSQL migration counts agree; `/ready` reports database `ok`; expected station reads work; authenticated collector writes work; stale/future observation protection still passes; container restart/recreation preserves station state; and rollback to the preserved SQLite checkpoint has either been rehearsed or its exact tested configuration boundary is recorded.
 
+### Acceptance result — 18 September 2026
+
+**PASS / Tested.** The Synology development/test API is cut over to PostgreSQL. `/ready` reported `database=ok`, `databaseBackend=postgresql` and 307 confirmed stations; live collector writes returned HTTP 202 and were committed to PostgreSQL; unauthenticated ingestion remained HTTP 401; station-list and detail reads returned HTTP 200; stale observations did not overwrite newer state; implausibly future observations were rejected with HTTP 400; PostgreSQL restart and forced container recreation preserved state (309 rows before and after recreation); and the API/collector recovered automatically. The preserved rollback boundary is `server/data/atommonitor.sqlite3`; on 18 September it remained present (104K) and a read-only `PRAGMA integrity_check` returned `ok`. Rollback therefore remains the documented configuration switch back to SQLite using this preserved database; a disruptive live rollback rehearsal was not required for this development/test checkpoint.
+
 ## What follows
 
 After Phase 3 passes, the API can be made stateless and replicated behind a load balancer because all replicas can use the same PostgreSQL database. That is the next architecture phase, not part of this migration.

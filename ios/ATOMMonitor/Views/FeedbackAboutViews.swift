@@ -86,7 +86,6 @@ struct AboutView: View {
                 Text("Monitors the operational health and technical status of PilotAware ATOM ground stations.")
                 LabeledContent("Version", value: version)
                 LabeledContent("Build", value: build)
-                LabeledContent("Version / Build", value: "\(version) (\(build))")
                 LabeledContent("Platform", value: "iPhone / iOS \(UIDevice.current.systemVersion)")
             }
 

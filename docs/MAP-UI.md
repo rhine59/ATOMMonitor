@@ -49,3 +49,4 @@ Physical-device testing should additionally verify the Map header on small, stan
 
 ## Device location
 Location is optional. Core map browsing and the Home station control work without location permission.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nMap/UI behaviour is unchanged by the server resilience work. iOS simulation is complete for the current phone checkpoint; Android remains paused with the Home-station picker scrolling defect open. Functional parity remains required when phone work resumes. See `CHECKPOINT-2026-09-18.md`.\n

@@ -28,7 +28,6 @@ services:
         condition: service_healthy
     build:
       context: .
-    container_name: atommonitor-api
     restart: unless-stopped
     ports:
       - "8088:8080"

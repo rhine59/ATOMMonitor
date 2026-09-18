@@ -28,6 +28,12 @@ struct ContentView: View {
 
             NavigationStack { HelpView() }
                 .tabItem { Label("Help", systemImage: "questionmark.circle") }
+
+            NavigationStack { FeedbackView() }
+                .tabItem { Label("Feedback", systemImage: "star.bubble") }
+
+            NavigationStack { AboutView() }
+                .tabItem { Label("About", systemImage: "info.circle") }
         }
         .task { await store.load() }
     }
@@ -104,10 +110,6 @@ private struct HelpView: View {
                 Text("Inactive after is configurable from 1 to 30 days. Map layer and map/status colours are stored locally.")
             }
 
-            Section("Feedback and About") {
-                NavigationLink { FeedbackView() } label: { Label("Feedback", systemImage: "star.bubble") }
-                NavigationLink { AboutView() } label: { Label("About", systemImage: "info.circle") }
-            }
 
             Section("Privacy and scope") {
                 Text("ATOM Monitor stores ground-station status, preferences, favourites and a station cache. It does not request device location for Home behaviour and must not be used to display or retain aircraft movements or aircraft identities.")

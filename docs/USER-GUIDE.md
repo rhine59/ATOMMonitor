@@ -63,3 +63,4 @@ ATOM Monitor is currently proprietary software: **© 2026 Richard Hine. All righ
 
 ## Data and privacy scope
 Aircraft traffic remains outside project scope and must not be stored as tracks, identities or movement history.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nUser-facing behaviour is unchanged by the server resilience checkpoint. iOS simulation is complete for the current phone checkpoint; Android remains paused at its current parity checkpoint. A future cross-platform Station Detail favourite add/remove control remains queued. See `CHECKPOINT-2026-09-18.md`.\n

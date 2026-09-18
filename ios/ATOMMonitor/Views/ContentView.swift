@@ -23,7 +23,7 @@ struct ContentView: View {
             NavigationStack { ReportView(store: store) }
                 .tabItem { Label("Report", systemImage: "chart.bar") }
 
-            NavigationStack { SettingsView(store: store) }
+            NavigationStack { AppSettingsView(store: store) }
                 .tabItem { Label("Settings", systemImage: "gearshape") }
 
             NavigationStack { HelpView() }

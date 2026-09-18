@@ -10,7 +10,7 @@ Acceptance tests are executable project evidence. Each implemented architecture 
 - `scripts/phase2-acceptance.sh` regression-tests the preserved SQLite backup/recovery mechanism entirely in a temporary directory: source integrity, backup, SHA-256/integrity verification, retention and controlled restore. It does not overwrite the live PostgreSQL registry or production backup directory.
 - `scripts/phase3-acceptance.sh` validates the current PostgreSQL migration boundary: named-volume mount, PostgreSQL readiness, populated registry, reads/security, preserved SQLite rollback database, PostgreSQL restart persistence and API recovery. It deliberately restarts PostgreSQL and therefore causes a short development/test interruption.
 - `scripts/phase4-acceptance.sh` validates the replicated topology: two API replicas, Nginx entry point, collector HTTP 202 traffic through Nginx, loss/rejoin of either replica, API recreation, load-balancer recreation, HTTP 401 ingestion boundary and final recovery.
-- `scripts/all-phases-acceptance.sh` runs Phases 1–4 in order and stops if a runner exits non-zero.
+- `scripts/service-api-acceptance.sh` exercises the current live service matrix: Nginx `/health`, `/ready`, station list/detail and 404 paths; safe feedback validation; observation authentication; PostgreSQL/API confirmed-station count agreement; direct in-container `/health`, `/ready` and station reads on every API replica; and a new live collector HTTP 202 observed through Nginx. PostgreSQL is tested with `psql` because it is intentionally not an HTTP service.\n- `scripts/all-phases-acceptance.sh` runs Phases 1–4 and then the current service/API matrix, stopping if a runner exits non-zero.
 
 Shared simple PASS/FAIL helpers live in `scripts/lib/acceptance.sh`.
 
@@ -23,7 +23,7 @@ sh -n scripts/phase1-acceptance.sh
 sh -n scripts/phase2-acceptance.sh
 sh -n scripts/phase3-acceptance.sh
 sh -n scripts/phase4-acceptance.sh
-sh -n scripts/all-phases-acceptance.sh
+sh -n scripts/service-api-acceptance.sh\nsh -n scripts/all-phases-acceptance.sh
 ```
 
 Run one phase with, for example:
@@ -38,7 +38,7 @@ Run the complete implemented-phase regression suite with:
 sh scripts/all-phases-acceptance.sh
 ```
 
-Phase 3 and Phase 4 include deliberate container restart/failure/recreation tests. Run the complete suite only during an acceptable development/test interruption window.
+The service/API matrix uses explicit HTTP status/body assertions for every currently implemented HTTP route that can be exercised safely without sending feedback email or mutating the registry with synthetic station data. The collector write path is proven using a new real station-only HTTP 202 in the Nginx access log after the test starts. Direct replica checks execute HTTP requests from inside each API container because replica ports are deliberately not published on the host.\n\nPhase 3 and Phase 4 include deliberate container restart/failure/recreation tests. Run the complete suite only during an acceptable development/test interruption window.
 
 ## Historical versus current-state validation
 

@@ -72,3 +72,5 @@ For every implementation change: update this register and affected documentation
 ATOM Monitor monitors PilotAware ATOM ground-station operational health and technical status only. It must not display, record or retain aircraft movements, tracks or aircraft identities.
 
 - **Copyright/attribution (18 Sep 2026):** iOS and Android About screens now show `© 2026 Richard Hine. All rights reserved.` and identify PilotAware® as a registered trademark of PilotAware Ltd, with an independent-project/non-affiliation notice. README records the current all-rights-reserved/no-project-licence position. Third-party dependency licences remain governed by their respective licence terms.
+
+- **Distribution licensing (18 Sep 2026):** About now identifies ATOM Monitor as proprietary/licensed-not-sold software. iOS links to Apple's Standard EULA; Android links to Google Play terms and includes notices for AndroidX/Jetpack Compose and osmdroid under Apache License 2.0 plus OpenStreetMap attribution/licensing. Store agreements themselves are distribution-platform terms and do not transfer ownership of ATOM Monitor source code.

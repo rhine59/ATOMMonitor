@@ -50,8 +50,8 @@ The latest successful station snapshot remains visible after a temporary network
 ## Station details
 Record date & time uses `lastSeen` as an absolute local date/time. Other observation ages remain relative. Missing values display **Not reported**.
 
-## Help
-The application contains a local User Guide so core operating instructions remain available without opening an external web page.
+## Feedback and About
+Feedback accepts a 1–5 star rating plus comments or suggestions and sends them privately to Richard Hine through the ATOM Monitor server. The destination email address is held only in server configuration and is not displayed by the app. Feedback includes app version, platform and OS version to help diagnose suggestions or problems.\n\nAbout identifies Richard Hine as the creator, shows the installed app version/build and platform/OS information, credits PilotAware/ATOM, and repeats the station-only privacy and scope statement.\n\n## Help\nThe application contains a local User Guide so core operating instructions remain available without opening an external web page.
 
 ## Data and privacy scope
 Aircraft traffic remains outside project scope and must not be stored as tracks, identities or movement history.

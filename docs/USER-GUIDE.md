@@ -4,7 +4,7 @@
 ATOM Monitor is an iPhone and Android application for viewing the operational health and technical status of PilotAware ATOM ground stations. It does **not** display, record or retain aircraft movements, tracks or aircraft identities.
 
 ## Main navigation
-The iPhone application has Map, Stations, Favourites, Report, Settings and Help areas. Android is being kept to the same functional areas; Report parity is implemented in source and awaits its first confirmed Android build/runtime test.
+The main application areas are Map, Stations, Favourites, Report, Settings, Help, Feedback and About. Feedback and About are first-class navigation areas at the same level as Settings and Help. Android is being kept to the same functional areas; current Feedback/About Android changes still await build/runtime verification.
 
 ## Map
 Tapping a station opens its detail. On iPhone the default individual marker colours are **green Healthy, purple Back-level PilotAware software, blue No recent heartbeat, red Inactive, orange Warning and grey Unknown**. These colours are configurable in Settings and can be restored to defaults. Operational health takes precedence over the back-level-software presentation.
@@ -51,7 +51,15 @@ The latest successful station snapshot remains visible after a temporary network
 Record date & time uses `lastSeen` as an absolute local date/time. Other observation ages remain relative. Missing values display **Not reported**.
 
 ## Feedback and About
-Feedback accepts a 1–5 star rating plus comments or suggestions and sends them privately to Richard Hine through the ATOM Monitor server. The destination email address is held only in server configuration and is not displayed by the app. Feedback includes app version, platform and OS version to help diagnose suggestions or problems.\n\nAbout identifies Richard Hine as the creator, shows the installed app version/build and platform/OS information, credits PilotAware/ATOM, and repeats the station-only privacy and scope statement.\n\n## Help\nThe application contains a local User Guide so core operating instructions remain available without opening an external web page.
+Feedback accepts a 1–5 star rating plus comments or suggestions and submits them privately to Richard Hine through the ATOM Monitor server. The destination email address is held only in server configuration and is not displayed by the app. Feedback includes app version, platform and OS version to help diagnose suggestions or problems.
+
+**Feedback email delivery is currently deferred:** the user interface is present, but the Synology SMTP relay has not yet been configured/tested. Until that deployment work is completed, Send Feedback may report that feedback could not be sent.
+
+About identifies **Richard Hine** as the creator and displays **Version**, **Build** and **Platform/OS** separately. It links to the official PilotAware ATOM information page and includes the product copyright, PilotAware trademark/non-affiliation statement and distribution/licence notices. The redundant combined Version / Build line is deliberately not shown.
+
+ATOM Monitor is currently proprietary software: **© 2026 Richard Hine. All rights reserved.** iPhone distribution uses the applicable Apple terms/Standard EULA unless a custom EULA is later adopted. Android About separately identifies applicable third-party/open-source notices; those notices do not make ATOM Monitor itself open source.
+
+## Help\nThe application contains a local User Guide so core operating instructions remain available without opening an external web page.
 
 ## Data and privacy scope
 Aircraft traffic remains outside project scope and must not be stored as tracks, identities or movement history.

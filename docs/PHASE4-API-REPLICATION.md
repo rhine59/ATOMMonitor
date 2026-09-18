@@ -166,3 +166,15 @@ returned:
 ```
 
 Result: PASS for replica recovery/rejoin without loss of the external API contract. The next resilience checkpoint is forced API replica recreation and clean rediscovery/rejoin through the load balancer.
+
+## API replica recreation checkpoint — 18 September 2026
+
+Both API replicas were deliberately force-recreated with:
+
+```bash
+sudo docker compose up -d --scale atom-api=2 --force-recreate atom-api
+```
+
+Compose recreated both `server-atom-api-1` and `server-atom-api-2` while PostgreSQL remained healthy. Both replacement API containers subsequently reached healthy state. The unchanged Nginx entry point on host port 8088 successfully served `GET /ready` after recreation, demonstrating runtime Docker-DNS rediscovery of the replacement backends. API logs then showed numerous live collector `POST /api/v1/observations` requests returning HTTP 202.
+
+Result: PASS for API container recreation, backend rediscovery, read recovery and live collector-write recovery. This command intentionally recreates the whole scaled `atom-api` service on this Compose version; it is therefore a recovery/recreation test rather than a zero-overlap rolling-update mechanism.

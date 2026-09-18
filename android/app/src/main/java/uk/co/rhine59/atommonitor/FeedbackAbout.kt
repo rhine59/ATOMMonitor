@@ -67,6 +67,18 @@ fun AboutScreen() {
             Text("Copyright", style = MaterialTheme.typography.titleMedium)
             Text("© 2026 Richard Hine. All rights reserved.")
             HorizontalDivider()
+            Text("Licence & distribution", style = MaterialTheme.typography.titleMedium)
+            Text("ATOM Monitor is proprietary software. It is licensed for use, not sold; no rights are granted except those provided by the applicable end-user licence and law.")
+            TextButton(onClick = { uriHandler.openUri("https://play.google.com/about/play-terms/") }) { Text("Google Play Terms") }
+            Text("Android distribution through Google Play is subject to Google's applicable Play terms and developer distribution requirements.", style = MaterialTheme.typography.bodySmall)
+            HorizontalDivider()
+            Text("Open-source notices", style = MaterialTheme.typography.titleMedium)
+            Text("AndroidX / Jetpack Compose — Apache License 2.0")
+            Text("osmdroid 6.1.20 — Apache License 2.0")
+            TextButton(onClick = { uriHandler.openUri("https://www.apache.org/licenses/LICENSE-2.0") }) { Text("Apache License 2.0") }
+            TextButton(onClick = { uriHandler.openUri("https://www.openstreetmap.org/copyright") }) { Text("OpenStreetMap copyright and licence") }
+            Text("Map data © OpenStreetMap contributors.", style = MaterialTheme.typography.bodySmall)
+            HorizontalDivider()
             Text("ATOM Monitor does not display, record or retain aircraft movements, tracks or aircraft identities.")
     }
 }

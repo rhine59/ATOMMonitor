@@ -80,3 +80,4 @@ Separate three categories in future notes:
 - **Confirmed:** supported by current source documentation or captured live packets.
 - **Observed:** seen at a particular time/station but not guaranteed universally.
 - **Hypothesis:** architectural assumption requiring validation.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nThe current tested implementation uses the station-only OGN/APRS collector, PostgreSQL persistence and two stateless APIs behind Nginx. Research notes remain background evidence; current runtime truth is captured in the architecture, runbook and 18 September checkpoint. See `CHECKPOINT-2026-09-18.md`.\n

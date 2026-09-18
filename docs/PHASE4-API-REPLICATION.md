@@ -76,3 +76,25 @@ Phase 4 is **Tested** only after two API replicas are running against PostgreSQL
 ## Non-goals
 
 This phase does not implement PostgreSQL high availability, collector high availability, multi-NAS/site failover, external orchestration, Kubernetes, or geographic redundancy. Those require separate failure-domain decisions after the same-Synology API-replication checkpoint is understood.
+
+## Pre-cutover runtime checkpoint — 18 September 2026
+
+Immediately before the first Phase 4 topology deployment, the existing single-API PostgreSQL-backed stack was verified on the Synology with `sudo docker compose ps`:
+
+- `atommonitor-api`: Up/healthy, host `8088 -> 8080`.
+- `atommonitor-postgres`: Up/healthy, private `5432/tcp`.
+- `atommonitor-ogn-probe`: Up.
+
+The existing entry point was then checked with:
+
+```bash
+curl -fsS http://localhost:8088/ready
+```
+
+and returned:
+
+```json
+{"confirmedStations":308,"database":"ok","databaseBackend":"postgresql","service":"atommonitor-api","status":"ready"}
+```
+
+This is the rollback/reference checkpoint immediately before deploying the Phase 4 load-balancer topology. No Phase 4 runtime cutover had occurred at this point.

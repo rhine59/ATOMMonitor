@@ -53,3 +53,4 @@ The collector should discard aircraft position traffic rather than persist it.
 ## Long-term result
 
 A user should be able to open ATOM Monitor, see the ATOM network as a health map, navigate to any known station, and answer: **Where is it? Is it reporting? When did it last report? What technical state is it reporting? Has that state changed over time?**
+\n\n## Checkpoint synchronization — 18 September 2026\n\nThe project has reached the PostgreSQL/two-API/Nginx tested server checkpoint while retaining the ground-station-only product boundary. The complete Phase 1–4 and service/API acceptance suite passed on the Synology. See `CHECKPOINT-2026-09-18.md`.\n

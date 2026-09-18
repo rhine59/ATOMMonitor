@@ -465,3 +465,127 @@ resolver 127.0.0.11 valid=10s ipv6=off;
 ```
 
 Without this line Nginx fails to start when an upstream server uses the `resolve` parameter. This is a required clean-rebuild setting, not a host-specific manual fix.
+
+## 25. Current clean rebuild procedure — PostgreSQL + replicated API + Nginx
+
+This section supersedes older SQLite/single-API topology statements above for the current Phase 3/4 development/test environment. It is intentionally step-by-step so the server can be recreated from a clean Synology checkout without relying on undocumented settings from the existing NAS.
+
+### Step 1 — prepare the Synology
+
+Install/enable DSM Container Manager (Docker/Compose), Git and SSH. Use the normal Synology account for Git and `sudo` for Docker/Compose. Ensure the NAS can make outbound connections required by GitHub, container registries and the OGN/APRS collector.
+
+### Step 2 — clone the repository
+
+```bash
+cd /volume1/docker
+git clone git@github.com:rhine59/ATOMMonitor.git
+cd /volume1/docker/ATOMMonitor
+git status
+git branch --show-current
+```
+
+The expected branch is `main`. Configure GitHub SSH authentication first as described earlier in this runbook if the repository is private and the NAS has no key yet.
+
+### Step 3 — create local server configuration
+
+`server/.env` is deliberately ignored by Git. Create it from the committed template:
+
+```bash
+cd /volume1/docker/ATOMMonitor/server
+cp .env.example .env
+chmod 600 .env
+```
+
+Edit `.env` locally and replace placeholder secrets. At minimum the running PostgreSQL topology requires `ATOM_INGEST_TOKEN`, `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` and `ATOM_DATABASE_URL`. The database URL must address Compose service `postgres` on port 5432 and use credentials matching the PostgreSQL variables, for example in shape only:
+
+```text
+postgresql://atommonitor:<local-password>@postgres:5432/atommonitor
+```
+
+Do not commit `.env`, tokens or passwords. If a password contains URL-reserved characters, encode it correctly in the URL or choose a generated secret that is safe for this use.
+
+### Step 4 — validate Compose before changing runtime
+
+```bash
+sudo docker compose config --quiet
+```
+
+A successful validation returns silently.
+
+### Step 5 — create/start PostgreSQL and the replicated API topology
+
+The PostgreSQL data directory is held in the named Docker volume `atommonitor-postgres-data`; it is not stored in Git. Start the current topology with two API replicas:
+
+```bash
+sudo docker compose up -d --build --scale atom-api=2
+sudo docker compose ps
+```
+
+Expected services are `atommonitor-postgres`, `atommonitor-lb`, `atommonitor-ogn-probe`, and two Compose-managed `atom-api` containers such as `server-atom-api-1` and `server-atom-api-2`. Both APIs, PostgreSQL and Nginx should become healthy; the collector should be running. The API service deliberately has no fixed `container_name`, because a fixed name prevents Compose scaling.
+
+### Step 6 — understand the current routing
+
+The current runtime path is:
+
+```text
+LAN / DSM reverse proxy -> Synology :8088 -> atom-lb (Nginx)
+                                             |
+                                             +-> atom-api replica 1 --+
+                                             +-> atom-api replica 2 --+-> PostgreSQL
+
+single-active OGN collector -> atom-lb -> API replicas -> PostgreSQL
+```
+
+Only Nginx publishes host port 8088. API replicas expose port 8080 only inside the Compose network. PostgreSQL port 5432 remains private to that network. The collector is intentionally single-active and submits to `http://atom-lb:8080/api/v1/observations`.
+
+### Step 7 — retain Docker DNS configuration for Nginx
+
+The committed `server/nginx/atommonitor.conf` uses runtime service discovery for scaled API containers. It must contain Docker's embedded resolver:
+
+```nginx
+resolver 127.0.0.11 valid=10s ipv6=off;
+```
+
+Do not replace this with a container IP. Docker container addresses are ephemeral.
+
+### Step 8 — verify local readiness and reads
+
+```bash
+curl -fsS http://localhost:8088/ready
+curl -fsS -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8088/api/v1/stations
+```
+
+Expected: `/ready` reports `status=ready`, `database=ok`, `databaseBackend=postgresql`; the station list returns HTTP 200. The exact station count is live data and must not be hard-coded as a rebuild requirement.
+
+Verify live collector ingestion:
+
+```bash
+sudo docker compose logs --since=2m atom-api | grep 'POST /api/v1/observations' | tail -10
+```
+
+Expected: live submissions return HTTP 202. Do not retain general aircraft traffic as test evidence; ATOM Monitor remains ground-station operational monitoring only.
+
+### Step 9 — recreate DSM/public networking
+
+Configure DSM Reverse Proxy source HTTPS `granvillehouse.synology.me:8445` to destination HTTP `localhost:8088`, assign a valid certificate for `granvillehouse.synology.me`, and configure the router TCP forwarding for public port 8445 to the NAS as described in Sections 9–13. Do not expose host port 8088 or PostgreSQL 5432 directly to the Internet.
+
+Verify with certificate checking enabled:
+
+```bash
+curl -fsS https://granvillehouse.synology.me:8445/health
+curl -fsS https://granvillehouse.synology.me:8445/api/v1/stations >/dev/null
+```
+
+### Step 10 — persistence and resilience checks
+
+PostgreSQL persistence belongs to the named volume, so a clean NAS rebuild without restoring that volume starts with a new database. Source checkout alone is not a database backup. After establishing an operational backup policy for PostgreSQL, include that restore procedure here; the older SQLite backup procedure does not back up the active PostgreSQL database.
+
+For an API-only resilience check, stop one replica, verify `/ready` and station reads remain available and collector POSTs continue with HTTP 202, then restore the replica and confirm it becomes healthy. Do not delete the PostgreSQL volume as part of an API resilience test.
+
+### Step 11 — rollback boundary
+
+Phase 4 topology rollback is to one PostgreSQL-backed API instance; it does not require converting the database back to SQLite. Phase 3 retains the separately documented SQLite rollback boundary at `server/data/atommonitor.sqlite3`, but the current runtime backend is PostgreSQL. Never delete `atommonitor-postgres-data` during a topology rollback.
+
+### Step 12 — final clean-rebuild verification
+
+Before declaring a newly recreated environment operational, confirm: Compose validates; PostgreSQL is healthy; two API replicas are healthy; Nginx is healthy and owns host port 8088; the single collector is running; `/ready` reports PostgreSQL; station reads return HTTP 200; live collector submissions return HTTP 202; DSM HTTPS works with valid TLS; and the app can reach the public endpoint. Record any host-specific prerequisite discovered during a rebuild in this runbook rather than leaving it only on the NAS.

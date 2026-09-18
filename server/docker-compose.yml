@@ -91,11 +91,11 @@ services:
     container_name: atommonitor-ogn-probe
     restart: unless-stopped
     depends_on:
-      atom-api:
+      atom-lb:
         condition: service_healthy
     environment:
       ATOM_INGEST_TOKEN: ${ATOM_INGEST_TOKEN:?Set ATOM_INGEST_TOKEN in server/.env}
-    command: ["--prefix", "PW", "--api-url", "http://atom-api:8080/api/v1/observations"]
+    command: ["--prefix", "PW", "--api-url", "http://atom-lb:8080/api/v1/observations"]
     stop_grace_period: 20s
     logging:
       driver: json-file

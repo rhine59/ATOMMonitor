@@ -31,7 +31,12 @@ def db():
   if psycopg is None:raise RuntimeError("psycopg is required for PostgreSQL")
   c=psycopg.connect(DATABASE_URL,row_factory=dict_row)
   try:
-   c.execute(STATION_SCHEMA);c.commit();yield c
+   c.execute(STATION_SCHEMA);c.commit()
+   try:
+    yield c
+    c.commit()
+   except Exception:
+    c.rollback();raise
   finally:c.close()
  else:
   os.makedirs(os.path.dirname(DB_PATH),exist_ok=True);c=sqlite3.connect(DB_PATH);c.row_factory=sqlite3.Row
@@ -39,7 +44,12 @@ def db():
    c.execute(STATION_SCHEMA)
    cols={r[1] for r in c.execute("PRAGMA table_info(stations)")}
    if "isPilotAware" not in cols:c.execute("ALTER TABLE stations ADD COLUMN isPilotAware INTEGER NOT NULL DEFAULT 0")
-   c.commit();yield c
+   c.commit()
+   try:
+    yield c
+    c.commit()
+   except Exception:
+    c.rollback();raise
   finally:c.close()
 def sql(q):return q.replace("?", "%s") if DATABASE_URL else q
 def parse_time(value):

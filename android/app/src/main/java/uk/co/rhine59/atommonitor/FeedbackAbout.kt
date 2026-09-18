@@ -63,6 +63,10 @@ fun AboutScreen() {
             Text("Credits", style = MaterialTheme.typography.titleMedium)
             Text("Created by Richard Hine")
             Text("PilotAware and ATOM are acknowledged as the technologies and ground-station network monitored by this application.")\n            TextButton(onClick = { uriHandler.openUri("https://www.pilotaware.com/atom") }) { Text("PilotAware ATOM") }
+            Text("PilotAware® is a registered trademark of PilotAware Ltd. ATOM Monitor is an independent project and is not affiliated with, endorsed by or sponsored by PilotAware Ltd.", style = MaterialTheme.typography.bodySmall)
+            HorizontalDivider()
+            Text("Copyright", style = MaterialTheme.typography.titleMedium)
+            Text("© 2026 Richard Hine. All rights reserved.")
             HorizontalDivider()
             Text("ATOM Monitor does not display, record or retain aircraft movements, tracks or aircraft identities.")
     }

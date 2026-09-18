@@ -98,3 +98,19 @@ and returned:
 ```
 
 This is the rollback/reference checkpoint immediately before deploying the Phase 4 load-balancer topology. No Phase 4 runtime cutover had occurred at this point.
+
+## First load-balancer deployment finding — 18 September 2026
+
+The first `atom-lb` start exposed a required Nginx/Docker DNS setting. Nginx restarted with:
+
+```text
+no resolver defined to resolve names at run time in upstream "atommonitor_api"
+```
+
+Because the upstream uses `server atom-api:8080 resolve;` for runtime replica discovery, the Nginx configuration must explicitly use Docker's embedded DNS resolver. The configuration was corrected with:
+
+```nginx
+resolver 127.0.0.11 valid=10s ipv6=off;
+```
+
+This setting is part of the reproducible Compose environment and must be retained in a clean rebuild. The failure occurred before the load balancer could serve host port 8088; PostgreSQL and the recreated API remained separate from this Nginx configuration failure.

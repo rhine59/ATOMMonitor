@@ -191,3 +191,13 @@ This validates the current automated rebuild/test runner against the Phase 4 Pos
 The Synology runtime acceptance runner `scripts/phase4-acceptance.sh` completed with `PHASE 4 ACCEPTANCE: PASS`. Verified: Compose validation; PostgreSQL-backed readiness through Nginx; station reads; exactly two API replicas; live collector HTTP 202 submissions visible in the Nginx access log; continued reads and collector writes with replica 1 stopped; replica 1 rejoin; continued reads and collector writes with replica 2 stopped; replica 2 rejoin; API replica recreation and recovery; load-balancer recreation and recovery; unauthenticated observation ingestion rejected with HTTP 401; and final readiness/read-path recovery. The runner's exit cleanup restores the intended two-API-replica plus load-balancer topology.
 
 At the instant the final `docker compose ps` snapshot was printed, the newly recreated Nginx and API containers still displayed Docker health state `starting`; the script's subsequent application-level readiness and station-read assertions passed. This is therefore recorded as successful application recovery, not as evidence that Docker's asynchronous health-state display had already changed to `healthy` at that exact snapshot.
+
+## Full Phase 1–4 and service/API acceptance — 18 September 2026
+
+The Synology runner `scripts/all-phases-acceptance.sh` completed with `ALL IMPLEMENTED PHASE AND SERVICE/API ACCEPTANCE TESTS: PASS`.
+
+Runtime evidence included Phase 1 base runtime/API/security checks; Phase 2 preserved SQLite integrity, temporary backup, retention, checksum verification and controlled restore; Phase 3 PostgreSQL named-volume/readiness/population checks plus restart persistence (310 total station rows at that checkpoint) and API recovery; and Phase 4 two-replica failure/rejoin, API recreation, Nginx recreation, live collector HTTP 202 traffic and HTTP 401 authentication boundary.
+
+The final current-stack service/API matrix passed Nginx `/health`, PostgreSQL-backed `/ready`, station list, station detail and missing-station 404; safe invalid-feedback HTTP 400; unauthenticated observation HTTP 401; PostgreSQL/API confirmed PilotAware count agreement (308 at that checkpoint); direct `/health`, `/ready` and station-list HTTP checks on both API replicas; and a new live collector observation returning HTTP 202 through Nginx. Counts are checkpoint evidence and are not fixed expected values.
+
+During Phase 4, the immediate `docker compose ps` snapshot showed newly recreated Nginx/API containers as health `starting`; application-level readiness/read assertions passed, and the subsequent service matrix waited until Nginx was healthy before passing all direct and load-balanced checks.

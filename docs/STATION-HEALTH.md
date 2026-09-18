@@ -68,3 +68,4 @@ Exact names/units must be validated from the source protocol before implementati
 ## Future alerting
 
 Notifications for favourite stations are a possible later feature. They should use hysteresis/debouncing to avoid repeated alerts during brief network interruptions and should distinguish server/upstream feed failure from an individual station ceasing to report.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nHealth semantics remain unchanged at this checkpoint. The server architecture underneath them is now PostgreSQL plus two stateless APIs behind Nginx, with full service/API acceptance passed. See `CHECKPOINT-2026-09-18.md`.\n

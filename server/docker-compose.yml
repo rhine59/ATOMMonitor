@@ -11,6 +11,12 @@ services:
     environment:
       ATOM_DB: /data/atommonitor.sqlite3
       ATOM_INGEST_TOKEN: ${ATOM_INGEST_TOKEN:?Set ATOM_INGEST_TOKEN in server/.env}
+      FEEDBACK_TO_NAME: ${FEEDBACK_TO_NAME:-Richard Hine}
+      FEEDBACK_TO_EMAIL: ${FEEDBACK_TO_EMAIL:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       PORT: "8080"
       PYTHONUNBUFFERED: "1"
     healthcheck:

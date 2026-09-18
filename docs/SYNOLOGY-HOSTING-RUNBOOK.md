@@ -6,39 +6,31 @@ This is the authoritative rebuild, deployment, networking and diagnostic runbook
 
 ATOM Monitor collects and serves **PilotAware ATOM ground-station operational health and technical status only**. It must not store or expose aircraft identities, aircraft positions, tracks or movement history.
 
-The server consists of two Docker Compose services:
+The current server stack consists of PostgreSQL, two stateless API replicas, one Nginx load balancer and one single-active OGN/APRS ground-station collector. PostgreSQL is the active station-registry backend. Nginx alone publishes Synology host port `8088`; the API replicas and PostgreSQL remain private to the Compose network. The collector submits observations through Nginx rather than directly to an API replica.
 
-- `atommonitor-api` — persistent SQLite station registry and REST API.
-- `atommonitor-ogn-probe` — OGN/APRS ground-station collector/classifier feeding receiver/status observations to the API.
-
-The current Compose file maps Synology host port `8088` to API container port `8080`, mounts `./data` at `/data`, stores SQLite at `/data/atommonitor.sqlite3`, and runs both containers with `restart: unless-stopped`.
-
-## 2. Production topology
+## 2. Current hosted topology
 
 ```text
 OGN/APRS receiver/status feed
         |
         v
-Synology NAS
-  /volume1/docker/ATOMMonitor
+single-active atommonitor-ogn-probe
         |
-        +-- Docker: atommonitor-ogn-probe
-        |       |
-        |       +--> http://atom-api:8080/api/v1/observations
+        v
+atommonitor-lb (Nginx) :8080
         |
-        +-- Docker: atommonitor-api :8080
-                |
-                +--> ./server/data/atommonitor.sqlite3
-                |
-                v
-          Synology host :8088
-                |
-                v
+        +--> atom-api replica 1 --+
+        +--> atom-api replica 2 --+--> PostgreSQL
+        |
+        v
+Synology host :8088
+        |
+        v
 DSM Reverse Proxy
 HTTPS granvillehouse.synology.me:8445
-                |
-                v
-ATOM Monitor iPhone app
+        |
+        v
+ATOM Monitor phone clients
 ```
 
 `8088` is an internal/LAN service port. **Do not forward TCP 8088 from the Internet.** Public clients use HTTPS on `granvillehouse.synology.me:8445`.
@@ -86,33 +78,11 @@ For a clean rebuild, clone the private `rhine59/ATOMMonitor` repository into `/v
 
 ## 5. Persistent data
 
-The Compose file uses:
+The active runtime database is PostgreSQL. Compose stores it in the named Docker volume `atommonitor-postgres-data`. A Git checkout does not contain or restore this database.
 
-```text
-./server/data  ->  /data
-ATOM_DB=/data/atommonitor.sqlite3
-```
+The legacy `server/data/atommonitor.sqlite3` file is retained only as the tested Phase 3 rollback boundary and is ignored by Git. The older SQLite backup procedure in Section 22 is historical/rollback material; it is **not** a backup of the active PostgreSQL service.
 
-Therefore the live database is expected at:
-
-```text
-/volume1/docker/ATOMMonitor/server/data/atommonitor.sqlite3
-```
-
-The runtime database, journal, WAL and SHM files are deliberately ignored by Git. They are operational data, not source code.
-
-Before destructive server work, back up `server/data/` separately from Git. A source-code checkout alone does **not** restore the station registry.
-
-A simple stopped-service backup is:
-
-```bash
-cd /volume1/docker/ATOMMonitor/server
-sudo docker compose down
-cp -a data "data-backup-$(date +%Y%m%d-%H%M%S)"
-sudo docker compose up -d
-```
-
-For routine NAS backups, include `/volume1/docker/ATOMMonitor/server/data` in the Synology backup policy.
+Do not remove `atommonitor-postgres-data` during routine rebuilds, API recreation, scaling or Phase 4 rollback. A PostgreSQL backup/restore policy remains an outstanding operational requirement and must be documented/tested before the database is treated as fully protected.
 
 ## 6. Build and start the containers
 
@@ -120,28 +90,12 @@ From the server directory:
 
 ```bash
 cd /volume1/docker/ATOMMonitor/server
-sudo docker compose build
-sudo docker compose up -d
+sudo docker compose config --quiet
+sudo docker compose up -d --build --scale atom-api=2
 sudo docker compose ps
 ```
 
-For a clean rebuild:
-
-```bash
-sudo docker compose down
-sudo docker compose build --no-cache
-sudo docker compose up -d
-sudo docker compose ps
-```
-
-Expected containers:
-
-```text
-atommonitor-api
-atommonitor-ogn-probe
-```
-
-Both are configured `restart: unless-stopped`, so they should restart automatically after a NAS/Docker restart unless deliberately stopped.
+For a clean image rebuild, add `--no-cache` to the build step if required, then start with `--scale atom-api=2`. Expected runtime containers are `atommonitor-postgres`, `atommonitor-lb`, `atommonitor-ogn-probe`, and two Compose-managed API replicas such as `server-atom-api-1` and `server-atom-api-2`. PostgreSQL, Nginx and both API replicas should become healthy; the collector should be running.
 
 ## 7. Repeatable build/test runner
 
@@ -389,22 +343,13 @@ Finally test the iPhone over cellular data for a real Internet-path check.
 
 ## 18. Recovery from a clean NAS/container installation
 
-1. Install/enable Container Manager/Docker and Git/SSH support.
-2. Restore or clone `rhine59/ATOMMonitor` to `/volume1/docker/ATOMMonitor` as the normal Synology user.
-3. Restore `server/data/` from backup if retaining the existing station registry.
-4. Run `sh scripts/synology-build-test.sh`.
-5. Recreate/verify the DSM `ATOMMonitor` reverse-proxy rule on HTTPS 8445 to `localhost:8088`.
-6. Assign/verify the `granvillehouse.synology.me` TLS certificate.
-7. Recreate/verify router TCP forwarding `8445 -> NAS:8445`.
-8. Verify local `/health` and `/api/v1/stations`.
-9. Verify public HTTPS endpoints with certificate checking enabled.
-10. Verify the iPhone using cellular data.
+Use the authoritative clean-rebuild procedure in Section 25. In summary: install the prerequisites; clone the repository as the normal Synology user; create ignored `server/.env` from `.env.example`; restore PostgreSQL from a tested backup if existing registry data must be retained; validate Compose; start with two API replicas; verify PostgreSQL/Nginx/API/collector health; recreate DSM reverse proxy, TLS and router configuration; then verify local and public endpoints. Do not restore the legacy SQLite file as though it were the active PostgreSQL database.
 
 ## 19. Security notes and outstanding hardening
 
 The public reverse proxy must expose only what ATOM Monitor needs. The current server also has an observation-ingestion path used internally by the collector. Before treating the Internet-facing deployment as fully hardened production service, restrict or authenticate ingestion so an external client cannot submit arbitrary observations. Public access should be limited to intended read endpoints wherever practical.
 
-Keep DSM, Container Manager/Docker and images patched. Do not place credentials, tokens or private keys in Git. Do not expose Docker's management socket or the SQLite database over the network.
+Keep DSM, Container Manager/Docker and images patched. Do not place credentials, tokens or private keys in Git. Do not expose Docker's management socket, PostgreSQL port 5432, API replica ports, or legacy SQLite files over the network.
 
 ## 20. Known server engineering work
 
@@ -428,7 +373,7 @@ curl -fsS https://granvillehouse.synology.me:8445/health
 sudo docker compose logs --tail=30 atom-api ogn-station-probe
 ```
 
-If all checks pass, the Synology Docker host, persistent registry, LAN API, public DNS/TLS reverse proxy and collector are operational.
+If all checks pass, the Synology Docker host, PostgreSQL registry, replicated API behind Nginx, LAN/public DNS/TLS path and collector are operational.
 
 ## 22. Phase 2 SQLite backup/recovery checkpoint — 18 September 2026
 

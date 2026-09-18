@@ -94,6 +94,13 @@ struct AboutView: View {
                 LabeledContent("Created by", value: "Richard Hine")
                 Text("PilotAware and ATOM are acknowledged as the technologies and ground-station network monitored by this application.")
                 Link("PilotAware ATOM", destination: URL(string: "https://www.pilotaware.com/atom")!)
+                Text("PilotAware® is a registered trademark of PilotAware Ltd. ATOM Monitor is an independent project and is not affiliated with, endorsed by or sponsored by PilotAware Ltd.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Copyright") {
+                Text("© 2026 Richard Hine. All rights reserved.")
             }
 
             Section("Privacy and scope") {

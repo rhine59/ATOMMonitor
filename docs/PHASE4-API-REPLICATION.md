@@ -188,3 +188,11 @@ http://atom-lb:8080/api/v1/observations
 ```
 
 rather than addressing `atom-api` directly. This preserves a single collector while ensuring ingestion uses the same replicated API entry layer as other traffic. Runtime deployment/verification of this routing change remains required before it is marked tested.
+
+## Collector through load balancer runtime checkpoint — 18 September 2026
+
+The single-active OGN collector was recreated from the Compose definition that targets `http://atom-lb:8080/api/v1/observations`. After deployment, PostgreSQL, Nginx and both API replicas remained healthy and the collector remained running. API logs showed repeated live observation submissions returning HTTP 202 after the routing change.
+
+The API access-log source for those POSTs was `172.23.0.5`, consistent with traffic arriving from the intermediary container path rather than the collector's previous direct-to-API path. The committed Compose target is the authoritative proof of intended routing; container IP addresses are ephemeral and must not be copied into configuration or rebuild instructions.
+
+Result: PASS for live collector ingestion through the committed load-balancer route. No aircraft movement data was introduced or retained by this change.

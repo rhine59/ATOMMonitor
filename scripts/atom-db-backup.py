@@ -117,15 +117,34 @@ def verify(path: Path) -> None:
     print("Controlled restore verification: PASS")
 
 
+def sqlite_sidecars(path: Path) -> tuple[Path, Path, Path]:
+    """Return SQLite sidecars that must not survive a replacement database."""
+    return tuple(Path(str(path) + suffix) for suffix in ("-wal", "-shm", "-journal"))
+
+
 def restore(path: Path, target: Path, force: bool) -> None:
     check_checksum(path)
     inspect_db(path)
-    if target.exists() and not force:
-        raise RuntimeError(f"target exists: {target}; use --force only after stopping services")
+    sidecars = sqlite_sidecars(target)
+    existing_sidecars = [sidecar for sidecar in sidecars if sidecar.exists()]
+    if (target.exists() or existing_sidecars) and not force:
+        detail = ", ".join(str(item) for item in ([target] if target.exists() else []) + existing_sidecars)
+        raise RuntimeError(
+            f"target database state exists: {detail}; use --force only after stopping services"
+        )
     target.parent.mkdir(parents=True, exist_ok=True)
     temp = target.with_suffix(target.suffix + ".restore-partial")
+    temp.unlink(missing_ok=True)
     shutil.copy2(path, temp)
     inspect_db(temp)
+
+    # A WAL/SHM/journal belongs to the previous database generation.  It must
+    # never be presented to SQLite beside the replacement database.  --force
+    # is deliberately required and the recovery runbook requires services to
+    # be stopped before this point.
+    for sidecar in sidecars:
+        sidecar.unlink(missing_ok=True)
+
     temp.replace(target)
     integrity, total, confirmed = inspect_db(target)
     print(f"Restored: {target}")

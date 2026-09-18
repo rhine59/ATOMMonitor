@@ -57,7 +57,6 @@ fun AboutScreen() {
             Text("Monitors the operational health and technical status of PilotAware ATOM ground stations.")
             Text("Version: " + (p.versionName ?: "Unknown"))
             Text("Build: " + p.longVersionCode)
-            Text("Version / Build: " + (p.versionName ?: "Unknown") + " (" + p.longVersionCode + ")")
             Text("Platform: Android " + Build.VERSION.RELEASE)
             HorizontalDivider()
             Text("Credits", style = MaterialTheme.typography.titleMedium)

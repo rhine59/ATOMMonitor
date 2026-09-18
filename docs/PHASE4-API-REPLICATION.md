@@ -150,3 +150,19 @@ With two API replicas healthy, `server-atom-api-1` was deliberately stopped. Com
 Through Nginx on host port 8088, `GET /ready` continued to return HTTP 200 with PostgreSQL ready and 308 confirmed stations, and `GET /api/v1/stations` continued to return HTTP 200. The surviving `server-atom-api-2` logs also showed repeated authenticated collector submissions to `POST /api/v1/observations` returning HTTP 202 while replica 1 was stopped.
 
 Result: PASS for read continuity and collector-write continuity after loss of one API replica. Replica restoration/rejoin remains to be tested.
+
+## Replica recovery and rejoin checkpoint — 18 September 2026
+
+After the single-replica failure-continuity test, `server-atom-api-1` was started again while replica 2 continued running. Compose showed both API replicas healthy, PostgreSQL healthy, Nginx healthy, and the single-active collector running. A subsequent request through the unchanged host entry point:
+
+```bash
+curl -fsS http://localhost:8088/ready
+```
+
+returned:
+
+```json
+{"confirmedStations":308,"database":"ok","databaseBackend":"postgresql","service":"atommonitor-api","status":"ready"}
+```
+
+Result: PASS for replica recovery/rejoin without loss of the external API contract. The next resilience checkpoint is forced API replica recreation and clean rediscovery/rejoin through the load balancer.

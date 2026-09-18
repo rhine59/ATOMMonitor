@@ -173,3 +173,9 @@ Simulator recordings/logs that are final evidence may be tracked. Raw intermedia
 ## Current evidence
 
 Phase 1 Synology resilience/security evidence is recorded in `docs/PHASE1-TEST-EVIDENCE-2026-09-17.md`. The Android public-server runtime networking checkpoint is recorded above. The feature register is the authoritative current status source; historical checkpoint documents are snapshots and should not be interpreted as overriding it.
+
+## Phase 4 API replication runtime tests — 18 September 2026
+
+On the Synology development/test stack, Phase 4 runtime testing established the following checkpoints: Nginx cutover on host port 8088 preserved PostgreSQL-backed `/ready`; two scaled API replicas were simultaneously healthy; `/ready` and `/api/v1/stations` succeeded through the load balancer; stopping `server-atom-api-1` left reads available through replica 2 and live collector ingestion continued with HTTP 202; restarting replica 1 produced a clean healthy rejoin; force-recreating the scaled API service recreated both replicas, after which both became healthy, Nginx rediscovered the replacement backends, `/ready` succeeded and live observation POSTs again returned HTTP 202.
+
+Detailed command/evidence sequence is retained in `docs/PHASE4-API-REPLICATION.md`. Phase 4 must not be marked fully Tested until the remaining acceptance items and clean-from-scratch runbook update/review are complete.

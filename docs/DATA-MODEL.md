@@ -83,3 +83,4 @@ If multiple sources are later combined, it may be useful to retain provider-spec
 ## Explicit exclusions
 
 There is intentionally no aircraft, flight, track-point, aircraft-identity or aircraft-position table in this project.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nPostgreSQL is now the active persistent station registry and Phase 3 migration is Tested. The full acceptance run proved named-volume persistence across PostgreSQL restart and API recovery. The preserved SQLite database is rollback/historical state only. PostgreSQL backup/restore remains an outstanding operational requirement. See `CHECKPOINT-2026-09-18.md`.\n

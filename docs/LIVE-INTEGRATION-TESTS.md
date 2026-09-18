@@ -110,3 +110,4 @@ python3 -c 'import sys,json; d=json.load(sys.stdin); from collections import Cou
 ```
 
 This command intentionally reports aggregate ground-station registry coverage only.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nThe committed cross-phase framework is now Tested on the Synology. `scripts/all-phases-acceptance.sh` passed Phases 1–4 and the current service/API matrix. Runtime evidence is recorded in `BUILD-AND-TEST.md` and summarized in `CHECKPOINT-2026-09-18.md`. See `CHECKPOINT-2026-09-18.md`.\n

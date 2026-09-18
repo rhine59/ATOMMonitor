@@ -142,3 +142,11 @@ sudo docker compose up -d --scale atom-api=2
 Compose reported both `server-atom-api-1` and `server-atom-api-2` healthy, PostgreSQL healthy, and the load balancer and single-active OGN collector running. Through the load-balancer entry point, `GET /ready` returned PostgreSQL-backed ready status with 308 confirmed stations, and `GET /api/v1/stations` returned HTTP 200.
 
 Result: PASS for normal two-replica reads through the load balancer. Controlled single-replica failure/recovery testing remains outstanding.
+
+## Single-replica failure continuity checkpoint — 18 September 2026
+
+With two API replicas healthy, `server-atom-api-1` was deliberately stopped. Compose then showed `server-atom-api-2`, PostgreSQL and Nginx healthy while the single-active OGN collector remained running.
+
+Through Nginx on host port 8088, `GET /ready` continued to return HTTP 200 with PostgreSQL ready and 308 confirmed stations, and `GET /api/v1/stations` continued to return HTTP 200. The surviving `server-atom-api-2` logs also showed repeated authenticated collector submissions to `POST /api/v1/observations` returning HTTP 202 while replica 1 was stopped.
+
+Result: PASS for read continuity and collector-write continuity after loss of one API replica. Replica restoration/rejoin remains to be tested.

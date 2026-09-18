@@ -10,7 +10,7 @@ The project has a working Synology Docker server, a native SwiftUI iPhone applic
 
 ### Server
 
-The Synology Docker deployment maintains a persistent ground-station registry from OGN/APRS receiver/status traffic and exposes station data through a REST API. The internal/LAN service is host port `8088`; runtime station state is stored in SQLite. Aircraft messages are discarded and aircraft movement data is not part of the database or API.
+The Synology Docker deployment maintains a persistent ground-station registry from OGN/APRS receiver/status traffic and exposes station data through a REST API. The internal/LAN service is host port `8088`; runtime station state is stored in PostgreSQL in a persistent named Docker volume. Two stateless API replicas run behind Nginx; the preserved SQLite database is rollback/historical data, not the live backend. Aircraft messages are discarded and aircraft movement data is not part of the database or API.
 
 Public access is through DSM Reverse Proxy at `https://granvillehouse.synology.me:8445/`, terminating valid HTTPS and forwarding internally to `http://localhost:8088`. Port 8088 is diagnostic/internal and must not be directly Internet-forwarded. The complete rebuild/deployment procedure is in `docs/SYNOLOGY-HOSTING-RUNBOOK.md`.
 
@@ -54,8 +54,8 @@ OGN APRS receiver/status traffic only
               v
        Synology Docker
   collector / classifier
-  persistent station registry
-  SQLite / REST API :8088 internal
+  PostgreSQL persistent station registry
+  Nginx -> two stateless REST API replicas :8088 internal
               |
               v
        DSM Reverse Proxy
@@ -91,4 +91,4 @@ PilotAware® is a registered trademark of PilotAware Ltd. ATOM Monitor is an ind
 
 Feedback and About are now first-class navigation areas on both phone clients. About carries creator, Version, Build, Platform/OS, PilotAware ATOM link, copyright/trademark/non-affiliation and distribution/licence information. Feedback UI is implemented but mail delivery is deliberately deferred until Synology SMTP configuration/testing is resumed.
 
-Phase 2 SQLite backup tooling has passed live backup, integrity/checksum verification, controlled restore-copy verification and retention pruning. A daily 02:00 DSM Task Scheduler job has been created but has not yet had its execution verified; NAS backup-policy inclusion and an explicit safe recovery drill remain outstanding. Phase 3 PostgreSQL migration and later stateless API replication remain future architecture work.
+Phase 2 SQLite backup/recovery tooling is retained and regression-tested against the preserved rollback database. Phase 3 PostgreSQL migration is Tested and PostgreSQL is the live backend. Phase 4 two-replica API/Nginx resilience acceptance passed, including loss/rejoin of either replica, API/LB recreation and live collector HTTP 202 traffic through Nginx. The complete Phase 1–4 plus service/API acceptance suite passed on the Synology. PostgreSQL backup/restore and the associated NAS/external backup policy remain the principal server operational gap. See `docs/CHECKPOINT-2026-09-18.md`.

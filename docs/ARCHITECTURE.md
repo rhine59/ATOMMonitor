@@ -1,6 +1,6 @@
 # ATOM Monitor — Architecture
 
-Last updated: 17 September 2026
+Last updated: 18 September 2026
 
 ## Purpose and scope
 
@@ -20,7 +20,7 @@ Synology NAS / Docker Compose
   ATOM API (Gunicorn + Flask)
         |
         v
-  SQLite persistent station registry
+  PostgreSQL persistent station registry
         |
         +---- HTTPS public reads via DSM reverse proxy :8445
         |
@@ -37,7 +37,7 @@ The current development/test deployment runs on the Synology NAS using Docker Co
 
 The API exposes inexpensive process liveness at `/health` and database-backed readiness at `/ready`. Docker checks `/ready` and uses bounded JSON logging, a graceful stop period and `restart: unless-stopped`.
 
-The SQLite database is persisted outside the disposable container filesystem. PostgreSQL and horizontally replicated stateless API instances remain future resilience/scalability work; multiple API replicas must not be introduced while SQLite is the shared state mechanism.
+PostgreSQL is the live development/test station registry and is persisted in a named Docker volume outside disposable container filesystems. Phase 3 PostgreSQL migration is Tested. The next resilience step is Phase 4: two stateless API replicas behind a load balancer, still on the same Synology and sharing PostgreSQL.
 
 ## Network boundary
 
@@ -85,10 +85,10 @@ Missing optional technical telemetry by itself is not treated as a station failu
 
 The current Phase 1 development/test deployment has health/readiness checks, authenticated ingestion, bounded logging, graceful restart behaviour, Gunicorn WSGI serving and stale/future-packet protection. Phase 2 SQLite backup/recovery is substantially implemented but remains open for the deferred recovery drill and NAS backup-policy check.
 
-Phase 3 migrates the development/test persistent station registry from SQLite to PostgreSQL before any stateless API replication/load balancing. PostgreSQL will run as a dedicated Compose service with its own persistent volume and healthcheck. The API and collector contract remains station-only and unchanged. Migration will be explicit and repeatable: preserve/verify the SQLite source, initialise PostgreSQL schema, copy station rows, compare total and confirmed PilotAware counts, then switch the API database backend. Because this is not a production service, no zero-downtime migration is required; correctness, rollback and evidence take priority.
+Phase 3 PostgreSQL migration is Tested. The development/test API now uses the shared PostgreSQL registry; live writes, reads, authentication, stale/future ordering, restart and container-recreation persistence passed, and the preserved SQLite rollback boundary remains verified.
 
-The Phase 3 rollback boundary is the database-backend switch. The verified SQLite database and its backups remain intact until PostgreSQL runtime tests pass. If the PostgreSQL deployment fails acceptance, the development/test stack can be returned to the SQLite-backed configuration without converting PostgreSQL data back into SQLite.
+Phase 4 now introduces multiple stateless API replicas behind a load balancer. Both replicas will share PostgreSQL, while the collector remains single-active and will submit through the load-balancing entry point. The existing public HTTPS/LAN API contract must remain unchanged. Phase 4 rollback is a Compose topology rollback to one API instance using the same PostgreSQL data; it does not require database conversion.
 
-Only after PostgreSQL migration passes will the architecture move to multiple stateless API replicas behind a load balancer. The collector remains single-active at that stage; collector HA is a separate later problem and must not be implemented by simply starting duplicate collectors.
+Collector HA is a separate later problem and must not be implemented by simply starting duplicate collectors.
 
 Two replicas on the same Synology would protect only against an individual process/container failure; they would not protect against NAS, router, broadband, power or site failure.

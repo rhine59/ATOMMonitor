@@ -78,7 +78,7 @@ struct AboutView: View {
             }
             Section("Credits") {
                 LabeledContent("Created by", value: "Richard Hine")
-                Text("PilotAware and ATOM are acknowledged as the technologies and ground-station network monitored by this application.")
+                Text("PilotAware and ATOM are acknowledged as the technologies and ground-station network monitored by this application.")\n                Link("PilotAware ATOM", destination: URL(string: "https://www.pilotaware.com/atom")!)
             }
             Section("Privacy and scope") {
                 Text("ATOM Monitor does not display, record or retain aircraft movements, tracks or aircraft identities.")

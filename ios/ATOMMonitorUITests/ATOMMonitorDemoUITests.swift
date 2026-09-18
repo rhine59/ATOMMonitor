@@ -67,28 +67,34 @@ final class ATOMMonitorDemoUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["PilotAware versions"].waitForExistence(timeout: 2))
         XCTAssertTrue(app.buttons["Share report"].waitForExistence(timeout: 2))
 
-        step("Settings: set a home station and verify the Map home button")
+        step("Settings: server, refresh interval and inactive threshold")
         selectTab("Settings", in: app); sleep(2)
-        let homePicker = app.buttons["Home station"]
-        if homePicker.waitForExistence(timeout: 2) {
-            homePicker.tap()
-            let demoHome = app.buttons["PW Demo Healthy"]
-            if demoHome.waitForExistence(timeout: 2) { demoHome.tap() }
-        }
-        selectTab("Map", in: app); sleep(2)
-        XCTAssertTrue(app.buttons["Go to home station"].waitForExistence(timeout: 2))
-        app.buttons["Go to home station"].tap(); sleep(2)
-
-        step("Settings: server connection and configurable 1-10 minute refresh interval")
-        selectTab("Settings", in: app); sleep(2)
-        let refreshLabel = app.staticTexts["Refresh interval"]
-        if !refreshLabel.exists { app.swipeUp(); sleep(1) }
-        XCTAssertTrue(refreshLabel.waitForExistence(timeout: 2))
-        let increment = app.buttons.matching(NSPredicate(format: "label == %@", "Increment")).firstMatch
-        if increment.exists { increment.tap(); increment.tap(); sleep(1) }
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["Test Connection"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Every ")).firstMatch.waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Inactive after ")).firstMatch.waitForExistence(timeout: 2))
 
         step("Help: project purpose and user guide")
         selectTab("Help", in: app); sleep(2)
+
+        step("Feedback: rating and comments UI without sending mail")
+        selectTab("Feedback", in: app); sleep(2)
+        XCTAssertTrue(app.navigationBars["Feedback"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Your rating"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["Comments or suggestions"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.buttons["Send Feedback"].waitForExistence(timeout: 2))
+
+        step("About: identity, version, build, credits and distribution details")
+        selectTab("About", in: app); sleep(2)
+        XCTAssertTrue(app.navigationBars["About"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Version"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["Build"].waitForExistence(timeout: 2))
+        XCTAssertFalse(app.staticTexts["Version / Build"].exists, "Combined Version / Build row must not reappear")
+        XCTAssertTrue(app.staticTexts["Created by"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["Richard Hine"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.links["PilotAware ATOM"].waitForExistence(timeout: 2))
+        app.swipeUp(); sleep(1)
+        XCTAssertTrue(app.staticTexts["Licence & distribution"].waitForExistence(timeout: 2))
 
         step("Map: cached snapshot, persisted layer and last-updated indicator remain available")
         selectTab("Map", in: app); sleep(3)

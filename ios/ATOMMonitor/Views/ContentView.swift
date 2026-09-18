@@ -29,7 +29,7 @@ struct ContentView: View {
             NavigationStack { HelpView() }
                 .tabItem { Label("Help", systemImage: "questionmark.circle") }
         }
-        .task { await store.start() }
+        .task { await store.load() }
     }
 }
 

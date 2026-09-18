@@ -40,21 +40,29 @@ struct FeedbackView: View {
     }
 
     @MainActor private func send() async {
-        sending = true; result = nil
+        sending = true
+        result = nil
         defer { sending = false }
         do {
             let base = try ServerConfiguration.normalizedURL(from: ServerConfiguration.configuredURLString)
             var request = URLRequest(url: base.appending(path: "api/v1/feedback"))
-            request.httpMethod = "POST"; request.timeoutInterval = 15
+            request.httpMethod = "POST"
+            request.timeoutInterval = 15
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
             let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
             request.httpBody = try JSONSerialization.data(withJSONObject: [
-                "rating": rating, "comments": comments, "platform": "iPhone",
-                "version": "\(version) (\(build))", "osVersion": UIDevice.current.systemVersion
+                "rating": rating,
+                "comments": comments,
+                "platform": "iPhone",
+                "version": "\(version) (\(build))",
+                "osVersion": UIDevice.current.systemVersion
             ])
             let (_, response) = try await URLSession.shared.data(for: request)
-            guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else { throw FeedbackError.sendFailed }
+            guard let http = response as? HTTPURLResponse,
+                  (200..<300).contains(http.statusCode) else {
+                throw FeedbackError.sendFailed
+            }
             result = "Thank you. Your feedback has been sent to Richard Hine."
             comments = ""
         } catch {
@@ -64,8 +72,13 @@ struct FeedbackView: View {
 }
 
 struct AboutView: View {
-    private var version: String { Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown" }
-    private var build: String { Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown" }
+    private var version: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+    }
+
+    private var build: String {
+        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
+    }
 
     var body: some View {
         List {
@@ -76,10 +89,13 @@ struct AboutView: View {
                 LabeledContent("Version / Build", value: "\(version) (\(build))")
                 LabeledContent("Platform", value: "iPhone / iOS \(UIDevice.current.systemVersion)")
             }
+
             Section("Credits") {
                 LabeledContent("Created by", value: "Richard Hine")
-                Text("PilotAware and ATOM are acknowledged as the technologies and ground-station network monitored by this application.")\n                Link("PilotAware ATOM", destination: URL(string: "https://www.pilotaware.com/atom")!)
+                Text("PilotAware and ATOM are acknowledged as the technologies and ground-station network monitored by this application.")
+                Link("PilotAware ATOM", destination: URL(string: "https://www.pilotaware.com/atom")!)
             }
+
             Section("Privacy and scope") {
                 Text("ATOM Monitor does not display, record or retain aircraft movements, tracks or aircraft identities.")
                 Text("Feedback is sent privately to Richard Hine. The feedback destination email address is not displayed by the app.")
@@ -89,4 +105,6 @@ struct AboutView: View {
     }
 }
 
-private enum FeedbackError: Error { case sendFailed }
+private enum FeedbackError: Error {
+    case sendFailed
+}

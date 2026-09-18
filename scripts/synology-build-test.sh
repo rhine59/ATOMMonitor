@@ -10,11 +10,12 @@ cd "$ROOT/server"
 echo '=== ATOM Monitor Synology build/test ==='
 echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 echo "Git: $(git -C "$ROOT" rev-parse --short HEAD)"
-echo "API host port: $HOST_PORT"
+echo "API load-balancer host port: $HOST_PORT"
 
-echo '\n--- Persistent storage ---'
-mkdir -p "$ROOT/server/data"
-echo "SQLite data directory: $ROOT/server/data"
+[ -f .env ] || { echo 'ERROR: server/.env is missing; copy .env.example and set local secrets first.'; exit 1; }
+
+echo '\n--- Compose validation ---'
+sudo docker compose config --quiet
 
 echo '\n--- Python collector unit tests ---'
 cd diagnostic
@@ -24,18 +25,24 @@ cd ..
 echo '\n--- Docker rebuild ---'
 sudo docker compose down
 sudo docker compose build --no-cache
-sudo docker compose up -d
+sudo docker compose up -d --scale atom-api=2
 
 echo '\n--- Container state ---'
 sudo docker compose ps
 
-echo '\n--- API health ---'
+echo '\n--- PostgreSQL-backed readiness through Nginx ---'
 i=0
-until curl -fsS "http://localhost:${HOST_PORT}/health"; do
-  i=$((i+1)); [ "$i" -ge 20 ] && { echo 'API did not become ready'; exit 1; }
+until READY="$(curl -fsS "http://localhost:${HOST_PORT}/ready" 2>/dev/null)"; do
+  i=$((i+1)); [ "$i" -ge 60 ] && { echo 'API did not become ready through Nginx'; exit 1; }
   sleep 1
 done
-echo
+printf '%s\n' "$READY"
+printf '%s' "$READY" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d.get('status')=='ready'; assert d.get('database')=='ok'; assert d.get('databaseBackend')=='postgresql'; print('readiness_backend=postgresql')"
+
+echo '\n--- Replicated API state ---'
+replica_count="$(sudo docker compose ps -q atom-api | wc -l | tr -d ' ')"
+echo "api_replicas=$replica_count"
+[ "$replica_count" -eq 2 ] || { echo 'ERROR: expected two API replicas'; exit 1; }
 
 echo '\n--- Station API sample/count ---'
 HOST_PORT="$HOST_PORT" python3 - <<'PY'
@@ -47,7 +54,17 @@ for s in data[:10]:
     print(s.get('name'), s.get('health'), s.get('lastHeartbeat'), s.get('latitude'), s.get('longitude'))
 PY
 
-echo '\n--- Recent container logs ---'
-sudo docker compose logs --tail=50 atom-api ogn-station-probe
+echo '\n--- Live collector ingestion ---'
+i=0
+while :; do
+  accepted="$(sudo docker compose logs --since=90s atom-api 2>/dev/null | grep -c 'POST /api/v1/observations HTTP/1.1\" 202' || true)"
+  [ "$accepted" -gt 0 ] && break
+  i=$((i+1)); [ "$i" -ge 12 ] && { echo 'ERROR: no HTTP 202 collector observation seen within test window'; exit 1; }
+  sleep 5
+done
+echo "accepted_observation_posts=$accepted"
 
-echo '\nPASS: unit tests, Docker build/start and local REST API checks completed.'
+echo '\n--- Recent container logs ---'
+sudo docker compose logs --tail=50 atom-lb atom-api ogn-station-probe postgres
+
+echo '\nPASS: unit tests, Compose validation, PostgreSQL-backed rebuild/start, two API replicas, Nginx REST path and live HTTP 202 ingestion completed.'

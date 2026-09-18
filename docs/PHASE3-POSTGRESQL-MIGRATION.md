@@ -66,3 +66,4 @@ Phase 3 is **Tested** only after the PostgreSQL service is healthy; schema creat
 ## What follows
 
 After Phase 3 passes, the API can be made stateless and replicated behind a load balancer because all replicas can use the same PostgreSQL database. That is the next architecture phase, not part of this migration.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nPostgreSQL is the active registry and Phase 3 is Tested. The full cross-phase run reconfirmed the named-volume mount, PostgreSQL readiness/population, preserved SQLite rollback boundary, persistence across PostgreSQL restart and API recovery. PostgreSQL backup/restore remains a separate outstanding operational requirement. See `CHECKPOINT-2026-09-18.md`.\n

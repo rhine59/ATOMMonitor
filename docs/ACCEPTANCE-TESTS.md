@@ -53,3 +53,4 @@ No Phase 5 implementation/acceptance contract is currently defined in the reposi
 ## Evidence rule
 
 A runner being committed means only that the test is implemented. It becomes **Tested** only after it is run on the intended environment and its result is recorded in Git. Do not commit secrets, tokens, passwords, raw aircraft traffic or transient container addresses in acceptance evidence.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nThe cross-phase acceptance framework is now Tested. The complete Synology run passed Phases 1–4 and the current service/API matrix, including direct checks of both API replicas and a new collector HTTP 202 through Nginx. See `CHECKPOINT-2026-09-18.md`.\n

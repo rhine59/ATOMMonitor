@@ -94,3 +94,4 @@ Android parity is reached when every user-visible iPhone feature above either:
 - has an explicit documented platform-specific reason for a native difference while preserving the same user objective.
 
 A source implementation or successful compile alone is not sufficient to mark parity Tested.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nServer work has advanced independently to the tested PostgreSQL/two-API/Nginx checkpoint. iOS simulation is complete for the current phone checkpoint; Android remains paused with the Home-station picker scrolling defect open. Phone functional parity remains mandatory when phone work resumes. See `CHECKPOINT-2026-09-18.md`.\n

@@ -29,10 +29,6 @@ struct AppSettingsView: View {
                 Text("Stations not seen for this many days are shown Inactive. Default 2 days.")
                     .font(.caption).foregroundStyle(.secondary)
             }
-            Section("Feedback and About") {
-                NavigationLink { FeedbackView() } label: { Label("Feedback", systemImage: "star.bubble") }
-                NavigationLink { AboutView() } label: { Label("About", systemImage: "info.circle") }
-            }
         }
         .navigationTitle("Settings")
     }

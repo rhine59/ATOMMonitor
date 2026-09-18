@@ -92,3 +92,4 @@ Phase 4 now introduces multiple stateless API replicas behind a load balancer. B
 Collector HA is a separate later problem and must not be implemented by simply starting duplicate collectors.
 
 Two replicas on the same Synology would protect only against an individual process/container failure; they would not protect against NAS, router, broadband, power or site failure.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nThe current Synology development/test topology is PostgreSQL plus two stateless API replicas behind Nginx with one single-active collector. The full Phase 1–4 and service/API acceptance suite passed, including both replica-loss/rejoin paths, API and Nginx recreation, direct checks of both replicas, PostgreSQL/API count agreement and new live collector HTTP 202 traffic through Nginx. Multiple replicas on one NAS do not provide host/site HA. See `CHECKPOINT-2026-09-18.md`.\n

@@ -75,3 +75,4 @@ The server supplies the base health state. Phone clients may additionally derive
 ## Security boundary
 
 Public HTTPS GET access is intentional for station-health information. Observation ingestion is authenticated. The collector is station-only and the API must never grow aircraft-position/identity endpoints as part of ATOM Monitor.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nThe API contract is now exercised through Nginx and directly on both API replicas by `scripts/service-api-acceptance.sh`. `/health`, PostgreSQL-backed `/ready`, station list/detail/404, safe feedback validation and observation authentication all passed. PostgreSQL/API confirmed-station counts agreed at the checkpoint; live counts must never be hard-coded. See `CHECKPOINT-2026-09-18.md`.\n

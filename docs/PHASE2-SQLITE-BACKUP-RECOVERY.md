@@ -83,15 +83,17 @@ Inspecting this controlled copy proves recovery without risking the production r
 
 For an actual live restore, first stop the Compose services and preserve the damaged/current database separately. Only then use `restore --force` against `server/data/atommonitor.sqlite3`, restart Compose, and verify `/ready` and `/api/v1/stations`. A live restore must not be performed merely as a test.
 
+The restore utility treats SQLite `-wal`, `-shm` and `-journal` files as part of the database generation being replaced. Without `--force`, the presence of the target database **or any of those sidecars** blocks restore. During an explicitly forced restore, after the backup has passed checksum/integrity checks and the replacement temporary copy has passed integrity checking, stale target sidecars are removed before the replacement database is atomically moved into place. This is safe only while every process that can access the database is stopped; otherwise a live SQLite process could recreate or continue using sidecar state during replacement.
+
 ## Synology scheduling
 
 After the first manual backup and restore verification pass, configure DSM Task Scheduler to run once daily as the normal repository owner (or another account with read access to the database and write access to the backup directory):
 
 ```bash
-cd /volume1/docker/ATOMMonitor && /usr/bin/python3 scripts/atom-db-backup.py backup >> /volume1/docker/ATOMMonitor-backups/backup.log 2>&1
+cd /volume1/docker/ATOMMonitor && /bin/python3 scripts/atom-db-backup.py backup >> /volume1/docker/ATOMMonitor-backups/backup.log 2>&1
 ```
 
-The exact Python path must be confirmed on the NAS before saving the scheduled task. Do not use `sudo` unless NAS permissions require it; Git operations remain non-root.
+The Synology Python path was confirmed as `/bin/python3` on 18 September 2026. The 02:00 BST scheduled run at 01:00:03Z and a manual DSM Task Scheduler run both completed with SQLite integrity `ok`, valid SHA-256 output and plausible station counts. Do not use `sudo` unless NAS permissions require it; Git operations remain non-root.
 
 The backup directory itself should be included in the Synology/NAS backup policy so a NAS-volume failure does not destroy both the live database and its local backup copies.
 

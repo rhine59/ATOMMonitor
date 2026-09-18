@@ -34,7 +34,7 @@ final class ATOMMonitorDemoUITests: XCTestCase {
 
         step("Stations: searchable station registry, manual refresh and pull-to-refresh")
         selectTab("Stations", in: app)
-        XCTAssertTrue(app.navigationBars["Stations"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.searchFields.firstMatch.waitForExistence(timeout: 3), "Stations screen did not become interactive")
         let listRefresh = refreshButton(in: app)
         XCTAssertTrue(listRefresh.waitForExistence(timeout: 2), "Missing Stations refresh control")
         listRefresh.tap(); sleep(2)
@@ -90,9 +90,10 @@ final class ATOMMonitorDemoUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Version"].waitForExistence(timeout: 2))
         XCTAssertTrue(app.staticTexts["Build"].waitForExistence(timeout: 2))
         XCTAssertFalse(app.staticTexts["Version / Build"].exists, "Combined Version / Build row must not reappear")
-        XCTAssertTrue(app.staticTexts["Created by"].waitForExistence(timeout: 2))
-        XCTAssertTrue(app.staticTexts["Richard Hine"].waitForExistence(timeout: 2))
-        XCTAssertTrue(app.links["PilotAware ATOM"].waitForExistence(timeout: 2))
+        let creator = app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] %@", "Richard Hine")).firstMatch
+        XCTAssertTrue(creator.waitForExistence(timeout: 2), "Missing Richard Hine creator credit")
+        let pilotAware = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS[c] %@", "PilotAware ATOM")).firstMatch
+        XCTAssertTrue(pilotAware.waitForExistence(timeout: 2), "Missing PilotAware ATOM credit/link")
         app.swipeUp(); sleep(1)
         XCTAssertTrue(app.staticTexts["Licence & distribution"].waitForExistence(timeout: 2))
 

@@ -1,17 +1,23 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var store = StationStore()
+    @StateObject private var store: StationStore
+    @AppStorage("homeStationID") private var homeStationID = ""
+    @AppStorage("favouriteStationIDs") private var favouriteStationIDs = ""
+
+    init(repository: any StationRepository) {
+        _store = StateObject(wrappedValue: StationStore(repository: repository))
+    }
 
     var body: some View {
         TabView {
-            NavigationStack { StationMapView(store: store) }
+            NavigationStack { StationMapView(store: store, homeStationID: homeStationID, favouriteStationIDs: $favouriteStationIDs) }
                 .tabItem { Label("Map", systemImage: "map") }
 
-            NavigationStack { StationListView(store: store) }
+            NavigationStack { StationListView(store: store, favouriteStationIDs: $favouriteStationIDs) }
                 .tabItem { Label("Stations", systemImage: "list.bullet") }
 
-            NavigationStack { FavouritesView(store: store) }
+            NavigationStack { FavouritesView(store: store, favouriteStationIDs: $favouriteStationIDs) }
                 .tabItem { Label("Favourites", systemImage: "star") }
 
             NavigationStack { ReportView(store: store) }
@@ -29,13 +35,16 @@ struct ContentView: View {
 
 private struct FavouritesView: View {
     @ObservedObject var store: StationStore
+    @Binding var favouriteStationIDs: String
+    private var favouriteIDs: Set<String> { Set(favouriteStationIDs.split(separator: ",").map(String.init)) }
+    private var favouriteStations: [ATOMStation] { store.stations.filter { favouriteIDs.contains($0.id) } }
 
     var body: some View {
         List {
-            if store.favouriteStations.isEmpty {
+            if favouriteStations.isEmpty {
                 ContentUnavailableView("No Favourites", systemImage: "star", description: Text("Mark a ground station as a favourite from Station Detail."))
             } else {
-                ForEach(store.favouriteStations) { station in
+                ForEach(favouriteStations) { station in
                     NavigationLink {
                         StationDetailView(
                             station: station,

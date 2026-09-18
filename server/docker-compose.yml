@@ -37,6 +37,9 @@ services:
     environment:
       ATOM_DB: /data/atommonitor.sqlite3
       ATOM_DATABASE_URL: ${ATOM_DATABASE_URL:-}
+      POSTGRES_DB: ${POSTGRES_DB:-atommonitor}
+      POSTGRES_USER: ${POSTGRES_USER:-atommonitor}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in server/.env}
       ATOM_INGEST_TOKEN: ${ATOM_INGEST_TOKEN:?Set ATOM_INGEST_TOKEN in server/.env}
       FEEDBACK_TO_NAME: ${FEEDBACK_TO_NAME:-Richard Hine}
       FEEDBACK_TO_EMAIL: ${FEEDBACK_TO_EMAIL:-}

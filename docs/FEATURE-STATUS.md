@@ -92,4 +92,4 @@ Server Phase 1 resilience remains Tested. The Synology stack is a development/te
 
 | Synology replicated-stack build/test runner | Rebuild and verify the current PostgreSQL + Nginx + two-API + single-collector topology reproducibly. | Server | Tested | Full Synology run passed: PostgreSQL-backed readiness, two API replicas, Nginx read path and live collector HTTP 202 ingestion verified after rebuild. |
 
-| Phase 4 automated acceptance runner | Exercise both API-replica failures, rejoin, API/LB recreation, load-balanced reads, collector ingestion and unauthenticated-write rejection with checked results. | Server | In progress | Script committed; Synology runtime execution required. |
+| Phase 4 automated acceptance runner | Exercise both API-replica failures, rejoin, API/LB recreation, load-balanced reads, collector ingestion and unauthenticated-write rejection with checked results. | Server | Tested | Synology runtime suite passed both replica-loss paths, rejoin, API/LB recreation, PostgreSQL-backed reads, collector HTTP 202 ingestion through Nginx, and unauthenticated HTTP 401 rejection. |

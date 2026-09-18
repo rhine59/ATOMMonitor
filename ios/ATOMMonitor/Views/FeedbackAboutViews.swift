@@ -102,6 +102,14 @@ struct AboutView: View {
                 Text("© 2026 Richard Hine. All rights reserved.")
             }
 
+            Section("Licence & distribution") {
+                Text("ATOM Monitor is proprietary software. It is licensed for use, not sold; no rights are granted except those provided by the applicable end-user licence and law.")
+                Link("Apple Standard EULA", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
+                Text("iPhone distribution through the App Store is subject to Apple's applicable App Store and developer terms.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Privacy and scope") {
                 Text("ATOM Monitor does not display, record or retain aircraft movements, tracks or aircraft identities.")
                 Text("Feedback is sent privately to Richard Hine. The feedback destination email address is not displayed by the app.")

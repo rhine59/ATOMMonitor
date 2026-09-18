@@ -33,7 +33,7 @@ The collector connects receive-only to the OGN APRS service and classifies Pilot
 
 ## Server deployment
 
-The current production deployment runs on the Synology NAS using Docker Compose. The API container is served by Gunicorn 23.0.0 with two workers and two threads per worker. The collector waits for the API readiness healthcheck before starting.
+The current development/test deployment runs on the Synology NAS using Docker Compose. The API container is served by Gunicorn 23.0.0 with two workers and two threads per worker. The collector waits for the API readiness healthcheck before starting.
 
 The API exposes inexpensive process liveness at `/health` and database-backed readiness at `/ready`. Docker checks `/ready` and uses bounded JSON logging, a graceful stop period and `restart: unless-stopped`.
 
@@ -83,6 +83,12 @@ Missing optional technical telemetry by itself is not treated as a station failu
 
 ## Resilience roadmap
 
-The current Phase 1 deployment has health/readiness checks, authenticated ingestion, bounded logging, graceful restart behaviour, production WSGI serving and stale/future-packet protection. Next resilience work includes automated SQLite backup/recovery, then PostgreSQL migration before stateless API replication/load balancing.
+The current Phase 1 development/test deployment has health/readiness checks, authenticated ingestion, bounded logging, graceful restart behaviour, Gunicorn WSGI serving and stale/future-packet protection. Phase 2 SQLite backup/recovery is substantially implemented but remains open for the deferred recovery drill and NAS backup-policy check.
+
+Phase 3 migrates the development/test persistent station registry from SQLite to PostgreSQL before any stateless API replication/load balancing. PostgreSQL will run as a dedicated Compose service with its own persistent volume and healthcheck. The API and collector contract remains station-only and unchanged. Migration will be explicit and repeatable: preserve/verify the SQLite source, initialise PostgreSQL schema, copy station rows, compare total and confirmed PilotAware counts, then switch the API database backend. Because this is not a production service, no zero-downtime migration is required; correctness, rollback and evidence take priority.
+
+The Phase 3 rollback boundary is the database-backend switch. The verified SQLite database and its backups remain intact until PostgreSQL runtime tests pass. If the PostgreSQL deployment fails acceptance, the development/test stack can be returned to the SQLite-backed configuration without converting PostgreSQL data back into SQLite.
+
+Only after PostgreSQL migration passes will the architecture move to multiple stateless API replicas behind a load balancer. The collector remains single-active at that stage; collector HA is a separate later problem and must not be implemented by simply starting duplicate collectors.
 
 Two replicas on the same Synology would protect only against an individual process/container failure; they would not protect against NAS, router, broadband, power or site failure.

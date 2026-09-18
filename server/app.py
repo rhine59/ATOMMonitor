@@ -17,7 +17,13 @@ MAX_FUTURE_SKEW=timedelta(minutes=5)
 FEEDBACK_TO_NAME=os.getenv("FEEDBACK_TO_NAME","Richard Hine")
 FEEDBACK_TO_EMAIL=os.getenv("FEEDBACK_TO_EMAIL","")
 SMTP_HOST=os.getenv("SMTP_HOST",""); SMTP_PORT=int(os.getenv("SMTP_PORT","587")); SMTP_USER=os.getenv("SMTP_USER",""); SMTP_PASSWORD=os.getenv("SMTP_PASSWORD","")
+STATION_COLUMNS=["id","name","isPilotAware","latitude","longitude","altitudeMetres","lastPosition","lastHeartbeat","lastTechnicalStatus","pilotAwareVersion","softwareVersion","cpuLoadPercent","ramUsedMB","ramTotalMB","cpuTemperatureC","ntpOffsetMS","ntpCorrectionPPM","frequencyCorrectionKHz","rfCorrectionPPM","signalQualityDB","voltageV","uptimeMinutes","lastSeen"]
 STATION_SCHEMA="""CREATE TABLE IF NOT EXISTS stations(id TEXT PRIMARY KEY,name TEXT NOT NULL,isPilotAware INTEGER NOT NULL DEFAULT 0,latitude REAL,longitude REAL,altitudeMetres REAL,lastPosition TEXT,lastHeartbeat TEXT,lastTechnicalStatus TEXT,pilotAwareVersion TEXT,softwareVersion TEXT,cpuLoadPercent REAL,ramUsedMB REAL,ramTotalMB REAL,cpuTemperatureC REAL,ntpOffsetMS REAL,ntpCorrectionPPM REAL,frequencyCorrectionKHz REAL,rfCorrectionPPM REAL,signalQualityDB REAL,voltageV REAL,uptimeMinutes INTEGER,lastSeen TEXT NOT NULL)"""
+PG_COLUMN_MAP={x:x.lower() for x in STATION_COLUMNS}
+def canonical_row(r):
+ d=dict(r)
+ if DATABASE_URL:return {x:d.get(PG_COLUMN_MAP[x]) for x in STATION_COLUMNS}
+ return d
 def backend():return "postgresql" if DATABASE_URL else "sqlite"
 @contextmanager
 def db():
@@ -53,6 +59,7 @@ def upsert(o):
  with db() as c:
   existing=c.execute(sql("SELECT * FROM stations WHERE id=?"),(station,)).fetchone()
   if existing:
+   existing=canonical_row(existing)
    current=parse_time(existing[category])
    if current and incoming < current:return True
   v={"id":station,"name":station,"lastSeen":now}
@@ -72,7 +79,7 @@ def health_for(r):
   dt=datetime.fromisoformat(r["lastHeartbeat"].replace('Z','+00:00'));age=(datetime.now(timezone.utc)-dt).total_seconds()
   return "healthy" if age<=420 else "warning" if age<=900 else "noRecentHeartbeat"
  except Exception:return "unknown"
-def row_json(r):d=dict(r);d["health"]=health_for(r);return d
+def row_json(r):d=canonical_row(r);d["health"]=health_for(d);return d
 @app.get('/health')
 def health():return jsonify({"status":"ok","service":"atommonitor-api"})
 @app.get('/ready')
@@ -114,7 +121,7 @@ def feedback():
  return jsonify({"status":"sent","recipient":FEEDBACK_TO_NAME}),202
 @app.get('/api/v1/stations')
 def stations():
- with db() as c:rows=c.execute("SELECT * FROM stations WHERE isPilotAware=1 ORDER BY name COLLATE NOCASE").fetchall()
+ with db() as c:rows=c.execute("SELECT * FROM stations WHERE isPilotAware=1 ORDER BY lower(name)").fetchall()
  return jsonify([row_json(r) for r in rows])
 @app.get('/api/v1/stations/<station_id>')
 def station(station_id):

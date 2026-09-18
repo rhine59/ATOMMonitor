@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """Persistent ATOM ground-station registry/API. No aircraft data is accepted or stored."""
 from __future__ import annotations
-import hmac,os,sqlite3
+import hmac,os,sqlite3,smtplib
+from email.message import EmailMessage
 from datetime import datetime,timezone,timedelta
 from flask import Flask,jsonify,request
 DB_PATH=os.getenv("ATOM_DB","/data/atommonitor.sqlite3"); INGEST_TOKEN=os.getenv("ATOM_INGEST_TOKEN",""); app=Flask(__name__)
 MAX_FUTURE_SKEW=timedelta(minutes=5)
+FEEDBACK_TO_NAME=os.getenv("FEEDBACK_TO_NAME","Richard Hine")
+FEEDBACK_TO_EMAIL=os.getenv("FEEDBACK_TO_EMAIL","")
+SMTP_HOST=os.getenv("SMTP_HOST",""); SMTP_PORT=int(os.getenv("SMTP_PORT","587")); SMTP_USER=os.getenv("SMTP_USER",""); SMTP_PASSWORD=os.getenv("SMTP_PASSWORD","")
 def db():
  os.makedirs(os.path.dirname(DB_PATH),exist_ok=True);c=sqlite3.connect(DB_PATH);c.row_factory=sqlite3.Row
  c.execute("""CREATE TABLE IF NOT EXISTS stations(id TEXT PRIMARY KEY,name TEXT NOT NULL,isPilotAware INTEGER NOT NULL DEFAULT 0,latitude REAL,longitude REAL,altitudeMetres REAL,lastPosition TEXT,lastHeartbeat TEXT,lastTechnicalStatus TEXT,pilotAwareVersion TEXT,softwareVersion TEXT,cpuLoadPercent REAL,ramUsedMB REAL,ramTotalMB REAL,cpuTemperatureC REAL,ntpOffsetMS REAL,ntpCorrectionPPM REAL,frequencyCorrectionKHz REAL,rfCorrectionPPM REAL,signalQualityDB REAL,voltageV REAL,uptimeMinutes INTEGER,lastSeen TEXT NOT NULL)""")
@@ -63,6 +67,30 @@ def observation():
  if not expected or not hmac.compare_digest(supplied,expected):return jsonify({"error":"unauthorized"}),401
  if not upsert(request.get_json(silent=True) or {}):return jsonify({"error":"invalid ground-station observation"}),400
  return jsonify({"status":"accepted"}),202
+@app.post('/api/v1/feedback')
+def feedback():
+ data=request.get_json(silent=True) or {}
+ try: rating=int(data.get("rating",0))
+ except (TypeError,ValueError): rating=0
+ comments=str(data.get("comments","")).strip()
+ platform=str(data.get("platform","Unknown")).strip()[:80]
+ version=str(data.get("version","Unknown")).strip()[:80]
+ os_version=str(data.get("osVersion","Unknown")).strip()[:120]
+ if rating not in range(1,6):return jsonify({"error":"rating must be 1 to 5"}),400
+ if len(comments)>4000:return jsonify({"error":"comments too long"}),400
+ if not all([FEEDBACK_TO_EMAIL,SMTP_HOST,SMTP_USER,SMTP_PASSWORD]):
+  app.logger.error("feedback mail is not configured");return jsonify({"error":"feedback service unavailable"}),503
+ msg=EmailMessage()
+ msg["Subject"]=f"ATOM Monitor feedback - {rating}/5 stars"
+ msg["From"]=SMTP_USER
+ msg["To"]=FEEDBACK_TO_EMAIL
+ msg.set_content(f"ATOM Monitor feedback\n\nRating: {rating}/5\nPlatform: {platform}\nApp version: {version}\nOS: {os_version}\n\nComments / suggestions:\n{comments or '(none)'}\n")
+ try:
+  with smtplib.SMTP(SMTP_HOST,SMTP_PORT,timeout=15) as smtp:
+   smtp.starttls();smtp.login(SMTP_USER,SMTP_PASSWORD);smtp.send_message(msg)
+ except Exception:
+  app.logger.exception("feedback email failed");return jsonify({"error":"unable to send feedback"}),502
+ return jsonify({"status":"sent","recipient":FEEDBACK_TO_NAME}),202
 @app.get('/api/v1/stations')
 def stations():
  with db() as c:rows=c.execute("SELECT * FROM stations WHERE isPilotAware=1 ORDER BY name COLLATE NOCASE").fetchall()

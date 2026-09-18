@@ -4,7 +4,7 @@ ATOM Monitor is a cross-platform mobile application and supporting Synology-host
 
 > **Scope:** ATOM Monitor does not display, record or retain aircraft movements, tracks or aircraft identities.
 
-## Current checkpoint — 17 September 2026
+## Current checkpoint — 18 September 2026
 
 The project has a working Synology Docker server, a native SwiftUI iPhone application with physical-device report/sharing verification, and a native Kotlin/Jetpack Compose Android application using the same ATOM station REST API. Android source has been advanced toward current iPhone parity but still requires its first confirmed Android build/runtime checkpoint.
 
@@ -16,7 +16,7 @@ Public access is through DSM Reverse Proxy at `https://granvillehouse.synology.m
 
 ### iPhone application
 
-The iOS application targets iOS 17+ and is generated with XcodeGen. Its functional areas are **Map, Stations, Favourites, Report, Settings and Help**. Report provides counts by displayed status and PilotAware version and shares a responsive HTML report with horizontal bar graphs plus a station-level CSV attachment through the native iOS share sheet.
+The iOS application targets iOS 17+ and is generated with XcodeGen. Its functional areas are **Map, Stations, Favourites, Report, Settings, Help, Feedback and About**. The latest iPhone source has a confirmed Xcode build after XcodeGen regeneration; About/version/licensing refinements require the current checkpoint rebuild/runtime confirmation. Report provides counts by displayed status and PilotAware version and shares a responsive HTML report with horizontal bar graphs plus a station-level CSV attachment through the native iOS share sheet.
 
 The Map supports clustering, Find, selectable Apple map layers, Home station, manual refresh, configurable health/status colours and station-count status. Station detail displays **Record date & time** as the absolute local date/time of `lastSeen`, alongside relative observation ages. The latest station snapshot is cached locally and refresh defaults to five minutes.
 
@@ -24,11 +24,11 @@ XcodeGen now persists automatic signing for the development team (`VNQTGCW476`),
 
 ### Android application
 
-The `android/` directory contains a native Kotlin/Jetpack Compose counterpart targeting Android API 26+. Its navigation source now includes **Map, Stations, Favourites, Report, Settings and Help**. The Android Report implementation mirrors the station-only report scope: total/status/version counts, responsive HTML bar graphs, station-level CSV, and native Android sharing using FileProvider-backed temporary files.
+The `android/` directory contains a native Kotlin/Jetpack Compose counterpart targeting Android API 26+. Its navigation source now includes **Map, Stations, Favourites, Report, Settings, Help, Feedback and About**. The Android Report implementation mirrors the station-only report scope: total/status/version counts, responsive HTML bar graphs, station-level CSV, and native Android sharing using FileProvider-backed temporary files.
 
 The Android source also includes station mapping/search, station and favourite lists, technical detail, absolute Record date & time plus relative observation ages, public-server configuration, 1–10 minute foreground refresh, manual refresh, Home-station preference, persistent preferences and a local latest-snapshot cache. It defaults to `https://granvillehouse.synology.me:8445/`.
 
-Android mapping currently uses osmdroid/OpenStreetMap so it requires no Google Maps API key. Marker clustering, full configurable colour parity, explicit `/health` Test Connection, stronger refresh lifecycle handling, Android automated tests and the approved app icon remain parity work. The current Android changes are **build pending** until Android Studio/Gradle confirms them.
+Android mapping currently uses osmdroid/OpenStreetMap so it requires no Google Maps API key. Marker clustering, full configurable colour parity, explicit `/health` Test Connection, stronger refresh lifecycle handling, Android automated tests and the approved app icon remain parity work. The responsive Android launcher previously built and ran successfully on the Pixel 10a emulator with live station data. The newer Feedback/About/licensing changes are **build/runtime test pending**. Home map centring passed, while the Home-station picker scrolling defect remains open.
 
 ## Build
 
@@ -65,7 +65,7 @@ https://granvillehouse.synology.me:8445
  iPhone / SwiftUI   Android / Compose
 ```
 
-Before the Internet-facing deployment is treated as fully hardened, observation ingestion must not remain an unauthenticated public write surface; public access should be restricted to intended read functionality wherever practical.
+Observation ingestion is authenticated with the private collector token. The new feedback relay is not production-ready until private SMTP configuration, delivery testing and abuse/rate-limiting review are completed.
 
 ## Known follow-up work
 
@@ -86,3 +86,9 @@ Copyright © 2026 Richard Hine. All rights reserved.
 Unless and until a separate licence is added to this repository, no licence to copy, modify, distribute or create derivative works from ATOM Monitor is granted beyond rights that apply by law or by the hosting platform terms.
 
 PilotAware® is a registered trademark of PilotAware Ltd. ATOM Monitor is an independent project and is not affiliated with, endorsed by or sponsored by PilotAware Ltd. References to PilotAware and ATOM identify the third-party technology and ground-station network with which ATOM Monitor interoperates.
+
+## 18 September 2026 checkpoint
+
+Feedback and About are now first-class navigation areas on both phone clients. About carries creator, Version, Build, Platform/OS, PilotAware ATOM link, copyright/trademark/non-affiliation and distribution/licence information. Feedback UI is implemented but mail delivery is deliberately deferred until Synology SMTP configuration/testing is resumed.
+
+Phase 2 SQLite backup tooling has passed live backup, integrity/checksum verification, controlled restore-copy verification and retention pruning. A daily 02:00 DSM Task Scheduler job has been created but has not yet had its execution verified; NAS backup-policy inclusion and an explicit safe recovery drill remain outstanding. Phase 3 PostgreSQL migration and later stateless API replication remain future architecture work.

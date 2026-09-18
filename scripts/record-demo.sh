@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"; IOS="$ROOT/ios"; OUT="$ROOT/artifacts"; mkdir -p "$OUT"
-SCHEME="ATOMMonitor"; RAW="$OUT/ATOMMonitor-Demo-raw.mp4"; FINAL="$OUT/ATOMMonitor-Demo.mp4"; LOG="$OUT/ATOMMonitor-Demo-test.log"
+SCHEME="ATOMMonitor"; STAMP="${ATOM_DEMO_STAMP:-2026-09-18}"; RAW="$OUT/ATOMMonitor-Demo-${STAMP}-raw.mp4"; FINAL="$OUT/ATOMMonitor-Demo-${STAMP}.mp4"; LOG="$OUT/ATOMMonitor-Demo-${STAMP}-test.log"
 # Keep Xcode build products outside ~/Documents/File Provider storage. On this Mac,
 # .app bundles created under the repository's artifacts/DerivedData acquired FinderInfo
 # / File Provider metadata and failed simulator CodeSign. /tmp was verified clean.

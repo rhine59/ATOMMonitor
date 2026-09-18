@@ -471,3 +471,12 @@ For every user-facing implementation change, update the corresponding entry in `
 After a verified Android change, commit the implementation, affected documentation and relevant build/test evidence. Do not commit generated `build/` directories, local Android Studio state, signing keys, secrets, runtime caches or the generated debug APK.
 
 Build and runtime status are independent: record **Build passed — runtime test pending** after a successful compile/package checkpoint, and only advance to **Tested** after the relevant emulator/physical-device regression checks have actually passed.
+
+
+## 22. Feedback, About and distribution checkpoint — 18 September 2026
+
+Android source now places **Feedback** and **About** at the same main-navigation level as Settings and Help. About displays Version, Build and Android platform information separately, credits Richard Hine, links to the official PilotAware ATOM page, carries the ATOM Monitor copyright/trademark/non-affiliation notice, and exposes distribution/open-source notices including AndroidX/Jetpack Compose, osmdroid and OpenStreetMap attribution.
+
+Feedback accepts a 1–5 rating and comments and posts them to the server-side relay so the destination email address is not shown in the application. Server SMTP delivery is intentionally deferred and therefore must not be marked Tested.
+
+These latest Android changes are **build/runtime test pending**. The earlier Pixel 10a responsive-map checkpoint remains valid, including successful Home map centring; the searchable Home-station picker still has a scrolling defect and is the first Android parity defect to resume. Release signing/AAB work also remains outstanding.

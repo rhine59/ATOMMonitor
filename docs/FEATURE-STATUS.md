@@ -90,4 +90,4 @@ Server Phase 1 resilience remains Tested. The Synology stack is a development/te
 
 - **Phase 2 restore hardening (18 Sep 2026):** commit `b1e132f` adds explicit SQLite WAL/SHM/journal sidecar handling to recovery. Documentation commit `2cd4f2f` records the safety invariant: all database users must be stopped before a forced live replacement. Implementation is committed but recovery-drill runtime evidence is pending.
 
-| Synology replicated-stack build/test runner | Rebuild and verify the current PostgreSQL + Nginx + two-API + single-collector topology reproducibly. | Server | In progress | Script updated for current topology; Synology runtime execution still required. |
+| Synology replicated-stack build/test runner | Rebuild and verify the current PostgreSQL + Nginx + two-API + single-collector topology reproducibly. | Server | Tested | Full Synology run passed: PostgreSQL-backed readiness, two API replicas, Nginx read path and live collector HTTP 202 ingestion verified after rebuild. |

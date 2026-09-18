@@ -85,7 +85,7 @@ def health():return jsonify({"status":"ok","service":"atommonitor-api"})
 @app.get('/ready')
 def ready():
  try:
-  with db() as c:c.execute("SELECT 1").fetchone();n=c.execute("SELECT COUNT(*) FROM stations WHERE isPilotAware=1").fetchone()[0]
+  with db() as c:c.execute("SELECT 1").fetchone();row=c.execute("SELECT COUNT(*) AS confirmed FROM stations WHERE isPilotAware=1").fetchone();n=row["confirmed"] if DATABASE_URL else row[0]
   return jsonify({"status":"ready","service":"atommonitor-api","database":"ok","databaseBackend":backend(),"confirmedStations":n})
  except Exception:
   app.logger.exception("readiness database check failed");return jsonify({"status":"not_ready","service":"atommonitor-api","database":"unavailable"}),503

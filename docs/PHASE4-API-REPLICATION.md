@@ -130,3 +130,15 @@ returned:
 ```
 
 Result: PASS for the single-replica load-balancer cutover checkpoint. PostgreSQL remained the active backend and the readiness contract remained unchanged. Two-replica scaling had not yet been attempted at this checkpoint.
+
+## Two-replica service checkpoint — 18 September 2026
+
+The API service was scaled with:
+
+```bash
+sudo docker compose up -d --scale atom-api=2
+```
+
+Compose reported both `server-atom-api-1` and `server-atom-api-2` healthy, PostgreSQL healthy, and the load balancer and single-active OGN collector running. Through the load-balancer entry point, `GET /ready` returned PostgreSQL-backed ready status with 308 confirmed stations, and `GET /api/v1/stations` returned HTTP 200.
+
+Result: PASS for normal two-replica reads through the load balancer. Controlled single-replica failure/recovery testing remains outstanding.

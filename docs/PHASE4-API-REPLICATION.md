@@ -114,3 +114,19 @@ resolver 127.0.0.11 valid=10s ipv6=off;
 ```
 
 This setting is part of the reproducible Compose environment and must be retained in a clean rebuild. The failure occurred before the load balancer could serve host port 8088; PostgreSQL and the recreated API remained separate from this Nginx configuration failure.
+
+## Load-balancer cutover checkpoint — 18 September 2026
+
+After adding Docker's embedded DNS resolver to Nginx and restarting only `atom-lb`, the load balancer reached `healthy` state and owned Synology host port `8088 -> 8080`. The pre-existing public/LAN API contract was then verified through the new load-balancing entry point:
+
+```bash
+curl -fsS http://localhost:8088/ready
+```
+
+returned:
+
+```json
+{"confirmedStations":308,"database":"ok","databaseBackend":"postgresql","service":"atommonitor-api","status":"ready"}
+```
+
+Result: PASS for the single-replica load-balancer cutover checkpoint. PostgreSQL remained the active backend and the readiness contract remained unchanged. Two-replica scaling had not yet been attempted at this checkpoint.

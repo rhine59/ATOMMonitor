@@ -76,3 +76,4 @@ Before building the full server:
 - other current `glidernet` receiver/server examples
 
 Use these as protocol references, not as an assumption that all old packet examples remain current.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nThe collector remains single-active and station-only, and now submits authenticated observations through Nginx to the replicated API tier. The complete acceptance suite observed a new live collector HTTP 202 through that path. See `CHECKPOINT-2026-09-18.md`.\n

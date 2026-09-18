@@ -7,7 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.Modifier\nimport androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,7 +51,7 @@ private fun FeedbackContent(server: String, context: Context) {
 @Composable
 fun AboutScreen() {
     val context = androidx.compose.ui.platform.LocalContext.current
-    val p = remember { context.packageManager.getPackageInfo(context.packageName, 0) }
+    val p = remember { context.packageManager.getPackageInfo(context.packageName, 0) }\n    val uriHandler = LocalUriHandler.current
     Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("About ATOM Monitor", style = MaterialTheme.typography.headlineSmall)
             Text("Monitors the operational health and technical status of PilotAware ATOM ground stations.")
@@ -62,7 +62,7 @@ fun AboutScreen() {
             HorizontalDivider()
             Text("Credits", style = MaterialTheme.typography.titleMedium)
             Text("Created by Richard Hine")
-            Text("PilotAware and ATOM are acknowledged as the technologies and ground-station network monitored by this application.")
+            Text("PilotAware and ATOM are acknowledged as the technologies and ground-station network monitored by this application.")\n            TextButton(onClick = { uriHandler.openUri("https://www.pilotaware.com/atom") }) { Text("PilotAware ATOM") }
             HorizontalDivider()
             Text("ATOM Monitor does not display, record or retain aircraft movements, tracks or aircraft identities.")
     }

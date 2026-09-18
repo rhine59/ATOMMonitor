@@ -455,3 +455,13 @@ Feedback delivery is deliberately **deferred at this checkpoint**. The phone UI 
 Every server/infrastructure change must keep this runbook executable from scratch. In particular, Phase 3/4 work must document PostgreSQL, ignored local `server/.env` creation, persistent Docker volumes, API replicas, load balancer, the single-active collector, DSM reverse proxy/TLS/router configuration, validation commands and rollback. Secrets must never be committed; the runbook must instead state which variables are required and how to create/provide them.
 
 Before a major architecture phase is marked Tested, review this runbook against a hypothetical clean Synology installation and ensure no required host-only knowledge is missing. Where older sections still describe SQLite or a single API as current topology, they must be brought forward to the tested PostgreSQL/replicated architecture as that phase is completed.
+
+### Phase 4 Nginx/Docker DNS requirement
+
+For the replicated API topology, Nginx performs runtime discovery of the Compose `atom-api` service. Its committed configuration therefore explicitly declares Docker's embedded DNS resolver:
+
+```nginx
+resolver 127.0.0.11 valid=10s ipv6=off;
+```
+
+Without this line Nginx fails to start when an upstream server uses the `resolve` parameter. This is a required clean-rebuild setting, not a host-specific manual fix.

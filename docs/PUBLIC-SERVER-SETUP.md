@@ -138,3 +138,4 @@ Some routers do not support NAT loopback/hairpinning. If the public hostname wor
 ## Repository/runtime separation
 
 DNS records, router rules and certificates contain site-specific operational configuration and are not committed as secrets to Git. This document, app configuration UI and test procedure are version controlled. Record non-secret deployment decisions and test results in the project documentation as the public endpoint is commissioned.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nPublic HTTPS remains DSM Reverse Proxy at `https://granvillehouse.synology.me:8445/`, forwarding to Nginx on host port 8088. Behind Nginx the current tested stack has two stateless API replicas sharing PostgreSQL. The API replicas and PostgreSQL are not host-published. See `CHECKPOINT-2026-09-18.md`.\n

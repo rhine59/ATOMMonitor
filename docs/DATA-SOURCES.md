@@ -61,3 +61,4 @@ Possible approaches to investigate:
 2. a PilotAware-published ATOM station registry/map data source;
 3. initial import from an appropriate public receiver registry followed by live OGN updates;
 4. maintaining a project registry built from multiple validated sources.
+\n\n## Checkpoint synchronization — 18 September 2026\n\nThe authoritative current server state is PostgreSQL plus two stateless APIs behind Nginx with a single-active station-only OGN/APRS collector. The complete Phase 1–4 plus service/API acceptance suite passed. Earlier source-research material remains useful background but does not supersede the tested runtime checkpoint. See `CHECKPOINT-2026-09-18.md`.\n

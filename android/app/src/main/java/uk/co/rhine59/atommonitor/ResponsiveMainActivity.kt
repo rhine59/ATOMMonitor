@@ -71,6 +71,8 @@ private fun ResponsiveApp(vm: StationVM = viewModel()) {
                                     Tab.Report -> Icons.Default.Assessment
                                     Tab.Settings -> Icons.Default.Settings
                                     Tab.Help -> Icons.Default.Help
+                                    Tab.Feedback -> Icons.Default.Star
+                                    Tab.About -> Icons.Default.Info
                                 },
                                 contentDescription = item.title,
                                 modifier = Modifier.size(22.dp),
@@ -96,6 +98,8 @@ private fun ResponsiveApp(vm: StationVM = viewModel()) {
                 Tab.Report -> ReportScreen(vm)
                 Tab.Settings -> ResponsiveSettings(vm)
                 Tab.Help -> Help()
+                Tab.Feedback -> FeedbackScreen(vm.server)
+                Tab.About -> AboutScreen()
             }
         }
     }
@@ -255,9 +259,6 @@ private fun ResponsiveSettings(vm: StationVM) {
     var showHomePicker by remember { mutableStateOf(false) }
     var testResult by remember { mutableStateOf<String?>(null) }
     var testing by remember { mutableStateOf(false) }
-    var showFeedback by remember { mutableStateOf(false) }
-    var showAbout by remember { mutableStateOf(false) }
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val selectedHome = vm.stations.firstOrNull { it.id == vm.home }
 
@@ -304,13 +305,7 @@ private fun ResponsiveSettings(vm: StationVM) {
         item { Text("Inactive after: $inactive day${if (inactive == 1) "" else "s"}") }
         item { Slider(inactive.toFloat(), { inactive = it.toInt().coerceIn(1, 30); vm.inactiveAfterDays = inactive; vm.thresholdChanged() }, valueRange = 1f..30f, steps = 28) }
         item { Text("Stations not seen for this many days are shown Inactive. Default 2 days.", style = MaterialTheme.typography.bodySmall) }
-        item { HorizontalDivider(); Text("Feedback and About", style = MaterialTheme.typography.titleMedium) }
-        item { OutlinedButton(onClick = { showFeedback = true }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.Star, null); Spacer(Modifier.width(8.dp)); Text("Feedback") } }
-        item { OutlinedButton(onClick = { showAbout = true }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.Info, null); Spacer(Modifier.width(8.dp)); Text("About") } }
     }
-
-    if (showFeedback) FeedbackDialog(vm.server, context) { showFeedback = false }
-    if (showAbout) AboutDialog(context) { showAbout = false }
 
     if (showHomePicker) {
         HomeStationPicker(

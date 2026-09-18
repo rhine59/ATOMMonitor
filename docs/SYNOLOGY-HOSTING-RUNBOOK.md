@@ -1,6 +1,6 @@
 # ATOM Monitor — Synology Docker Hosting Runbook
 
-This is the authoritative rebuild, deployment, networking and diagnostic runbook for hosting the ATOM Monitor server on the Synology NAS.
+This is the authoritative rebuild, deployment, networking and diagnostic runbook for hosting the ATOM Monitor server on the Synology NAS. It must remain sufficient to recreate the environment from a clean NAS/checkout, not merely operate the existing host.
 
 ## 1. Scope and safety invariant
 
@@ -449,3 +449,9 @@ Before a live recovery drill, review the restore path for stale SQLite `-wal`, `
 The API source contains `POST /api/v1/feedback`. It validates a 1–5 rating and bounded comments and relays mail through SMTP. The private destination and SMTP settings are supplied only through ignored server environment configuration; they must not be placed in source, Compose defaults containing secrets, logs or phone clients.
 
 Feedback delivery is deliberately **deferred at this checkpoint**. The phone UI may report that feedback could not be sent until the server is configured. When this work resumes, configure the private recipient and SMTP credentials locally, rebuild/redeploy the API, test the endpoint, and confirm receipt without committing the destination address or credentials. Review abuse/rate-limiting protection before treating a public mail-relay endpoint as production-ready.
+
+## 24. Clean-rebuild documentation requirement
+
+Every server/infrastructure change must keep this runbook executable from scratch. In particular, Phase 3/4 work must document PostgreSQL, ignored local `server/.env` creation, persistent Docker volumes, API replicas, load balancer, the single-active collector, DSM reverse proxy/TLS/router configuration, validation commands and rollback. Secrets must never be committed; the runbook must instead state which variables are required and how to create/provide them.
+
+Before a major architecture phase is marked Tested, review this runbook against a hypothetical clean Synology installation and ensure no required host-only knowledge is missing. Where older sections still describe SQLite or a single API as current topology, they must be brought forward to the tested PostgreSQL/replicated architecture as that phase is completed.

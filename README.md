@@ -78,3 +78,11 @@ Shared engineering work includes server/cache ownership robustness, protecting t
 ## Terminology
 
 A missing heartbeat means no recent status report has been observed. It is not proof that the physical installation is powered off, so the applications deliberately say **No recent heartbeat** rather than **Offline**.
+
+## Copyright and third-party marks
+
+Copyright © 2026 Richard Hine. All rights reserved.
+
+Unless and until a separate licence is added to this repository, no licence to copy, modify, distribute or create derivative works from ATOM Monitor is granted beyond rights that apply by law or by the hosting platform terms.
+
+PilotAware® is a registered trademark of PilotAware Ltd. ATOM Monitor is an independent project and is not affiliated with, endorsed by or sponsored by PilotAware Ltd. References to PilotAware and ATOM identify the third-party technology and ground-station network with which ATOM Monitor interoperates.

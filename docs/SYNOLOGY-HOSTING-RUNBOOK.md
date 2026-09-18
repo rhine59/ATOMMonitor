@@ -429,3 +429,23 @@ sudo docker compose logs --tail=30 atom-api ogn-station-probe
 ```
 
 If all checks pass, the Synology Docker host, persistent registry, LAN API, public DNS/TLS reverse proxy and collector are operational.
+
+## 22. Phase 2 SQLite backup/recovery checkpoint — 18 September 2026
+
+The repository contains `scripts/atom-db-backup.py` for online SQLite backup, SHA-256 sidecars, integrity checking, retention and controlled restore verification. Live backup and verification passed with 307 station records / 305 confirmed PilotAware stations. Retention was demonstrated with `--keep 2`; a third backup pruned the oldest database and matching checksum.
+
+The intended backup directory is outside the Git checkout:
+
+```text
+/volume1/docker/ATOMMonitor-backups
+```
+
+A DSM Task Scheduler job named **ATOMMonitor Database Backup** has been created for daily 02:00 execution. At this checkpoint the scheduled execution has **not yet been verified**, so do not treat scheduling as Tested. Before relying on the job, confirm the Synology's absolute Python 3 path and then manually run the task and inspect `backup.log`. A naturally scheduled run should subsequently be observed. The backup directory must also be included in the NAS backup policy.
+
+Before a live recovery drill, review the restore path for stale SQLite `-wal`, `-shm` or `-journal` sidecars. The current recovery drill remains outstanding; do not overwrite the live database merely to satisfy a documentation checkpoint.
+
+## 23. Feedback mail relay deployment — deferred
+
+The API source contains `POST /api/v1/feedback`. It validates a 1–5 rating and bounded comments and relays mail through SMTP. The private destination and SMTP settings are supplied only through ignored server environment configuration; they must not be placed in source, Compose defaults containing secrets, logs or phone clients.
+
+Feedback delivery is deliberately **deferred at this checkpoint**. The phone UI may report that feedback could not be sent until the server is configured. When this work resumes, configure the private recipient and SMTP credentials locally, rebuild/redeploy the API, test the endpoint, and confirm receipt without committing the destination address or credentials. Review abuse/rate-limiting protection before treating a public mail-relay endpoint as production-ready.

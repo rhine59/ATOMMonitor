@@ -373,3 +373,11 @@ git log -1 --oneline
 - Missing telemetry should be represented as `Not reported`, not silently converted to zero.
 - The UI term for an overdue station is `No recent heartbeat`, not a definitive `Offline` state.
 - Aircraft identities, positions, tracks and movement history are outside ATOM Monitor's scope and must not be stored.
+
+## Documentation rule: rebuild from scratch
+
+The repository documentation must be sufficient to recreate the ATOM Monitor environment from a clean machine/NAS rather than merely describe the current running state. Every infrastructure, deployment, database, networking, secret/configuration, build or runtime change must therefore update the relevant setup/runbook documentation in the same development cycle.
+
+The rebuild instructions must be step-by-step and include prerequisites, repository checkout, required directory layout, ignored local configuration and how to generate/populate it without committing secrets, Docker/Compose build and startup, PostgreSQL creation/persistence, load-balancer configuration, collector startup, DSM reverse proxy/TLS/router requirements, health/readiness tests, expected results, persistence/recovery checks and rollback boundaries. Commands must be usable from a clean checkout, with platform-specific assumptions stated explicitly.
+
+A change is not documentation-complete if a future clean rebuild would depend on an undocumented setting that exists only on the current Synology host.

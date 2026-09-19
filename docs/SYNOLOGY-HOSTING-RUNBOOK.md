@@ -535,3 +535,22 @@ Phase 4 topology rollback is to one PostgreSQL-backed API instance; it does not 
 
 Before declaring a newly recreated environment operational, confirm: Compose validates; PostgreSQL is healthy; two API replicas are healthy; Nginx is healthy and owns host port 8088; the single collector is running; `/ready` reports PostgreSQL; station reads return HTTP 200; live collector submissions return HTTP 202; DSM HTTPS works with valid TLS; and the app can reach the public endpoint. Record any host-specific prerequisite discovered during a rebuild in this runbook rather than leaving it only on the NAS.
 \n\n## Checkpoint synchronization — 18 September 2026\n\nCurrent clean-rebuild target is PostgreSQL persistent named volume, two stateless API replicas, Nginx publishing host port 8088 and one single-active collector posting through Nginx. The complete acceptance suite passed this topology. A rebuild that must retain registry data still requires a tested PostgreSQL restore; the historical SQLite backup path is not a PostgreSQL backup. See `CHECKPOINT-2026-09-18.md`.\n
+
+## Per-container build/start procedure — 19 September 2026
+
+The current stack can be rebuilt/started and verified one service layer at a time from the repository root:
+
+```sh
+sh scripts/build-postgres.sh
+sh scripts/build-api.sh
+sh scripts/build-nginx.sh
+sh scripts/build-collector.sh
+```
+
+Or run the dependency-ordered wrapper:
+
+```sh
+sh scripts/build-all-containers.sh
+```
+
+The PostgreSQL script pulls the pinned Compose image tag, starts it without deleting its named volume, waits for health, checks the persistent mount and executes a database query. The API script builds the local API image, starts exactly two replicas, waits for both to become healthy and directly checks each replica's health/readiness/station API. The Nginx script pulls its Compose image, starts the load balancer, validates `nginx -t` and checks health/readiness/stations through host port 8088. The collector script runs its unit tests, builds its local image, starts the single collector and requires a new HTTP 202 observation in the Nginx log. These scripts do not replace the destructive Phase resilience acceptance suite.

@@ -51,3 +51,8 @@ A future phone feature remains queued: Station Detail should allow adding/removi
 The major operational gap is PostgreSQL backup/restore and its NAS/external backup policy. Phase 4 close-out documentation should also retain the exact single-API rollback procedure. Multiple API replicas on one Synology improve process/container resilience only; they do not provide NAS, router, broadband, power or site high availability. The collector remains deliberately single-active.
 
 No Phase 5 acceptance contract has yet been defined. It must not be invented retrospectively; define its objective and acceptance criteria before implementation.
+
+
+## 19 September 2026 follow-on
+
+Per-container build/start verification scripts have been added for PostgreSQL, API replicas, Nginx and the OGN station collector, plus an all-container dependency-ordered wrapper. They deliberately preserve the PostgreSQL named volume and keep resilience/failure testing separate in the Phase acceptance suite. Runtime verification of these new build scripts is pending.

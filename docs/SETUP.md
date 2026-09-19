@@ -382,3 +382,7 @@ The rebuild instructions must be step-by-step and include prerequisites, reposit
 
 A change is not documentation-complete if a future clean rebuild would depend on an undocumented setting that exists only on the current Synology host.
 \n\n## Checkpoint synchronization — 18 September 2026\n\nCurrent clean-rebuild target is PostgreSQL persistent named volume, two stateless API replicas, Nginx publishing host port 8088 and one single-active collector posting through Nginx. The complete acceptance suite passed this topology. Recreating an existing registry from scratch still requires a tested PostgreSQL restore procedure; do not substitute the historical SQLite backup path. See `CHECKPOINT-2026-09-18.md`.\n
+
+## Per-container build scripts — 19 September 2026
+
+For routine component-level rebuild/start verification from the repository root, use `scripts/build-postgres.sh`, `build-api.sh`, `build-nginx.sh`, or `build-collector.sh`. Run all four in dependency order with `sh scripts/build-all-containers.sh`. PostgreSQL and Nginx use upstream images and are pulled/started; API and collector are locally built. None of these scripts removes the PostgreSQL named volume or prints `.env`. Full resilience testing remains under the Phase acceptance scripts.

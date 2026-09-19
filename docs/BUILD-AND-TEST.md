@@ -201,3 +201,8 @@ Runtime evidence included Phase 1 base runtime/API/security checks; Phase 2 pres
 The final current-stack service/API matrix passed Nginx `/health`, PostgreSQL-backed `/ready`, station list, station detail and missing-station 404; safe invalid-feedback HTTP 400; unauthenticated observation HTTP 401; PostgreSQL/API confirmed PilotAware count agreement (308 at that checkpoint); direct `/health`, `/ready` and station-list HTTP checks on both API replicas; and a new live collector observation returning HTTP 202 through Nginx. Counts are checkpoint evidence and are not fixed expected values.
 
 During Phase 4, the immediate `docker compose ps` snapshot showed newly recreated Nginx/API containers as health `starting`; application-level readiness/read assertions passed, and the subsequent service matrix waited until Nginx was healthy before passing all direct and load-balanced checks.
+
+
+## Per-container build/start verification — 19 September 2026
+
+The repository now provides `scripts/build-postgres.sh`, `build-api.sh`, `build-nginx.sh`, `build-collector.sh` and `build-all-containers.sh`. PostgreSQL and Nginx are upstream image services, so their scripts pull/start/verify rather than claiming a local image build. The API and collector scripts build their local images and then perform service-specific runtime checks. The all-container wrapper runs them in dependency order: PostgreSQL, API, Nginx, collector. These are routine build/deployment verification scripts; the Phase acceptance runners remain the resilience/failure tests. Runtime execution of the new scripts is pending.

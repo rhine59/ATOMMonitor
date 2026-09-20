@@ -382,3 +382,7 @@ Every production architecture change must have a rollback path before deployment
 Kubernetes, Docker Swarm, Redis, a distributed message broker, PostgreSQL streaming replication and multi-site automatic failover are not current prerequisites. They add operational failure modes and maintenance cost. Introduce them only when measured load, recovery objectives or host-level availability requirements justify them.
 
 The immediate target is a well-engineered resilient Compose deployment on the existing Synology: stateless replicated APIs, PostgreSQL persistence, health-aware routing, tested backup/recovery, private ingestion and observable/versioned operations.\n\n## Checkpoint synchronization — 18 September 2026\n\nThe planned shared-state/multi-API architecture is now implemented for the development/test Synology: PostgreSQL, two stateless APIs, Nginx and one single-active collector. Full resilience acceptance passed. This protects against an individual API process/container failure only, not NAS/router/broadband/power/site failure. See `CHECKPOINT-2026-09-18.md`.\n
+
+## Restricted in-app operations
+
+The resilience roadmap now includes a restricted iOS/Android Admin function for current infrastructure health/resource visibility and deliberate scale up/down of the stateless API tier. This is a control-plane feature, not autoscaling. PostgreSQL, Nginx and the collector remain singleton/non-scalable from the app. Docker-host control must be isolated from the public API and narrowly allow-listed. See `ADMIN-INFRASTRUCTURE.md`.

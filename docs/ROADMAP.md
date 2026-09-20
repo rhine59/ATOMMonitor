@@ -62,3 +62,7 @@
 
 Build a minimal diagnostic OGN APRS collector whose only purpose is to find and print receiver/status messages for `PWMalham`, while explicitly discarding aircraft traffic. Use captured examples to define parser tests before designing the production schema around guessed packet formats.
 \n\n## Checkpoint synchronization — 18 September 2026\n\nPhase 3 PostgreSQL migration is Tested; Phase 4 replicated API/Nginx runtime acceptance has passed; and the cross-phase acceptance framework is Tested. The next server priority is PostgreSQL backup/restore and backup-policy coverage, followed by formal Phase 4 close-out. No Phase 5 acceptance contract has yet been defined. See `CHECKPOINT-2026-09-18.md`.\n
+
+## Planned restricted Admin function — 20 September 2026
+
+Add a separately authenticated iOS/Android Admin area backed by a narrow server-side control service. Phase one provides current ATOM Monitor container/host health and resource monitoring; phase two permits deliberate scale up/down of `atom-api` only, with bounds, confirmation, serialization and audit events. This is not automatic scaling and does not change the single-Synology failure domain. See `ADMIN-INFRASTRUCTURE.md`.

@@ -168,3 +168,11 @@ Planned. No Docker-control privilege has yet been granted to an application comp
 ## Implementation checkpoint — read-only monitoring
 
 The first server-side slice is now implemented in source. `atom-admin-monitor` is a separate service with a separate `ATOM_ADMIN_TOKEN`; Nginx routes only `/api/v1/admin/` to it. It exposes authenticated summary/container reads and filters Docker discovery to the current Compose project plus the explicit ATOM service allow-list. It has no mutation/scale endpoint. The Docker socket is mounted read-only into this dedicated monitor; note that filesystem read-only mode does not itself constrain Docker API verbs, so the service's code-level GET-only implementation, isolation from the public API process and strict route surface are security controls. A stronger Docker API proxy/authorization boundary remains required before scaling capability is enabled. Source/unit tests are committed; Synology build/runtime testing is pending.
+
+## Implementation checkpoint — controlled API scaling
+
+The second server-side slice is implemented in source. The public-facing `atom-admin-monitor` retains the read-only metrics role and now forwards only confirmed, authenticated scale requests to a private `atom-admin-control` service. Only that private service receives writable Docker-socket access; it exposes no host port and implements only allow-listed `atom-api` scaling plus bounded audit-event reads.
+
+The scale contract is `POST /api/v1/admin/api-scale` with `{"replicas":3,"confirmed":true}`. Counts are restricted to 1–4, Boolean/string counts are rejected, operations are serialized and rate-limited, and success is returned only after the requested number of replicas are running and Docker-healthy within the configured timeout. Scale activity is written to the persistent `atommonitor-admin-audit` volume without secrets. `ATOM_ADMIN_CONTROL_TOKEN` is a third, internal-only secret and must differ from both the external admin and ingest tokens.
+
+Source unit tests pass. Status remains **Implemented — Synology build/runtime acceptance pending**. It must not be marked Tested until the documented 2→3→2 live test proves public reads and collector writes continue, singleton services remain single, audit events are recorded, and both phone clients have been exercised.

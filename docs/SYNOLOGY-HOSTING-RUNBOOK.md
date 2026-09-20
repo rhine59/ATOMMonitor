@@ -559,3 +559,7 @@ The PostgreSQL script pulls the pinned Compose image tag, starts it without dele
 ## Restricted admin monitor
 
 The clean rebuild now requires a separate `ATOM_ADMIN_TOKEN` in ignored `server/.env`. Compose builds `atom-admin-monitor`, which mounts the Docker socket read-only and is not host-published; Nginx proxies only `/api/v1/admin/` to it. The ordinary `atom-api` service has no Docker socket access. This first implementation is read-only and has no scale endpoint. Before enabling scaling, replace/augment the current socket boundary with a tested narrowly authorized mutation mechanism. Runtime verification of the monitor is pending.
+
+## Admin scaling deployment checkpoint
+
+Add a third unique secret, `ATOM_ADMIN_CONTROL_TOKEN`, to `server/.env`, then rebuild/recreate `atom-admin-monitor` and `atom-admin-control`. Never expose control port 8091 through DSM Reverse Proxy or a host port. Verify the monitor mounts the Docker socket read-only and only the control service mounts it writable. Preserve the `atommonitor-admin-audit` named volume during ordinary container recreation. Runtime validation is pending and must include authenticated 2→3→2 scaling with continuous public reads/collector writes and singleton checks.

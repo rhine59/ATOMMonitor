@@ -102,3 +102,7 @@ The planned Admin function adds a separate authenticated control plane for ATOM 
 ## Read-only admin monitoring component
 
 A separate `atom-admin-monitor` container now owns the initial infrastructure-monitoring boundary. Nginx sends `/api/v1/admin/` to this service while all ordinary paths continue to the replicated public API. The public API therefore has no Docker socket mount. The monitor currently performs GET-only Docker inspection/stats and exposes no mutation route. Scaling remains deliberately unimplemented pending a stronger control boundary and runtime validation.
+
+## Admin control-plane checkpoint — 20 September 2026
+
+Infrastructure administration is split between `atom-admin-monitor` (authenticated external API and read-only current metrics) and the internal-only `atom-admin-control` boundary. The control container alone has writable Docker-socket access. It can scale only the Compose project’s `atom-api` containers from 1–4, waits for Docker health, serializes/rate-limits changes, and writes a bounded operational audit trail to a dedicated named volume. The public station API never receives Docker access.

@@ -66,3 +66,7 @@ Build a minimal diagnostic OGN APRS collector whose only purpose is to find and 
 ## Planned restricted Admin function — 20 September 2026
 
 Add a separately authenticated iOS/Android Admin area backed by a narrow server-side control service. Phase one provides current ATOM Monitor container/host health and resource monitoring; phase two permits deliberate scale up/down of `atom-api` only, with bounds, confirmation, serialization and audit events. This is not automatic scaling and does not change the single-Synology failure domain. See `ADMIN-INFRASTRUCTURE.md`.
+
+## Admin implementation progress — 20 September 2026
+
+Server delivery steps 1–3 are implemented in source: separate authentication/control design, read-only infrastructure monitoring, and guarded `atom-api` scaling. Next is Synology acceptance (including 2→3→2 availability and audit evidence), followed by iOS Admin UI/secure storage and Android parity/runtime tests.

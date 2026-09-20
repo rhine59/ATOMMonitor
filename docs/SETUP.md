@@ -397,3 +397,7 @@ ATOM_ADMIN_TOKEN=<strong separate local secret>
 ```
 
 Do not reuse `ATOM_INGEST_TOKEN`. The Compose stack now includes `atom-admin-monitor`, built from `server/Dockerfile.admin`. It is private to the Compose network and reached externally only through Nginx's authenticated `/api/v1/admin/` route. No admin scale endpoint exists in this first slice.
+
+## Admin control-plane configuration
+
+Set three different long random values in `server/.env`: `ATOM_INGEST_TOKEN`, `ATOM_ADMIN_TOKEN`, and internal-only `ATOM_ADMIN_CONTROL_TOKEN`. Rebuild both `atom-admin-monitor` and `atom-admin-control`. Do not publish port 8091; it is Compose-internal only. The writable Docker socket belongs only to `atom-admin-control`; its API is deliberately restricted to `atom-api` scaling and audit reads. Audit events persist in the `atommonitor-admin-audit` named volume.

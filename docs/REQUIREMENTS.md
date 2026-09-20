@@ -95,3 +95,7 @@ The provider design must remain replaceable/supplementable. OGN APRS receiver/st
 ## Restricted infrastructure administration — planned 20 September 2026
 
 A restricted cross-platform Admin function is now required for current ATOM Monitor infrastructure health/resource monitoring and deliberate API-tier scaling. It must use a dedicated authenticated server-side control boundary; phone clients must never receive Docker/Synology/database/ingest credentials or generic command execution. Only the stateless `atom-api` tier is initially scalable, with a proposed guarded range of 1–4 and normal target of two. PostgreSQL, Nginx and the single-active collector remain singletons. See `ADMIN-INFRASTRUCTURE.md`.
+
+## Restricted administration implementation checkpoint — 20 September 2026
+
+The server source now implements read-only monitoring and confirmed manual scaling of `atom-api` only. The permitted range is 1–4, normal target remains two, and the operation must serialize, rate-limit, audit and wait for every requested replica to become Docker-healthy. A private control credential separate from `ATOM_ADMIN_TOKEN` and `ATOM_INGEST_TOKEN` protects the internal monitor-to-control boundary. Runtime acceptance and both mobile Admin clients remain outstanding.

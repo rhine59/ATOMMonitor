@@ -103,3 +103,7 @@ Server Phase 1 resilience remains Tested. The Synology stack is a development/te
 
 
 | Restricted infrastructure Admin — read-only server monitor | Provide separately authenticated, allow-listed current container/host health and resource data without giving the public API Docker control. | Server / Synology | Implemented — build pending | Separate `atom-admin-monitor`, Nginx admin route, `ATOM_ADMIN_TOKEN` and unit tests committed 20 Sep 2026. No scale/mutation endpoint exists. Synology build/runtime test pending; stronger Docker authorization boundary required before scaling is enabled. |
+
+### Controlled API scaling — 20 September 2026
+
+**Implemented — Synology build/runtime test pending.** The source now includes the private `atom-admin-control` boundary, authenticated confirmed `atom-api` scaling (1–4 only), readiness verification, serialization, rate limiting and persistent audit events. Unit tests pass. It is not Tested until 2→3→2 acceptance succeeds on the Synology while public reads and collector ingestion continue and singleton services remain unchanged.

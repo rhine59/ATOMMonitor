@@ -211,3 +211,7 @@ The repository now provides `scripts/build-postgres.sh`, `build-api.sh`, `build-
 ## Read-only admin monitor tests
 
 Source includes `server/test_admin_monitor.py`, covering public monitor liveness, rejection of missing/wrong admin credentials and filtering of Docker results to the allow-listed ATOM Monitor project/services. Synology Compose build, authenticated endpoint checks and resource-value verification remain pending; therefore this feature is not yet Tested.
+
+## Admin control-plane source tests
+
+From `server/`, run `python -m unittest -v test_admin_monitor.py test_admin_control.py`. Current source has nine passing tests covering authentication, explicit confirmation, count/type bounds, forwarding, concurrency rejection and successful audit recording. Synology acceptance must additionally prove 2→3→2 scaling, three/two healthy replicas respectively, uninterrupted station reads and collector writes, unchanged singleton services and visible audit events.

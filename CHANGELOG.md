@@ -36,3 +36,11 @@
 - Defined initial health states: Healthy, Warning, No recent heartbeat, Unknown.
 - Selected PWMalham as the initial reference/test station.
 - Added project vision, requirements, architecture, data-source, OGN APRS, health, map UI, data-model, API, research, decision-log and roadmap documentation.
+
+## 20 September 2026 — restricted API scaling source checkpoint
+
+- Added private `atom-admin-control` service with writable Docker access isolated from the public API and monitoring service.
+- Added confirmed, authenticated, bounded `atom-api` scaling (1–4), readiness waiting, serialization and rate limiting.
+- Added persistent bounded admin audit events and `GET /api/v1/admin/events`.
+- Added separate internal `ATOM_ADMIN_CONTROL_TOKEN` configuration and unit coverage.
+- Synology 2→3→2 runtime acceptance and mobile Admin clients remain pending.

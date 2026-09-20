@@ -85,3 +85,7 @@ A separately authenticated `/api/v1/admin` contract is planned for infrastructur
 ## Read-only infrastructure administration — implemented, runtime pending
 
 `GET /api/v1/admin/summary` and `GET /api/v1/admin/containers` are implemented by the separate `atom-admin-monitor` service and require `Authorization: Bearer <ATOM_ADMIN_TOKEN>`. The token is distinct from the collector ingest token. Responses are filtered to allow-listed ATOM Monitor Compose services. No scale/mutation endpoint exists yet. Runtime verification is pending.
+
+## Restricted infrastructure administration — implemented contract
+
+Authenticated admin routes are `GET /api/v1/admin/summary`, `GET /api/v1/admin/containers`, `GET /api/v1/admin/events`, and `POST /api/v1/admin/api-scale`. The scale body is `{"replicas": <1..4>, "confirmed": true}`; missing confirmation or invalid counts return 400, a concurrent operation returns 409, rate limiting returns 429, control unavailability/failed readiness returns 503, and success reports previous, requested, running and healthy replica counts. No route accepts a service name or arbitrary Docker operation.

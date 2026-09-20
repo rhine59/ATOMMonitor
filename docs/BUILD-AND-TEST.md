@@ -206,3 +206,8 @@ During Phase 4, the immediate `docker compose ps` snapshot showed newly recreate
 ## Per-container build/start verification — 19 September 2026
 
 The repository now provides `scripts/build-postgres.sh`, `build-api.sh`, `build-nginx.sh`, `build-collector.sh` and `build-all-containers.sh`. PostgreSQL and Nginx are upstream image services, so their scripts pull/start/verify rather than claiming a local image build. The API and collector scripts build their local images and then perform service-specific runtime checks. The all-container wrapper runs them in dependency order: PostgreSQL, API, Nginx, collector. These are routine build/deployment verification scripts; the Phase acceptance runners remain the resilience/failure tests. Runtime execution of the new scripts is pending.
+
+
+## Read-only admin monitor tests
+
+Source includes `server/test_admin_monitor.py`, covering public monitor liveness, rejection of missing/wrong admin credentials and filtering of Docker results to the allow-listed ATOM Monitor project/services. Synology Compose build, authenticated endpoint checks and resource-value verification remain pending; therefore this feature is not yet Tested.

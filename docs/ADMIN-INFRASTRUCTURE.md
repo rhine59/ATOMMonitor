@@ -163,3 +163,8 @@ Implementation is Tested only when all of the following have evidence:
 ## Status
 
 Planned. No Docker-control privilege has yet been granted to an application component, and no admin endpoint should be considered implemented until the server-side security boundary and Synology privilege mechanism have been built and tested.
+
+
+## Implementation checkpoint — read-only monitoring
+
+The first server-side slice is now implemented in source. `atom-admin-monitor` is a separate service with a separate `ATOM_ADMIN_TOKEN`; Nginx routes only `/api/v1/admin/` to it. It exposes authenticated summary/container reads and filters Docker discovery to the current Compose project plus the explicit ATOM service allow-list. It has no mutation/scale endpoint. The Docker socket is mounted read-only into this dedicated monitor; note that filesystem read-only mode does not itself constrain Docker API verbs, so the service's code-level GET-only implementation, isolation from the public API process and strict route surface are security controls. A stronger Docker API proxy/authorization boundary remains required before scaling capability is enabled. Source/unit tests are committed; Synology build/runtime testing is pending.

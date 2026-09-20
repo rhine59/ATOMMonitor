@@ -386,3 +386,14 @@ A change is not documentation-complete if a future clean rebuild would depend on
 ## Per-container build scripts — 19 September 2026
 
 For routine component-level rebuild/start verification from the repository root, use `scripts/build-postgres.sh`, `build-api.sh`, `build-nginx.sh`, or `build-collector.sh`. Run all four in dependency order with `sh scripts/build-all-containers.sh`. PostgreSQL and Nginx use upstream images and are pulled/started; API and collector are locally built. None of these scripts removes the PostgreSQL named volume or prints `.env`. Full resilience testing remains under the Phase acceptance scripts.
+
+
+## Admin monitor local configuration
+
+Create a separate administrator secret in `server/.env`:
+
+```text
+ATOM_ADMIN_TOKEN=<strong separate local secret>
+```
+
+Do not reuse `ATOM_INGEST_TOKEN`. The Compose stack now includes `atom-admin-monitor`, built from `server/Dockerfile.admin`. It is private to the Compose network and reached externally only through Nginx's authenticated `/api/v1/admin/` route. No admin scale endpoint exists in this first slice.

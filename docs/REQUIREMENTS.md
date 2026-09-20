@@ -91,3 +91,7 @@ Initial derived states are Healthy, Warning, No recent heartbeat and Unknown. Cu
 
 The provider design must remain replaceable/supplementable. OGN APRS receiver/status traffic is the current live source. `OGN-R/PilotAware` is a strong live PilotAware/ATOM classifier; `PW` prefix filtering is useful for discovery but is not by itself an authoritative complete registry rule. No undocumented source is assumed permanently guaranteed.
 \n\n## Checkpoint synchronization — 18 September 2026\n\nCurrent server requirements are implemented through the PostgreSQL/two-API/Nginx checkpoint and the cross-phase acceptance framework is Tested. The ground-station-only scope and iOS/Android parity rule remain unchanged. PostgreSQL backup/restore remains an outstanding operational requirement. See `CHECKPOINT-2026-09-18.md`.\n
+
+## Restricted infrastructure administration — planned 20 September 2026
+
+A restricted cross-platform Admin function is now required for current ATOM Monitor infrastructure health/resource monitoring and deliberate API-tier scaling. It must use a dedicated authenticated server-side control boundary; phone clients must never receive Docker/Synology/database/ingest credentials or generic command execution. Only the stateless `atom-api` tier is initially scalable, with a proposed guarded range of 1–4 and normal target of two. PostgreSQL, Nginx and the single-active collector remain singletons. See `ADMIN-INFRASTRUCTURE.md`.

@@ -21,5 +21,11 @@ class AdminControlTests(unittest.TestCase):
         c.LOCK.acquire()
         try:self.assertEqual(self.client.post("/scale",json={"replicas":2},headers=self.headers).status_code,409)
         finally:c.LOCK.release()
+    def test_audit_is_bounded(self):
+        old=c.AUDIT_MAX_EVENTS; c.AUDIT_MAX_EVENTS=2
+        try:
+            for n in range(3):c.audit({"type":"test","number":n})
+            self.assertEqual([e["number"] for e in reversed(c.recent_events())],[1,2])
+        finally:c.AUDIT_MAX_EVENTS=old
 
 if __name__=="__main__":unittest.main()

@@ -11,6 +11,7 @@ SOCKET=os.getenv("DOCKER_SOCKET","/var/run/docker.sock")
 PROJECT=os.getenv("COMPOSE_PROJECT_NAME","server")
 MIN_REPLICAS=int(os.getenv("ATOM_API_MIN_REPLICAS","1")); MAX_REPLICAS=int(os.getenv("ATOM_API_MAX_REPLICAS","4"))
 TIMEOUT=int(os.getenv("ATOM_SCALE_TIMEOUT_SECONDS","60")); AUDIT=os.getenv("ATOM_ADMIN_AUDIT_FILE","/audit/admin-events.jsonl")
+AUDIT_MAX_EVENTS=int(os.getenv("ATOM_ADMIN_AUDIT_MAX_EVENTS","500"))
 LOCK=threading.Lock(); API_PREFIX=os.getenv("DOCKER_API_PREFIX","")
 LAST_SCALE_AT=0.0; MIN_SCALE_INTERVAL=float(os.getenv("ATOM_SCALE_MIN_INTERVAL_SECONDS","2"))
 
@@ -74,6 +75,11 @@ def audit(event):
     event={"timestamp":dt.datetime.now(dt.timezone.utc).isoformat(),**event}; os.makedirs(os.path.dirname(AUDIT),exist_ok=True)
     line=json.dumps(event,separators=(",",":"))
     with open(AUDIT,"a",encoding="utf-8") as f:f.write(line+"\n")
+    with open(AUDIT,encoding="utf-8") as f:lines=f.readlines()
+    if len(lines)>AUDIT_MAX_EVENTS:
+        replacement=AUDIT+".tmp"
+        with open(replacement,"w",encoding="utf-8") as f:f.writelines(lines[-AUDIT_MAX_EVENTS:])
+        os.replace(replacement,AUDIT)
 
 def recent_events(limit=100):
     try:

@@ -4,7 +4,7 @@ ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 echo '=== ATOM Monitor container build/start suite ==='
 echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 echo "Git: $(git -C "$ROOT" rev-parse --short HEAD)"
-for script in build-postgres.sh build-api.sh build-nginx.sh build-collector.sh; do
+for script in build-postgres.sh build-api.sh build-nginx.sh build-collector.sh build-admin.sh; do
   printf '\n===== %s =====\n' "$script"
   sh "$ROOT/scripts/$script"
 done

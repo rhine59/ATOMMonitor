@@ -51,3 +51,9 @@
 - Added iOS Keychain and Android Keystore-backed administrator-token storage.
 - Added infrastructure summary/container display and explicitly confirmed 1–4 API scaling controls.
 - Client build/runtime verification remains pending.
+
+## 20 September 2026 — Admin operational scripts
+
+- Removed a fixed Docker API-version assumption for Synology compatibility.
+- Added Admin container build/health/no-published-control-port validation.
+- Added deferred 2→3→2 live acceptance automation with public-read, singleton and audit checks.

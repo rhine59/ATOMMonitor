@@ -215,3 +215,7 @@ Source includes `server/test_admin_monitor.py`, covering public monitor liveness
 ## Admin control-plane source tests
 
 From `server/`, run `python -m unittest -v test_admin_monitor.py test_admin_control.py`. Current source has nine passing tests covering authentication, explicit confirmation, count/type bounds, forwarding, concurrency rejection and successful audit recording. Synology acceptance must additionally prove 2→3→2 scaling, three/two healthy replicas respectively, uninterrupted station reads and collector writes, unchanged singleton services and visible audit events.
+
+### Admin build and deferred live acceptance
+
+Run `scripts/build-admin.sh` to validate configuration, build/start both restricted Admin services, wait for Docker health and prove the control service has no published host port. When ready for the deliberate live scale test, export `ATOM_ADMIN_TOKEN` and optionally `ATOM_ADMIN_BASE_URL`, then run `scripts/admin-scaling-acceptance.sh`. It performs 2→3→2 scaling, continuously checks public station reads, verifies API health/singletons and confirms audit evidence. Collector-write continuity must also be checked from the live collector logs/API evidence before marking the feature Tested.

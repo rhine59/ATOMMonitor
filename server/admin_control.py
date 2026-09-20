@@ -11,7 +11,7 @@ SOCKET=os.getenv("DOCKER_SOCKET","/var/run/docker.sock")
 PROJECT=os.getenv("COMPOSE_PROJECT_NAME","server")
 MIN_REPLICAS=int(os.getenv("ATOM_API_MIN_REPLICAS","1")); MAX_REPLICAS=int(os.getenv("ATOM_API_MAX_REPLICAS","4"))
 TIMEOUT=int(os.getenv("ATOM_SCALE_TIMEOUT_SECONDS","60")); AUDIT=os.getenv("ATOM_ADMIN_AUDIT_FILE","/audit/admin-events.jsonl")
-LOCK=threading.Lock(); API_VERSION="v1.47"
+LOCK=threading.Lock(); API_PREFIX=os.getenv("DOCKER_API_PREFIX","")
 LAST_SCALE_AT=0.0; MIN_SCALE_INTERVAL=float(os.getenv("ATOM_SCALE_MIN_INTERVAL_SECONDS","2"))
 
 def auth():
@@ -22,7 +22,7 @@ def docker(method,path,body=None,ok=(200,201,204)):
     payload=b"" if body is None else json.dumps(body).encode(); s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM); s.settimeout(10)
     try:
         s.connect(SOCKET)
-        headers=f"{method} /{API_VERSION}{path} HTTP/1.1\r\nHost: docker\r\nConnection: close\r\nContent-Length: {len(payload)}\r\nContent-Type: application/json\r\n\r\n".encode()
+        headers=f"{method} {API_PREFIX}{path} HTTP/1.1\r\nHost: docker\r\nConnection: close\r\nContent-Length: {len(payload)}\r\nContent-Type: application/json\r\n\r\n".encode()
         s.sendall(headers+payload); chunks=[]
         while True:
             b=s.recv(65536)

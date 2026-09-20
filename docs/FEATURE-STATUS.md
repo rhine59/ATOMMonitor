@@ -111,3 +111,7 @@ Server Phase 1 resilience remains Tested. The Synology stack is a development/te
 ### iOS/Android Admin clients — 20 September 2026
 
 **Implemented — build/runtime test pending.** Both clients now expose the same locked Admin summary and confirmed 1–4 API scaling workflow. iOS uses Keychain; Android uses Android Keystore-backed encryption. Neither client accepts a service name or exposes generic Docker controls.
+
+### Admin build/acceptance automation — 20 September 2026
+
+**Implemented — execution pending.** `build-admin.sh` builds and health-checks the isolated monitor/control services and rejects an exposed control port. `admin-scaling-acceptance.sh` exercises 2→3→2, public-read continuity, healthy counts, singleton protection and audit evidence. Scripts are syntax-checked but remain unexecuted on Synology.

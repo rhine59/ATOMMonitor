@@ -1,0 +1,23 @@
+#!/bin/sh
+set -eu
+ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+cd "$ROOT/server"
+echo '=== Build/start restricted Admin control plane ==='
+[ -f .env ] || { echo 'FAIL: server/.env missing'; exit 1; }
+grep -q '^ATOM_ADMIN_TOKEN=.' .env || { echo 'FAIL: ATOM_ADMIN_TOKEN missing'; exit 1; }
+grep -q '^ATOM_ADMIN_CONTROL_TOKEN=.' .env || { echo 'FAIL: ATOM_ADMIN_CONTROL_TOKEN missing'; exit 1; }
+sudo docker compose config --quiet
+sudo docker compose build atom-admin-control atom-admin-monitor
+sudo docker compose up -d atom-admin-control atom-admin-monitor
+i=0
+while [ "$i" -lt 90 ]; do
+  control="$(sudo docker inspect atommonitor-admin-control --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' 2>/dev/null || true)"
+  monitor="$(sudo docker inspect atommonitor-admin-monitor --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' 2>/dev/null || true)"
+  [ "$control" = healthy ] && [ "$monitor" = healthy ] && break
+  i=$((i+1)); sleep 1
+done
+[ "$control" = healthy ] && [ "$monitor" = healthy ] || { echo "FAIL: control=$control monitor=$monitor"; exit 1; }
+published="$(sudo docker port atommonitor-admin-control 2>/dev/null || true)"
+[ -z "$published" ] || { echo 'FAIL: admin control has a published host port'; exit 1; }
+echo 'PASS: Admin control and monitor healthy; control has no published host port'
+echo 'ADMIN BUILD/START: PASS'

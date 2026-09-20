@@ -563,3 +563,7 @@ The clean rebuild now requires a separate `ATOM_ADMIN_TOKEN` in ignored `server/
 ## Admin scaling deployment checkpoint
 
 Add a third unique secret, `ATOM_ADMIN_CONTROL_TOKEN`, to `server/.env`, then rebuild/recreate `atom-admin-monitor` and `atom-admin-control`. Never expose control port 8091 through DSM Reverse Proxy or a host port. Verify the monitor mounts the Docker socket read-only and only the control service mounts it writable. Preserve the `atommonitor-admin-audit` named volume during ordinary container recreation. Runtime validation is pending and must include authenticated 2→3→2 scaling with continuous public reads/collector writes and singleton checks.
+
+### Admin build/test commands
+
+Use `scripts/build-admin.sh` for the two Admin containers. The control code uses Docker's unversioned local-socket API by default for compatibility with the Synology engine; `DOCKER_API_PREFIX` is available only if an explicit engine API prefix is later required. Run `scripts/admin-scaling-acceptance.sh` only in a planned test window because it deliberately changes the API tier 2→3→2. It does not alter PostgreSQL, Nginx or the collector.

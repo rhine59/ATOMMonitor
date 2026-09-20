@@ -69,6 +69,7 @@ private fun ResponsiveApp(vm: StationVM = viewModel()) {
                                     Tab.Stations -> Icons.Default.List
                                     Tab.Favourites -> Icons.Default.Star
                                     Tab.Report -> Icons.Default.Assessment
+                                    Tab.Admin -> Icons.Default.AdminPanelSettings
                                     Tab.Settings -> Icons.Default.Settings
                                     Tab.Help -> Icons.Default.Help
                                     Tab.Feedback -> Icons.Default.Star
@@ -96,6 +97,7 @@ private fun ResponsiveApp(vm: StationVM = viewModel()) {
                 Tab.Stations -> StationList(vm.stations, vm) { detail = it }
                 Tab.Favourites -> StationList(vm.stations.filter { vm.favourites().contains(it.id) }, vm) { detail = it }
                 Tab.Report -> ReportScreen(vm)
+                Tab.Admin -> AdminScreen(vm)
                 Tab.Settings -> ResponsiveSettings(vm)
                 Tab.Help -> Help()
                 Tab.Feedback -> FeedbackScreen(vm.server)

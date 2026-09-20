@@ -85,3 +85,7 @@ ATOMMonitor/
 ## UI and data principles
 
 The map remains the primary operational navigation surface. Stations remain available when heartbeat/position data is absent. Health does not depend on colour alone, missing telemetry is `Not reported`, cached station data is a latest snapshot rather than history, and aircraft data remains outside the application and report formats.
+
+## Restricted Admin checkpoint — 20 September 2026
+
+The iPhone app now includes a locked Admin tab. The separate administrator token is held in iOS Keychain; current ATOM container/API health is displayed and deliberate 1–4 `atom-api` scaling requires a confirmation dialog. Xcode build/runtime verification remains pending.

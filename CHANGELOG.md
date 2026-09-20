@@ -44,3 +44,10 @@
 - Added persistent bounded admin audit events and `GET /api/v1/admin/events`.
 - Added separate internal `ATOM_ADMIN_CONTROL_TOKEN` configuration and unit coverage.
 - Synology 2→3→2 runtime acceptance and mobile Admin clients remain pending.
+
+## 20 September 2026 — mobile Admin source checkpoint
+
+- Added locked Admin tabs to iOS and Android.
+- Added iOS Keychain and Android Keystore-backed administrator-token storage.
+- Added infrastructure summary/container display and explicitly confirmed 1–4 API scaling controls.
+- Client build/runtime verification remains pending.

@@ -107,3 +107,7 @@ Server Phase 1 resilience remains Tested. The Synology stack is a development/te
 ### Controlled API scaling — 20 September 2026
 
 **Implemented — Synology build/runtime test pending.** The source now includes the private `atom-admin-control` boundary, authenticated confirmed `atom-api` scaling (1–4 only), readiness verification, serialization, rate limiting and persistent audit events. Unit tests pass. It is not Tested until 2→3→2 acceptance succeeds on the Synology while public reads and collector ingestion continue and singleton services remain unchanged.
+
+### iOS/Android Admin clients — 20 September 2026
+
+**Implemented — build/runtime test pending.** Both clients now expose the same locked Admin summary and confirmed 1–4 API scaling workflow. iOS uses Keychain; Android uses Android Keystore-backed encryption. Neither client accepts a service name or exposes generic Docker controls.

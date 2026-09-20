@@ -480,3 +480,7 @@ Android source now places **Feedback** and **About** at the same main-navigation
 Feedback accepts a 1–5 rating and comments and posts them to the server-side relay so the destination email address is not shown in the application. Server SMTP delivery is intentionally deferred and therefore must not be marked Tested.
 
 These latest Android changes are **build/runtime test pending**. The earlier Pixel 10a responsive-map checkpoint remains valid, including successful Home map centring; the searchable Home-station picker still has a scrolling defect and is the first Android parity defect to resume. Release signing/AAB work also remains outstanding.
+
+## Restricted Admin checkpoint — 20 September 2026
+
+The responsive app now includes a locked Admin tab using Android Keystore-backed token encryption. It displays the shared admin summary/container contract and supports explicitly confirmed 1–4 `atom-api` scaling only. Android build/runtime verification remains pending.

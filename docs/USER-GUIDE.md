@@ -64,3 +64,7 @@ ATOM Monitor is currently proprietary software: **© 2026 Richard Hine. All righ
 ## Data and privacy scope
 Aircraft traffic remains outside project scope and must not be stored as tracks, identities or movement history.
 \n\n## Checkpoint synchronization — 18 September 2026\n\nUser-facing behaviour is unchanged by the server resilience checkpoint. iOS simulation is complete for the current phone checkpoint; Android remains paused at its current parity checkpoint. A future cross-platform Station Detail favourite add/remove control remains queued. See `CHECKPOINT-2026-09-18.md`.\n
+
+## Restricted Admin
+
+Admin is locked until the separate administrator token is accepted. iOS stores it in Keychain; Android encrypts it with an Android Keystore key. The screen shows only ATOM Monitor containers and API replica health/resources. To scale, select 1–4 API replicas, review the target and confirm. Only `atom-api` can change; PostgreSQL, Nginx and the collector remain singletons. Lock Admin removes the saved credential. Scaling is operational administration and does not provide automatic scaling or whole-host resilience.

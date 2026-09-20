@@ -341,6 +341,7 @@ enum class Tab(val title: String) {
     Stations("Stations"),
     Favourites("Favourites"),
     Report("Report"),
+    Admin("Admin"),
     Settings("Settings"),
     Help("Help"),
     Feedback("Feedback"),
@@ -378,8 +379,11 @@ fun App(vm: StationVM = viewModel()) {
                                     Tab.Stations -> Icons.Default.List
                                     Tab.Favourites -> Icons.Default.Star
                                     Tab.Report -> Icons.Default.Assessment
+                                    Tab.Admin -> Icons.Default.AdminPanelSettings
                                     Tab.Settings -> Icons.Default.Settings
                                     Tab.Help -> Icons.Default.Help
+                                    Tab.Feedback -> Icons.Default.Star
+                                    Tab.About -> Icons.Default.Info
                                 },
                                 contentDescription = item.title,
                                 modifier = Modifier.size(22.dp),
@@ -417,8 +421,11 @@ fun App(vm: StationVM = viewModel()) {
                         vm
                     ) { detail = it }
                 Tab.Report -> ReportScreen(vm)
+                Tab.Admin -> AdminScreen(vm)
                 Tab.Settings -> Settings(vm)
                 Tab.Help -> Help()
+                Tab.Feedback -> FeedbackScreen(vm.server)
+                Tab.About -> AboutScreen()
             }
         }
     }

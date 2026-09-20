@@ -23,6 +23,9 @@ struct ContentView: View {
             NavigationStack { ReportView(store: store) }
                 .tabItem { Label("Report", systemImage: "chart.bar") }
 
+            NavigationStack { AdminView() }
+                .tabItem { Label("Admin", systemImage: "lock.shield") }
+
             NavigationStack { AppSettingsView(store: store) }
                 .tabItem { Label("Settings", systemImage: "gearshape") }
 
@@ -110,6 +113,10 @@ private struct HelpView: View {
                 Text("Inactive after is configurable from 1 to 30 days. Map layer and map/status colours are stored locally.")
             }
 
+
+            Section("Admin") {
+                Text("Admin is restricted and requires the separate administrator token. The token is stored in the iPhone Keychain. It shows only ATOM Monitor infrastructure. Scaling requires choosing 1–4 API replicas and confirming the change; PostgreSQL, Nginx and the collector cannot be scaled from the app.")
+            }
 
             Section("Privacy and scope") {
                 Text("ATOM Monitor stores ground-station status, preferences, favourites and a station cache. It does not request device location for Home behaviour and must not be used to display or retain aircraft movements or aircraft identities.")

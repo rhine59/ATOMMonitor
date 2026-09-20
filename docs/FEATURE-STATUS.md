@@ -100,3 +100,6 @@ Server Phase 1 resilience remains Tested. The Synology stack is a development/te
 
 
 | Restricted infrastructure Admin | Provide authenticated iOS/Android monitoring of ATOM Monitor container/host health and resources, plus deliberate guarded scaling of the stateless API tier. | iOS / Android / Server / Synology | Planned | Design recorded 20 Sep 2026 in `docs/ADMIN-INFRASTRUCTURE.md`. Separate admin credential/control plane required; no Docker socket in public API; only `atom-api` initially scalable (proposed 1–4, normal 2); PostgreSQL/Nginx/collector remain singleton. |
+
+
+| Restricted infrastructure Admin — read-only server monitor | Provide separately authenticated, allow-listed current container/host health and resource data without giving the public API Docker control. | Server / Synology | Implemented — build pending | Separate `atom-admin-monitor`, Nginx admin route, `ATOM_ADMIN_TOKEN` and unit tests committed 20 Sep 2026. No scale/mutation endpoint exists. Synology build/runtime test pending; stronger Docker authorization boundary required before scaling is enabled. |

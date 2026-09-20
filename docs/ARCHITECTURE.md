@@ -97,3 +97,8 @@ Two replicas on the same Synology would protect only against an individual proce
 ## Restricted administration boundary — planned 20 September 2026
 
 The planned Admin function adds a separate authenticated control plane for ATOM Monitor container health/resource monitoring and API-replica scaling. Docker control must not be added to the existing public API container by mounting the Docker socket. A separate narrowly scoped admin-control component will expose only allow-listed ATOM Monitor monitoring and `atom-api` scaling. See `ADMIN-INFRASTRUCTURE.md`.
+
+
+## Read-only admin monitoring component
+
+A separate `atom-admin-monitor` container now owns the initial infrastructure-monitoring boundary. Nginx sends `/api/v1/admin/` to this service while all ordinary paths continue to the replicated public API. The public API therefore has no Docker socket mount. The monitor currently performs GET-only Docker inspection/stats and exposes no mutation route. Scaling remains deliberately unimplemented pending a stronger control boundary and runtime validation.

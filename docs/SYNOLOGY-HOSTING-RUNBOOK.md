@@ -554,3 +554,8 @@ sh scripts/build-all-containers.sh
 ```
 
 The PostgreSQL script pulls the pinned Compose image tag, starts it without deleting its named volume, waits for health, checks the persistent mount and executes a database query. The API script builds the local API image, starts exactly two replicas, waits for both to become healthy and directly checks each replica's health/readiness/station API. The Nginx script pulls its Compose image, starts the load balancer, validates `nginx -t` and checks health/readiness/stations through host port 8088. The collector script runs its unit tests, builds its local image, starts the single collector and requires a new HTTP 202 observation in the Nginx log. These scripts do not replace the destructive Phase resilience acceptance suite.
+
+
+## Restricted admin monitor
+
+The clean rebuild now requires a separate `ATOM_ADMIN_TOKEN` in ignored `server/.env`. Compose builds `atom-admin-monitor`, which mounts the Docker socket read-only and is not host-published; Nginx proxies only `/api/v1/admin/` to it. The ordinary `atom-api` service has no Docker socket access. This first implementation is read-only and has no scale endpoint. Before enabling scaling, replace/augment the current socket boundary with a tested narrowly authorized mutation mechanism. Runtime verification of the monitor is pending.

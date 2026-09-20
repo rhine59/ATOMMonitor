@@ -80,3 +80,8 @@ Public HTTPS GET access is intentional for station-health information. Observati
 ## Planned admin API
 
 A separately authenticated `/api/v1/admin` contract is planned for infrastructure summary, allow-listed ATOM Monitor container/resource state, bounded operational events and guarded `atom-api` replica scaling. It uses an administrator credential distinct from `ATOM_INGEST_TOKEN`; no generic Docker/shell/filesystem/configuration API is permitted. See `ADMIN-INFRASTRUCTURE.md`.
+
+
+## Read-only infrastructure administration — implemented, runtime pending
+
+`GET /api/v1/admin/summary` and `GET /api/v1/admin/containers` are implemented by the separate `atom-admin-monitor` service and require `Authorization: Bearer <ATOM_ADMIN_TOKEN>`. The token is distinct from the collector ingest token. Responses are filtered to allow-listed ATOM Monitor Compose services. No scale/mutation endpoint exists yet. Runtime verification is pending.

@@ -56,3 +56,8 @@ No Phase 5 acceptance contract has yet been defined. It must not be invented ret
 ## 19 September 2026 follow-on
 
 Per-container build/start verification scripts have been added for PostgreSQL, API replicas, Nginx and the OGN station collector, plus an all-container dependency-ordered wrapper. They deliberately preserve the PostgreSQL named volume and keep resilience/failure testing separate in the Phase acceptance suite. Runtime verification of these new build scripts is pending.
+
+
+## 20 September 2026 planned admin control plane
+
+A restricted cross-platform Admin function has been designed for ATOM Monitor infrastructure health/resource monitoring and guarded `atom-api` scale up/down. The design explicitly keeps Docker/Synology credentials and generic host control out of the phone apps and out of the public API container. Implementation/testing is future work. See `ADMIN-INFRASTRUCTURE.md`.

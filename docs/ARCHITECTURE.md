@@ -93,3 +93,7 @@ Collector HA is a separate later problem and must not be implemented by simply s
 
 Two replicas on the same Synology would protect only against an individual process/container failure; they would not protect against NAS, router, broadband, power or site failure.
 \n\n## Checkpoint synchronization — 18 September 2026\n\nThe current Synology development/test topology is PostgreSQL plus two stateless API replicas behind Nginx with one single-active collector. The full Phase 1–4 and service/API acceptance suite passed, including both replica-loss/rejoin paths, API and Nginx recreation, direct checks of both replicas, PostgreSQL/API count agreement and new live collector HTTP 202 traffic through Nginx. Multiple replicas on one NAS do not provide host/site HA. See `CHECKPOINT-2026-09-18.md`.\n
+
+## Restricted administration boundary — planned 20 September 2026
+
+The planned Admin function adds a separate authenticated control plane for ATOM Monitor container health/resource monitoring and API-replica scaling. Docker control must not be added to the existing public API container by mounting the Docker socket. A separate narrowly scoped admin-control component will expose only allow-listed ATOM Monitor monitoring and `atom-api` scaling. See `ADMIN-INFRASTRUCTURE.md`.

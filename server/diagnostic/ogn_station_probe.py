@@ -40,6 +40,9 @@ def parse_receiver_packet(line):
   if p:=PPM_RE.search(x['body']):o.rf_correction_ppm=float(p['v'])
   if q:=DB_RE.search(x['body']):o.rf_quality_db=float(q['v'])
  return o
+def touch_health(path):
+ if not path:return
+ with open(path,"w",encoding="ascii") as f:f.write(str(int(time.time())))
 def wanted(src,a):return (not a.station or src.casefold()==a.station.casefold()) and (not a.prefix or src.casefold().startswith(a.prefix.casefold()))
 def send(obs,url,token):
  if not url:return
@@ -53,10 +56,11 @@ def run(a):
   try:
    filt=a.filter or (f"b/{a.station}" if a.station else f"p/{a.prefix}" if a.prefix else None);print(f"Connecting to {a.host}:{a.port} …",file=sys.stderr,flush=True)
    with socket.create_connection((a.host,a.port),timeout=30) as s:
-    s.settimeout(None);login=f"user {a.user} pass -1 vers ATOMMonitor 0.4"+(f" filter {filt}" if filt else '');s.sendall((login+'\n').encode());print("Connected read-only; aircraft packets will be discarded.",file=sys.stderr,flush=True)
+    s.settimeout(None);touch_health(a.health_file);login=f"user {a.user} pass -1 vers ATOMMonitor 0.4"+(f" filter {filt}" if filt else '');s.sendall((login+'\n').encode());print("Connected read-only; aircraft packets will be discarded.",file=sys.stderr,flush=True)
     if filt:print(f"APRS server filter: {filt}",file=sys.stderr,flush=True)
     with s.makefile('r',encoding='utf-8',errors='replace') as stream:
      for raw in stream:
+      touch_health(a.health_file)
       line=raw.rstrip('\r\n')
       if not line or line.startswith('#'):continue
       h=HEADER_RE.match(line)
@@ -68,5 +72,5 @@ def run(a):
   except KeyboardInterrupt:return
   except Exception as e:print(f"OGN connection error: {e}; retrying in {a.retry}s",file=sys.stderr,flush=True);time.sleep(a.retry)
 def main():
- p=argparse.ArgumentParser();p.add_argument('--host',default=DEFAULT_HOST);p.add_argument('--port',type=int,default=DEFAULT_PORT);p.add_argument('--user',default='ATOMMON');p.add_argument('--station');p.add_argument('--prefix');p.add_argument('--filter');p.add_argument('--api-url');p.add_argument('--api-token',default=os.getenv('ATOM_INGEST_TOKEN'));p.add_argument('--retry',type=int,default=10);p.add_argument('--discovery',action='store_true');p.add_argument('--stats-interval',type=int,default=30);run(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--host',default=DEFAULT_HOST);p.add_argument('--port',type=int,default=DEFAULT_PORT);p.add_argument('--user',default='ATOMMON');p.add_argument('--station');p.add_argument('--prefix');p.add_argument('--filter');p.add_argument('--api-url');p.add_argument('--api-token',default=os.getenv('ATOM_INGEST_TOKEN'));p.add_argument('--retry',type=int,default=10);p.add_argument('--health-file',default=os.getenv('ATOM_COLLECTOR_HEALTH_FILE','/tmp/ogn-probe-health'));p.add_argument('--discovery',action='store_true');p.add_argument('--stats-interval',type=int,default=30);run(p.parse_args())
 if __name__=='__main__':main()

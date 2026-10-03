@@ -719,12 +719,12 @@ private fun shareReport(context:Context,vm:StationVM){
 @Composable
 fun MoreScreen(onSelect: (Tab) -> Unit) {
     val destinations = listOf(
+        Triple(Tab.About, Icons.Default.Info, "Version, attribution and licensing"),
         Triple(Tab.Admin, Icons.Default.AdminPanelSettings, "Monitor and scale ATOM services"),
-        Triple(Tab.Settings, Icons.Default.Settings, "Server, refresh and station status preferences"),
-        Triple(Tab.Legend, Icons.Default.Palette, "Station icon colours and meanings"),
-        Triple(Tab.Help, Icons.Default.Help, "User guide"),
         Triple(Tab.Feedback, Icons.Default.Star, "Send feedback"),
-        Triple(Tab.About, Icons.Default.Info, "Version, attribution and licensing")
+        Triple(Tab.Help, Icons.Default.Help, "User guide"),
+        Triple(Tab.Legend, Icons.Default.Palette, "Station icon colours and meanings"),
+        Triple(Tab.Settings, Icons.Default.Settings, "Server, refresh and station status preferences")
     )
     LazyColumn(Modifier.fillMaxSize().padding(16.dp)) {
         item { Text("More", style = MaterialTheme.typography.headlineSmall) }

@@ -26,7 +26,7 @@ private enum AdminKeychain {
 }
 
 @MainActor private final class AdminModel:ObservableObject {
-    @Published var token=AdminKeychain.load(), pairingCode=""
+    @Published var token = AdminKeychain.load()\n    @Published var pairingCode = ""
     @Published var summary:AdminSummary?; @Published var busy=false; @Published var message:String?; @Published var target=2
     private var baseURL:String{UserDefaults.standard.string(forKey:ServerConfiguration.key) ?? ATOMMonitorApp.defaultServerURL}
     private func request(_ path:String,method:String="GET",body:Data?=nil) async throws->Data {

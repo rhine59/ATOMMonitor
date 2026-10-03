@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Restricted infrastructure administration API for ATOM Monitor."""
 from __future__ import annotations
-import hmac, json, os, socket, urllib.error, urllib.request
+import base64, hashlib, hmac, io, ipaddress, json, os, secrets, socket, threading, time, urllib.error, urllib.request
+from pathlib import Path
 from urllib.parse import quote
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
+import qrcode
 
 app=Flask(__name__)
 ADMIN_TOKEN=os.getenv("ATOM_ADMIN_TOKEN","")
@@ -11,12 +13,38 @@ DOCKER_SOCKET=os.getenv("DOCKER_SOCKET","/var/run/docker.sock")
 PROJECT=os.getenv("COMPOSE_PROJECT_NAME","server")
 CONTROL_URL=os.getenv("ATOM_ADMIN_CONTROL_URL","http://atom-admin-control:8091")
 CONTROL_TOKEN=os.getenv("ATOM_ADMIN_CONTROL_TOKEN","")
+DEVICE_FILE=Path(os.getenv("ATOM_ADMIN_DEVICE_FILE","/data/admin-devices.json"))
+PAIR_TTL_SECONDS=int(os.getenv("ATOM_ADMIN_PAIR_TTL_SECONDS","300"))
+PAIRING_NETWORKS=tuple(ipaddress.ip_network(x.strip()) for x in os.getenv("ATOM_ADMIN_PAIRING_NETWORKS","192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,127.0.0.0/8").split(",") if x.strip())
+PAIRINGS={}; PAIR_LOCK=threading.Lock()
 ALLOWED_SERVICES=("postgres","atom-api","atom-lb","ogn-station-probe")
 
-def authorized():
+def token_hash(value):return hashlib.sha256(value.encode()).hexdigest()
+def load_devices():
+    try:return json.loads(DEVICE_FILE.read_text())
+    except (FileNotFoundError,json.JSONDecodeError,OSError):return {}
+def save_devices(devices):
+    DEVICE_FILE.parent.mkdir(parents=True,exist_ok=True)
+    tmp=DEVICE_FILE.with_suffix(".tmp"); tmp.write_text(json.dumps(devices,sort_keys=True)); os.replace(tmp,DEVICE_FILE)
+def supplied_token():
     supplied=request.headers.get("Authorization","")
+    return supplied[7:] if supplied.startswith("Bearer ") else ""
+def authorized():
+    token=supplied_token(); supplied=request.headers.get("Authorization","")
     expected=f"Bearer {ADMIN_TOKEN}" if ADMIN_TOKEN else ""
-    return bool(expected) and hmac.compare_digest(supplied,expected)
+    if expected and hmac.compare_digest(supplied,expected):return True
+    return bool(token) and token_hash(token) in load_devices()
+def client_ip():
+    forwarded=request.headers.get("X-Forwarded-For","").split(",")[0].strip()
+    return forwarded or request.remote_addr or ""
+def pairing_allowed():
+    try:return any(ipaddress.ip_address(client_ip()) in network for network in PAIRING_NETWORKS)
+    except ValueError:return False
+def new_pairing():
+    code=secrets.token_hex(4).upper(); expires=int(time.time())+PAIR_TTL_SECONDS
+    with PAIR_LOCK:
+        PAIRINGS.clear(); PAIRINGS[code]=expires
+    return code,expires
 
 def docker_get(path):
     s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM); s.settimeout(5)
@@ -89,6 +117,32 @@ def control_request(path,payload=None):
 
 @app.get("/health")
 def health_endpoint():return jsonify({"status":"ok","service":"atommonitor-admin-monitor"})
+@app.get("/api/v1/admin/pair")
+def pair_page():
+    if not pairing_allowed():return jsonify({"error":"pairing page is available only from an allowed local network"}),403
+    code,expires=new_pairing(); payload=json.dumps({"type":"atommonitor-admin-pair","code":code})
+    image=qrcode.make(payload); output=io.BytesIO(); image.save(output,format="PNG")
+    encoded=base64.b64encode(output.getvalue()).decode()
+    html=f'''<!doctype html><meta name="viewport" content="width=device-width"><title>Pair ATOMMonitor</title>
+<style>body{{font:18px -apple-system,sans-serif;max-width:34rem;margin:3rem auto;text-align:center;padding:1rem}}img{{width:260px}}code{{font-size:2rem;letter-spacing:.16em}}</style>
+<h1>Pair administrator device</h1><p>In ATOMMonitor, open Admin and scan this code or enter:</p>
+<img alt="Pairing QR code" src="data:image/png;base64,{encoded}"><p><code>{code}</code></p>
+<p>This one-time code expires in {PAIR_TTL_SECONDS//60} minutes.</p>'''
+    return Response(html,mimetype="text/html",headers={"Cache-Control":"no-store"})
+@app.post("/api/v1/admin/pair/exchange")
+def pair_exchange():
+    body=request.get_json(silent=True) or {}; code=str(body.get("code","")).strip().upper(); name=str(body.get("deviceName","Administrator device"))[:80]
+    now=int(time.time())
+    with PAIR_LOCK:expires=PAIRINGS.pop(code,None)
+    if not expires or expires<now:return jsonify({"error":"invalid or expired pairing code"}),401
+    token=secrets.token_urlsafe(32); devices=load_devices(); devices[token_hash(token)]={"name":name,"createdAt":now}; save_devices(devices)
+    return jsonify({"deviceToken":token,"deviceName":name})
+@app.delete("/api/v1/admin/device")
+def revoke_device():
+    token=supplied_token()
+    if not authorized() or not token:return jsonify({"error":"unauthorized"}),401
+    devices=load_devices(); devices.pop(token_hash(token),None); save_devices(devices)
+    return jsonify({"status":"revoked"})
 @app.get("/api/v1/admin/summary")
 def summary():
     if not authorized():return jsonify({"error":"unauthorized"}),401

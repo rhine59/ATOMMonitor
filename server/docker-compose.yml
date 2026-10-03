@@ -77,9 +77,13 @@ services:
       ATOM_ADMIN_TOKEN: ${ATOM_ADMIN_TOKEN:?Set ATOM_ADMIN_TOKEN in server/.env}
       ATOM_ADMIN_CONTROL_TOKEN: ${ATOM_ADMIN_CONTROL_TOKEN:?Set ATOM_ADMIN_CONTROL_TOKEN in server/.env}
       ATOM_ADMIN_CONTROL_URL: http://atom-admin-control:8091
+      ATOM_ADMIN_DEVICE_FILE: /data/admin-devices.json
+      ATOM_ADMIN_PAIRING_NETWORKS: ${ATOM_ADMIN_PAIRING_NETWORKS:-192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,127.0.0.0/8}
       COMPOSE_PROJECT_NAME: ${COMPOSE_PROJECT_NAME:-server}
       PORT: "8090"
-    volumes: [/var/run/docker.sock:/var/run/docker.sock:ro]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - atommonitor-admin-devices:/data
     expose: ["8090"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8090/health', timeout=4).read()"]
@@ -132,3 +136,4 @@ services:
 volumes:
   atommonitor-postgres-data:
   atommonitor-admin-audit:
+  atommonitor-admin-devices:

@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 WORKDIR /app
-RUN pip install --no-cache-dir flask==3.1.2 gunicorn==23.0.0
+RUN pip install --no-cache-dir flask==3.1.2 gunicorn==23.0.0 qrcode[pil]==8.2
 COPY admin_monitor.py /app/admin_monitor.py
 EXPOSE 8090
 CMD ["gunicorn","--bind","0.0.0.0:8090","--workers","1","--threads","2","--timeout","15","--access-logfile","-","--error-logfile","-","admin_monitor:app"]

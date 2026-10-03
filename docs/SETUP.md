@@ -401,3 +401,12 @@ Do not reuse `ATOM_INGEST_TOKEN`. The Compose stack now includes `atom-admin-mon
 ## Admin control-plane configuration
 
 Set three different long random values in `server/.env`: `ATOM_INGEST_TOKEN`, `ATOM_ADMIN_TOKEN`, and internal-only `ATOM_ADMIN_CONTROL_TOKEN`. Rebuild both `atom-admin-monitor` and `atom-admin-control`. Do not publish port 8091; it is Compose-internal only. The writable Docker socket belongs only to `atom-admin-control`; its API is deliberately restricted to `atom-api` scaling and audit reads. Audit events persist in the `atommonitor-admin-audit` named volume.
+
+
+## Current administrator setup — 3 October 2026
+
+This section supersedes older instructions that tell an operator to enter `ATOM_ADMIN_TOKEN` in a phone.
+
+Administrator phone access uses device pairing. Keep `ATOM_ADMIN_TOKEN` and `ATOM_ADMIN_CONTROL_TOKEN` only in `server/.env`; never disclose either value to a phone user. Configure trusted networks with `ATOM_ADMIN_PAIRING_NETWORKS`, rebuild using `scripts/build-admin.sh`, and validate with `scripts/admin-pairing-acceptance.sh`.
+
+From a trusted LAN, open `https://granvillehouse.synology.me:8445/api/v1/admin/pair`. In the app open Admin and scan the QR code, or type the displayed one-time code. Codes expire after five minutes and work once. Detailed rebuild, platform test, release and recovery instructions are in `docs/ADMIN-PAIRING-AND-RELEASE.md`.

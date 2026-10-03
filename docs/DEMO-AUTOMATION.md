@@ -88,7 +88,7 @@ The recorder now assigns a timestamp automatically, retains the Xcode result bun
 
 ## 100-station live snapshot
 
-By default the recorder downloads the current public station endpoint and selects exactly 100 real geolocated stations, evenly sampled after geographic sorting. Their real names, coordinates, health, software versions, timestamps and telemetry are retained. The generated JSON is ignored by Git and frozen for the duration of the build/recording, so the dataset cannot change midway through the tour.
+By default the recorder downloads the current public station endpoint and selects exactly 100 real geolocated stations, selected using a stable ID-hash sample that preserves the live network's natural geographic density. Their real names, coordinates, health, software versions, timestamps and telemetry are retained. The generated JSON is ignored by Git and frozen for the duration of the build/recording, so the dataset cannot change midway through the tour.
 
 Use a different count or endpoint with `ATOM_DEMO_STATION_COUNT` and `ATOM_DEMO_STATIONS_URL`. Set `ATOM_DEMO_USE_EXISTING_FIXTURE=1` only when intentionally reusing an already generated snapshot.
 

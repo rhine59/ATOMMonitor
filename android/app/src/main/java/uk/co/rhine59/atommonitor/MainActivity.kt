@@ -364,7 +364,9 @@ enum class Tab(val title: String) {
     Settings("Settings"),
     Help("Help"),
     Feedback("Feedback"),
-    About("About")
+    About("About"),
+    Legend("Legend"),
+    More("More")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -382,7 +384,8 @@ fun App(vm: StationVM = viewModel()) {
                         .navigationBarsPadding(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Tab.entries.forEach { item ->
+                    val primaryTabs = listOf(Tab.Map, Tab.Stations, Tab.Favourites, Tab.Report, Tab.More)
+                    primaryTabs.forEach { item ->
                         val selected = tab == item
 
                         Column(
@@ -403,6 +406,8 @@ fun App(vm: StationVM = viewModel()) {
                                     Tab.Help -> Icons.Default.Help
                                     Tab.Feedback -> Icons.Default.Star
                                     Tab.About -> Icons.Default.Info
+                                    Tab.Legend -> Icons.Default.Palette
+                                    Tab.More -> Icons.Default.MoreHoriz
                                 },
                                 contentDescription = item.title,
                                 modifier = Modifier.size(22.dp),
@@ -445,6 +450,8 @@ fun App(vm: StationVM = viewModel()) {
                 Tab.Help -> Help()
                 Tab.Feedback -> FeedbackScreen(vm.server)
                 Tab.About -> AboutScreen()
+                Tab.Legend -> StationIconLegend(vm)
+                Tab.More -> MoreScreen { tab = it }
             }
         }
     }
@@ -708,6 +715,67 @@ private fun shareReport(context:Context,vm:StationVM){
   item{Section("Radio",listOf("RF correction" to number(s.rfCorrectionPPM," ppm",1),"Signal quality" to number(s.signalQualityDB," dB",1)))}
  }
 }
+
+@Composable
+fun MoreScreen(onSelect: (Tab) -> Unit) {
+    val destinations = listOf(
+        Triple(Tab.Admin, Icons.Default.AdminPanelSettings, "Monitor and scale ATOM services"),
+        Triple(Tab.Settings, Icons.Default.Settings, "Server, refresh and station status preferences"),
+        Triple(Tab.Legend, Icons.Default.Palette, "Station icon colours and meanings"),
+        Triple(Tab.Help, Icons.Default.Help, "User guide"),
+        Triple(Tab.Feedback, Icons.Default.Star, "Send feedback"),
+        Triple(Tab.About, Icons.Default.Info, "Version, attribution and licensing")
+    )
+    LazyColumn(Modifier.fillMaxSize().padding(16.dp)) {
+        item { Text("More", style = MaterialTheme.typography.headlineSmall) }
+        items(destinations) { (destination, icon, detail) ->
+            Row(
+                Modifier.fillMaxWidth().clickable { onSelect(destination) }.padding(vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(icon, destination.title, Modifier.size(28.dp))
+                Spacer(Modifier.width(14.dp))
+                Column {
+                    Text(destination.title, style = MaterialTheme.typography.titleMedium)
+                    Text(detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun StationIconLegend(vm: StationVM) {
+    val entries = buildList {
+        add(Triple("healthy", false, "Recent heartbeat with no current operational warning."))
+        add(Triple("warning", false, "Heartbeat is becoming stale or telemetry indicates a warning."))
+        add(Triple("noRecentHeartbeat", false, "No heartbeat within the recent-heartbeat threshold."))
+        add(Triple("inactive", false, "Latest station record is older than the configured Inactive-after period."))
+        add(Triple("unknown", false, "Insufficient recent information to determine health."))
+        if (vm.highlightBackLevelSoftware) add(Triple("healthy", true, "Otherwise Healthy, but reporting an older PilotAware version. Operational status takes precedence."))
+    }
+    LazyColumn(Modifier.fillMaxSize().padding(16.dp)) {
+        item { Text("Station Icon Legend", style = MaterialTheme.typography.headlineSmall) }
+        items(entries) { (health, backLevel, detail) ->
+            Row(Modifier.fillMaxWidth().padding(vertical = 10.dp), verticalAlignment = Alignment.Top) {
+                Icon(healthIcon(health, backLevel), null, tint = healthColour(health, backLevel), modifier = Modifier.size(42.dp))
+                Spacer(Modifier.width(14.dp))
+                Column {
+                    Text(if (backLevel) "Back-level software" else healthTitle(health), style = MaterialTheme.typography.titleMedium)
+                    Text(detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
+        item {
+            Text(
+                "Back-level software appears only when highlighting is enabled in Settings.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
 @Composable fun DetailRows(rows:List<Pair<String,String>>){rows.forEach{(a,b)->Row(Modifier.fillMaxWidth().padding(vertical=4.dp)){Text(a,Modifier.weight(1f));Text(b)}}}
 @Composable fun Section(title:String,rows:List<Pair<String,String>>){Text(title,style=MaterialTheme.typography.titleMedium,modifier=Modifier.padding(top=14.dp));DetailRows(rows)}
 @Composable fun Settings(vm:StationVM){var server by remember{mutableStateOf(vm.server)};var refresh by remember{mutableIntStateOf(vm.refreshMinutes)};var inactive by remember{mutableIntStateOf(vm.inactiveAfterDays)};Column(Modifier.padding(16.dp)){Text("Settings",style=MaterialTheme.typography.headlineSmall);OutlinedTextField(server,{server=it},label={Text("Server")});Button({vm.server=server;vm.refresh()}){Text("Save & Test")};Text("Refresh interval: $refresh min");Slider(refresh.toFloat(),{refresh=it.toInt().coerceIn(1,10);vm.refreshMinutes=refresh},valueRange=1f..10f,steps=8);Text("Inactive after: $inactive day${if(inactive==1)"" else "s"}");Slider(inactive.toFloat(),{inactive=it.toInt().coerceIn(1,30);vm.inactiveAfterDays=inactive;vm.thresholdChanged()},valueRange=1f..30f,steps=28);Text("Stations not seen for this many days are shown Inactive. Default 2 days.",style=MaterialTheme.typography.bodySmall);Row(verticalAlignment=Alignment.CenterVertically){Text("Highlight back-level software",Modifier.weight(1f));Switch(vm.highlightBackLevelSoftware,{vm.highlightBackLevelSoftware=it})};Text("Off by default. When enabled, only otherwise Healthy stations can use the back-level colour.",style=MaterialTheme.typography.bodySmall)}}

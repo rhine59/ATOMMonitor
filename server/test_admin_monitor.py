@@ -1,6 +1,6 @@
-import os,tempfile,unittest
+import os,re,tempfile,unittest
 os.environ["ATOM_ADMIN_TOKEN"]="test-admin-token"
-_temp=tempfile.TemporaryDirectory(); os.environ["ATOM_ADMIN_DEVICE_FILE"]=_temp.name+"/devices.json"
+_temp=tempfile.TemporaryDirectory(); os.environ["ATOM_ADMIN_DEVICE_FILE"]=_temp.name+"/devices.json"; os.environ["ATOM_ADMIN_PAIR_FILE"]=_temp.name+"/pairings.json"
 import admin_monitor as m
 
 class AdminMonitorTests(unittest.TestCase):
@@ -9,7 +9,7 @@ class AdminMonitorTests(unittest.TestCase):
     def test_local_pairing_issues_one_time_device_credential(self):
         page=self.client.get("/api/v1/admin/pair")
         self.assertEqual(page.status_code,200)
-        code=next(iter(m.PAIRINGS))
+        code=re.search(rb"<code>([0-9A-F]+)</code>",page.data).group(1).decode()
         paired=self.client.post("/api/v1/admin/pair/exchange",json={"code":code,"deviceName":"Test phone"})
         self.assertEqual(paired.status_code,200); token=paired.json["deviceToken"]
         self.assertEqual(self.client.post("/api/v1/admin/pair/exchange",json={"code":code}).status_code,401)

@@ -1,3 +1,9 @@
+## 3 October 2026 — device pairing authentication
+
+- Replaced phone entry of the shared administrator token with five-minute, one-time device pairing codes.
+- Added persistent, individually revocable device credentials, a LAN-restricted pairing page with QR/short-code display, iOS Keychain plus Face ID/passcode unlock, and Android Keystore storage.
+- Bumped the iOS TestFlight build to 1.0 (3) and Android version code to 2.
+
 # Changelog
 
 ## 2026-09-17 — Reporting, sharing and cross-platform checkpoint

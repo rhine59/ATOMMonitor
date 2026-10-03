@@ -59,7 +59,7 @@ Returns a compact infrastructure summary:
 
 ### GET /api/v1/admin/containers
 
-Returns an allow-listed view of ATOM Monitor containers only:
+Returns an allow-listed view of ATOM Monitor containers only, including the monitoring and control-plane containers themselves:
 
 - logical service;
 - container name/instance;
@@ -197,3 +197,8 @@ Both clients provide **Scan pairing QR code** and exchange the scanned one-time 
 The production flow is now QR/short-code pairing, not manual entry of the shared Admin token. Pairing challenges are stored persistently in `/data/admin-pairings.json` alongside the device registry volume. This removed the HTTP 401 caused when page generation and exchange reached different processes or a recreated process.
 
 A live physical-iPhone pairing test passed. The repeatable server check is `scripts/admin-pairing-acceptance.sh`; the complete rebuild/release procedure is `docs/ADMIN-PAIRING-AND-RELEASE.md`. Android source parity exists but remains build/device-runtime pending.
+
+
+### Admin self-monitoring checkpoint — 3 October 2026
+
+The inventory allow-list includes both `atom-admin-monitor` and `atom-admin-control`. They appear in the same container health/resource list as PostgreSQL, API replicas, Nginx and the collector. This is observation only: the app can still scale only `atom-api`; neither Admin service can be scaled or mutated through the mobile control plane.

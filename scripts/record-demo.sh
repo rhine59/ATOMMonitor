@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"; IOS="$ROOT/ios"; OUT="$ROOT/artifacts"; mkdir -p "$OUT"
-SCHEME="ATOMMonitor"; STAMP="${ATOM_DEMO_STAMP:-2026-09-18}"; RAW="$OUT/ATOMMonitor-Demo-${STAMP}-raw.mp4"; FINAL="$OUT/ATOMMonitor-Demo-${STAMP}.mp4"; LOG="$OUT/ATOMMonitor-Demo-${STAMP}-test.log"
+SCHEME="ATOMMonitor"; STAMP="${ATOM_DEMO_STAMP:-$(date '+%Y-%m-%d-%H%M%S')}"; RAW="$OUT/ATOMMonitor-Demo-${STAMP}-raw.mp4"; FINAL="$OUT/ATOMMonitor-Demo-${STAMP}.mp4"; LOG="$OUT/ATOMMonitor-Demo-${STAMP}-test.log"; RESULT="$OUT/ATOMMonitor-Demo-${STAMP}.xcresult"
 # Keep Xcode build products outside ~/Documents/File Provider storage. On this Mac,
 # .app bundles created under the repository's artifacts/DerivedData acquired FinderInfo
 # / File Provider metadata and failed simulator CodeSign. /tmp was verified clean.
@@ -11,11 +11,11 @@ if [ -n "${DEVICE:-}" ]; then DEVICE_NAME="$DEVICE"; else AVAILABLE=$(xcrun simc
 [ -n "${DEVICE_NAME:-}" ] || { echo "No available iPhone Simulator was found."; exit 1; }
 UDID=$(xcrun simctl list devices available | sed -n "s/^    ${DEVICE_NAME} (\([0-9A-F-]*\)) .*$/\1/p" | head -1); [ -n "$UDID" ] || { echo "Simulator '$DEVICE_NAME' not found."; exit 1; }
 echo "Using Simulator: $DEVICE_NAME ($UDID)"; echo "DerivedData: $DERIVED_DATA"; xcrun simctl boot "$UDID" 2>/dev/null || true; open -a Simulator; xcrun simctl bootstatus "$UDID" -b
-rm -rf "$DERIVED_DATA"; rm -f "$RAW" "$FINAL" "$LOG"
+rm -rf "$DERIVED_DATA" "$RESULT"; rm -f "$RAW" "$FINAL" "$LOG"
 echo "Starting Simulator recording and XCUITest feature tour..."
 xcrun simctl io "$UDID" recordVideo --codec=h264 "$RAW" >/dev/null 2>&1 & REC=$!; trap 'kill -INT "$REC" 2>/dev/null || true' EXIT; sleep 1
 set +e
-xcodebuild test -project ATOMMonitor.xcodeproj -scheme "$SCHEME" -destination "id=$UDID" -derivedDataPath "$DERIVED_DATA" -only-testing:ATOMMonitorUITests/ATOMMonitorDemoUITests/testRecordedFeatureTour 2>&1 | tee "$LOG"
+xcodebuild test -project ATOMMonitor.xcodeproj -scheme "$SCHEME" -destination "id=$UDID" -derivedDataPath "$DERIVED_DATA" -resultBundlePath "$RESULT" -only-testing:ATOMMonitorUITests/ATOMMonitorDemoUITests/testRecordedFeatureTour 2>&1 | tee "$LOG"
 TEST_STATUS=${PIPESTATUS[0]}
 set -e
 kill -INT "$REC" 2>/dev/null || true; wait "$REC" 2>/dev/null || true; trap - EXIT
@@ -41,6 +41,6 @@ else
   cp "$RAW" "$FINAL"
 fi
 
-echo "Raw MP4: $RAW"; echo "Demo MP4: $FINAL"; echo "UI test log: $LOG"
+echo "Raw MP4: $RAW"; echo "Demo MP4: $FINAL"; echo "UI test log: $LOG"; echo "Xcode result bundle: $RESULT"
 if [ "$TEST_STATUS" -ne 0 ]; then echo "UI test failed; recording retained for diagnosis."; exit "$TEST_STATUS"; fi
 echo "PASS: automated ATOM Monitor feature tour completed."

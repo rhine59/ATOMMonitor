@@ -92,10 +92,20 @@ Initial derived states are Healthy, Warning, No recent heartbeat and Unknown. Cu
 The provider design must remain replaceable/supplementable. OGN APRS receiver/status traffic is the current live source. `OGN-R/PilotAware` is a strong live PilotAware/ATOM classifier; `PW` prefix filtering is useful for discovery but is not by itself an authoritative complete registry rule. No undocumented source is assumed permanently guaranteed.
 \n\n## Checkpoint synchronization — 18 September 2026\n\nCurrent server requirements are implemented through the PostgreSQL/two-API/Nginx checkpoint and the cross-phase acceptance framework is Tested. The ground-station-only scope and iOS/Android parity rule remain unchanged. PostgreSQL backup/restore remains an outstanding operational requirement. See `CHECKPOINT-2026-09-18.md`.\n
 
-## Restricted infrastructure administration — planned 20 September 2026
+## Restricted infrastructure administration
 
 A restricted cross-platform Admin function is now required for current ATOM Monitor infrastructure health/resource monitoring and deliberate API-tier scaling. It must use a dedicated authenticated server-side control boundary; phone clients must never receive Docker/Synology/database/ingest credentials or generic command execution. Only the stateless `atom-api` tier is initially scalable, with a proposed guarded range of 1–4 and normal target of two. PostgreSQL, Nginx and the single-active collector remain singletons. See `ADMIN-INFRASTRUCTURE.md`.
 
 ## Restricted administration implementation checkpoint — 20 September 2026
 
-The server source now implements read-only monitoring and confirmed manual scaling of `atom-api` only. The permitted range is 1–4, normal target remains two, and the operation must serialize, rate-limit, audit and wait for every requested replica to become Docker-healthy. A private control credential separate from `ATOM_ADMIN_TOKEN` and `ATOM_INGEST_TOKEN` protects the internal monitor-to-control boundary. Runtime acceptance and both mobile Admin clients remain outstanding.
+The server source now implements read-only monitoring and confirmed manual scaling of `atom-api` only. The permitted range is 1–4, normal target remains two, and the operation must serialize, rate-limit, audit and wait for every requested replica to become Docker-healthy. A private control credential separate from `ATOM_ADMIN_TOKEN` and `ATOM_INGEST_TOKEN` protects the internal monitor-to-control boundary. The server control plane and iOS pairing flow have live runtime evidence. Android source parity is implemented but device runtime acceptance remains outstanding.
+
+
+### Current Admin requirements checkpoint — 3 October 2026
+
+- Pairing must be LAN-restricted, expire after five minutes and be single-use.
+- Phones must store only individually revocable device credentials.
+- Admin inventory must include `atom-admin-monitor` and `atom-admin-control`.
+- Only `atom-api` may be scaled; every singleton must remain unchanged and healthy.
+- Proxy/client timeout layers must exceed the controller readiness window.
+- iOS and Android must consume the same generic summary/container contract.

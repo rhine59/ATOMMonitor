@@ -130,7 +130,7 @@ private struct HelpView: View {
 
 
             Section("Admin") {
-                Text("Admin is restricted and requires the separate administrator token. The token is stored in the iPhone Keychain. It shows only ATOM Monitor infrastructure. Scaling requires choosing 1–4 API replicas and confirming the change; PostgreSQL, Nginx and the collector cannot be scaled from the app.")
+                Text("Admin is restricted. From an approved local network, open the server pairing page and scan its QR code, or enter the five-minute one-time code. The paired device credential is stored in the iPhone Keychain; shared administrator secrets are never entered here. Lock keeps this device paired, while Remove this device revokes it. Scaling requires choosing 1–4 API replicas and confirming the change; PostgreSQL, Nginx and the collector cannot be scaled from the app.")
             }
 
             Section("Privacy and scope") {

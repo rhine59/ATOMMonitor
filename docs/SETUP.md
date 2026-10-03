@@ -410,3 +410,8 @@ This section supersedes older instructions that tell an operator to enter `ATOM_
 Administrator phone access uses device pairing. Keep `ATOM_ADMIN_TOKEN` and `ATOM_ADMIN_CONTROL_TOKEN` only in `server/.env`; never disclose either value to a phone user. Configure trusted networks with `ATOM_ADMIN_PAIRING_NETWORKS`, rebuild using `scripts/build-admin.sh`, and validate with `scripts/admin-pairing-acceptance.sh`.
 
 From a trusted LAN, open `https://granvillehouse.synology.me:8445/api/v1/admin/pair`. In the app open Admin and scan the QR code, or type the displayed one-time code. Codes expire after five minutes and work once. Detailed rebuild, platform test, release and recovery instructions are in `docs/ADMIN-PAIRING-AND-RELEASE.md`.
+
+
+## Synchronized full-stack rebuild — 3 October 2026
+
+Use `scripts/build-all-containers.sh` when server or Admin architecture changes. It rebuilds the database/API/Nginx/collector/Admin sequence, recreates Nginx, prints final Compose state and completes the Admin pairing acceptance flow. The current architecture and verification boundary are summarized in `docs/CHECKPOINT-2026-10-03-ADMIN.md`.

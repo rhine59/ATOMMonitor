@@ -139,3 +139,9 @@ Some routers do not support NAT loopback/hairpinning. If the public hostname wor
 
 DNS records, router rules and certificates contain site-specific operational configuration and are not committed as secrets to Git. This document, app configuration UI and test procedure are version controlled. Record non-secret deployment decisions and test results in the project documentation as the public endpoint is commissioned.
 \n\n## Checkpoint synchronization — 18 September 2026\n\nPublic HTTPS remains DSM Reverse Proxy at `https://granvillehouse.synology.me:8445/`, forwarding to Nginx on host port 8088. Behind Nginx the current tested stack has two stateless API replicas sharing PostgreSQL. The API replicas and PostgreSQL are not host-published. See `CHECKPOINT-2026-09-18.md`.\n
+
+## Current public Admin routing
+
+DSM Reverse Proxy forwards the public HTTPS origin to Nginx on host port 8088. Nginx sends only `/api/v1/admin/*` to `atom-admin-monitor`; all other paths remain on the replicated station API. Pairing is additionally restricted by source network. `atom-admin-control` has no published host port.
+
+Nginx Admin requests allow 105 seconds so the internal 90-second scaling readiness operation can finish. Clean rebuilds must recreate `atom-lb` to reload routing and timeout changes.

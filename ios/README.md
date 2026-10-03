@@ -60,7 +60,7 @@ From the repository root:
 ./scripts/record-demo.sh
 ```
 
-The UI tour covers Map, Stations, Favourites, Report, Settings and Help. The 17 September source update adds Report summary/share-control checks and the current compact `Stations` navigation title. Rerun the tour before marking that test update Tested.
+The UI tour covers every current navigation area: Map, Stations, Favourites, Report/share/drill-down, Settings, More/Legend, deterministic Admin inventory/scaling, Help, Feedback and About. It produces timestamped MP4, log and `.xcresult` evidence. Physical QR scanning, Face ID and real server mutation remain separate device tests.
 
 ## Source structure
 
@@ -106,3 +106,15 @@ The physical-iPhone QR pairing flow passed on 3 October 2026. Before the next Te
 ## Admin service inventory synchronization
 
 iOS decodes and displays the server's generic container array, including `atom-admin-monitor` and `atom-admin-control`. Neither Admin service receives scaling controls; only `atom-api` can be changed. The 120-second client timeout exceeds the server's complete scaling readiness/proxy window.
+
+
+## Record the complete application tour
+
+```bash
+cd ~/Documents/Xcode/ATOMMonitor
+git pull --ff-only
+chmod +x scripts/record-demo.sh
+./scripts/record-demo.sh
+```
+
+The final MP4 is written under `artifacts/ATOMMonitor-Demo-<timestamp>.mp4`. See `../docs/DEMO-AUTOMATION.md`.

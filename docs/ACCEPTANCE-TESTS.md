@@ -70,3 +70,8 @@ Manual iOS acceptance additionally requires a physical-device QR scan, Face ID/p
 Manual Android acceptance requires the same scanner, persistence, revocation and fallback checks on a Google Play-enabled device. Source is implemented; device runtime acceptance remains pending.
 
 Also verify the pairing page is rejected from outside the configured trusted networks. See `docs/ADMIN-PAIRING-AND-RELEASE.md`.
+
+
+## Admin self-monitoring acceptance
+
+After rebuilding the Admin services, unlock Admin and confirm the container list includes exactly one running/healthy `atom-admin-monitor` and one running/healthy `atom-admin-control`. Run `scripts/admin-scaling-acceptance.sh`; both Admin services must remain healthy singletons throughout the 2→3→2 API replica test.

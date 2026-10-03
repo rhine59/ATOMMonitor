@@ -238,3 +238,8 @@ See `docs/ADMIN-PAIRING-AND-RELEASE.md` for the commands and recovery procedure.
 ## Admin inventory regression
 
 The Admin container inventory must include `atom-admin-monitor` and `atom-admin-control`. Validate with `scripts/admin-scaling-acceptance.sh`, which now asserts that PostgreSQL, Nginx, the collector and both Admin services remain single healthy instances while API replicas scale 2→3→2.
+
+
+## 3 October full checkpoint release gate
+
+Use `CHECKPOINT-2026-10-03.md` as the release baseline. Server acceptance must include meaningful OGN collector health, pairing, revocation and 2→3→2 scaling with both Admin services remaining healthy. Mobile completion must be recorded separately for iOS build 4 and Android version code 4.

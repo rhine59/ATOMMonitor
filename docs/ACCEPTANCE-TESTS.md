@@ -54,3 +54,19 @@ No Phase 5 implementation/acceptance contract is currently defined in the reposi
 
 A runner being committed means only that the test is implemented. It becomes **Tested** only after it is run on the intended environment and its result is recorded in Git. Do not commit secrets, tokens, passwords, raw aircraft traffic or transient container addresses in acceptance evidence.
 \n\n## Checkpoint synchronization — 18 September 2026\n\nThe cross-phase acceptance framework is now Tested. The complete Synology run passed Phases 1–4 and the current service/API matrix, including direct checks of both API replicas and a new collector HTTP 202 through Nginx. See `CHECKPOINT-2026-09-18.md`.\n
+
+## Administrator device-pairing acceptance
+
+Automated server check:
+
+```bash
+sh scripts/admin-pairing-acceptance.sh
+```
+
+Pass requires: pairing page reachable from an allowed network; code exchange succeeds; the issued device credential can read Admin summary; reuse of the code returns 401; revocation succeeds; and the revoked credential returns 401. The script prints no code or credential.
+
+Manual iOS acceptance additionally requires a physical-device QR scan, Face ID/passcode unlock, relaunch persistence and manual-code fallback. This passed on 3 October 2026.
+
+Manual Android acceptance requires the same scanner, persistence, revocation and fallback checks on a Google Play-enabled device. Source is implemented; device runtime acceptance remains pending.
+
+Also verify the pairing page is rejected from outside the configured trusted networks. See `docs/ADMIN-PAIRING-AND-RELEASE.md`.

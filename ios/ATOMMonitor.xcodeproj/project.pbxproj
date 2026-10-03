@@ -440,6 +440,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "ATOM Monitor";
 				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "The camera scans one-time ATOM Monitor administrator pairing QR codes.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Face ID protects access to ATOM Monitor infrastructure administration.";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "ATOM Monitor connects to your configured server to retrieve ATOM ground-station health information.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -467,6 +468,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "ATOM Monitor";
 				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "The camera scans one-time ATOM Monitor administrator pairing QR codes.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Face ID protects access to ATOM Monitor infrastructure administration.";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "ATOM Monitor connects to your configured server to retrieve ATOM ground-station health information.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

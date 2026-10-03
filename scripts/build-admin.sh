@@ -21,5 +21,9 @@ done
 published="$(sudo docker port atommonitor-admin-control 2>/dev/null || true)"
 [ -z "$published" ] || { echo 'FAIL: admin control has a published host port'; exit 1; }
 curl -fsS http://127.0.0.1:8088/api/v1/admin/pair >/dev/null || { echo 'FAIL: Admin pairing page unavailable through load balancer'; exit 1; }
-echo 'PASS: Admin control, monitor and load balancer healthy; control has no published host port; pairing page reachable'
+summary_status="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8088/api/v1/admin/summary)"
+[ "$summary_status" = 401 ] || { echo "FAIL: Admin summary route returned HTTP $summary_status, expected unauthenticated 401"; exit 1; }
+scale_status="$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' --data '{"replicas":2,"confirmed":true}' http://127.0.0.1:8088/api/v1/admin/api-scale)"
+[ "$scale_status" = 401 ] || { echo "FAIL: Admin scale route returned HTTP $scale_status, expected unauthenticated 401"; exit 1; }
+echo 'PASS: Admin control, monitor and load balancer healthy; pairing, summary and scale routes present'
 echo 'ADMIN BUILD/START: PASS'

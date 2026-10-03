@@ -189,4 +189,4 @@ Manual entry of the shared administrator token in phone applications has been re
 - The pairing page is restricted by `ATOM_ADMIN_PAIRING_NETWORKS`, defaulting to RFC1918 and loopback networks. Add the actual trusted client subnet when the Synology reverse-proxy topology presents another address.
 - The legacy `ATOM_ADMIN_TOKEN` remains accepted temporarily for migration and rollback, but is no longer entered in either phone UI. `ATOM_ADMIN_CONTROL_TOKEN` remains internal-only.
 
-Initial client delivery uses the displayed short code. Direct in-app QR scanning is a follow-up convenience; the QR contains no permanent credential.
+Both clients provide **Scan pairing QR code** and exchange the scanned one-time payload immediately. Manual entry of the displayed short code remains available as a fallback. The QR contains no permanent credential.

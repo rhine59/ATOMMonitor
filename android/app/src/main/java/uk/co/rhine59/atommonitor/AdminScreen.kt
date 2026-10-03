@@ -36,7 +36,7 @@ private class AdminCredentialStore(private val context:Context) {
 
 private suspend fun adminRequest(server:String,token:String,path:String,method:String="GET",body:String?=null):JSONObject=withContext(Dispatchers.IO){
     val base=server.trim().let{if(it.endsWith('/'))it else "$it/"}; val c=URI(base+path).toURL().openConnection() as HttpURLConnection
-    c.requestMethod=method;c.connectTimeout=10_000;c.readTimeout=75_000;c.setRequestProperty("Authorization","Bearer $token");c.setRequestProperty("Content-Type","application/json");c.setRequestProperty("X-ATOM-Admin-Actor","android-admin")
+    c.requestMethod=method;c.connectTimeout=10_000;c.readTimeout=120_000;c.setRequestProperty("Authorization","Bearer $token");c.setRequestProperty("Content-Type","application/json");c.setRequestProperty("X-ATOM-Admin-Actor","android-admin")
     if(body!=null){c.doOutput=true;c.outputStream.use{it.write(body.toByteArray())}}
     try { val code=c.responseCode; val text=(if(code in 200..299)c.inputStream else c.errorStream).bufferedReader().use{it.readText()}; if(code !in 200..299) error("Admin request failed (HTTP $code)"); JSONObject(text) } finally {c.disconnect()}
 }

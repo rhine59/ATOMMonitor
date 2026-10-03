@@ -4,9 +4,9 @@ ATOM Monitor is a cross-platform mobile application and supporting Synology-host
 
 > **Scope:** ATOM Monitor does not display, record or retain aircraft movements, tracks or aircraft identities.
 
-## Current checkpoint — 18 September 2026
+## Current checkpoint — 3 October 2026
 
-The project has a working Synology Docker server, a native SwiftUI iPhone application with physical-device report/sharing verification, and a native Kotlin/Jetpack Compose Android application using the same ATOM station REST API. Android source has been advanced toward current iPhone parity but still requires its first confirmed Android build/runtime checkpoint.
+The project has a working Synology Docker server, a native SwiftUI iPhone application, and a native Kotlin/Jetpack Compose Android application using the same ATOM station REST API. Administrator QR pairing has passed a live iPhone test. Android pairing source parity is implemented but still requires device runtime verification.
 
 ### Server
 
@@ -96,3 +96,10 @@ Phase 2 SQLite backup/recovery tooling is retained and regression-tested against
 ## Restricted infrastructure administration checkpoint — 20 September 2026
 
 The server source now contains a separate authenticated Admin control plane. Read-only monitoring is handled by `atom-admin-monitor`; confirmed manual scaling is delegated to an internal-only `atom-admin-control` service that can change only the `atom-api` replica count from 1–4. Operations are serialized, rate-limited, audited and reported successful only after all requested replicas are Docker-healthy. Unit tests pass; Synology runtime acceptance and iOS/Android Admin UI remain pending.
+
+
+## Administrator device pairing — tested 3 October 2026
+
+Administrator access now uses a LAN-restricted, five-minute one-time QR/short code. The apps exchange it for an individually revocable device credential; shared administrator secrets are never entered on a phone. Pairing challenges and device registrations persist in the Admin Docker data volume, including across container recreation and load-balanced requests. The complete rebuild, release, acceptance and recovery procedure is in `docs/ADMIN-PAIRING-AND-RELEASE.md`.
+
+The iOS QR → exchange → stored credential flow passed on a physical iPhone. Android includes the corresponding Google code-scanner and Keystore implementation; its current build and device-runtime verification remain pending.

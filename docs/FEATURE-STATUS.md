@@ -182,3 +182,8 @@ The authoritative consolidated status is `CHECKPOINT-2026-10-03.md`.
 | Deterministic Admin inventory/scaling demo | Implemented — no live mutation |
 | Test log and `.xcresult` evidence | Implemented — generation pending |
 | Physical QR/Face ID/live scaling validation | Separate physical-device/server acceptance |
+
+
+## Expanded Simulator dataset — 3 October 2026
+
+The deterministic iOS demo repository now generates exactly 250 UK-wide station records with all effective health states, multiple software versions, missing-version/position cases and varied telemetry. The recorded UI test asserts the 250-station report total. Mac build/runtime execution remains pending.

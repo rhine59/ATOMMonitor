@@ -92,3 +92,8 @@ A `PW` callsign prefix is currently only a discovery hypothesis for PilotAware A
 3. Determine reliable ATOM identification and station registry bootstrap data.
 4. Implement persistent station/current-health storage and FastAPI endpoints.
 5. Replace the iOS fixture repository with `APIStationRepository`.
+
+
+## Admin self-monitoring
+
+The restricted Admin summary/container endpoints include `atom-admin-monitor` and `atom-admin-control` in their Compose-project allow-list. They are visible health/resource entries only. The private scaling mutation remains restricted to `atom-api`.

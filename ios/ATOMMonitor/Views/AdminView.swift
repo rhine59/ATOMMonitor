@@ -1,6 +1,8 @@
 import SwiftUI
 import Security
 import LocalAuthentication
+import AVFoundation
+import UIKit
 
 private struct AdminSummary: Decodable {
     struct Replicas: Decodable { let running: Int; let healthy: Int }
@@ -48,9 +50,16 @@ private enum AdminKeychain {
 }
 
 struct AdminView:View {
-    @StateObject private var model=AdminModel();@State private var confirming=false
+    @StateObject private var model=AdminModel();@State private var confirming=false;@State private var scanning=false
     var body:some View {
         content.navigationTitle("Admin").overlay{progressOverlay}.task{if !model.token.isEmpty{await model.unlock()}}
+            .sheet(isPresented:$scanning){QRCodeScannerView{payload in
+                scanning=false
+                if let data=payload.data(using:.utf8),let object=try? JSONSerialization.jsonObject(with:data) as? [String:Any],let code=object["code"] as? String{
+                    model.pairingCode=code
+                    Task{await model.pairDevice()}
+                }else{model.message="That QR code is not an ATOMMonitor pairing code."}
+            }}
             .confirmationDialog("Scale API to \(model.target) replicas?",isPresented:$confirming,titleVisibility:.visible){Button("Apply \(model.target) replicas",role:.destructive){Task{await model.scale()}};Button("Cancel",role:.cancel){}}message:{Text("Only atom-api will change. The server waits for all requested replicas to become healthy.")}
     }
     @ViewBuilder private var content:some View {if let summary=model.summary{summaryView(summary)}else{lockedView}}
@@ -60,6 +69,31 @@ struct AdminView:View {
     private func containerRow(_ item:AdminSummary.Container)->some View {VStack(alignment:.leading,spacing:4){HStack{Text(item.name).font(.headline);Spacer();Text(item.health).foregroundStyle(item.health=="healthy" ? Color.green:Color.orange)};Text("\(item.service) • \(item.state)").font(.caption).foregroundStyle(.secondary);resourceUsage(item)}}
     @ViewBuilder private func resourceUsage(_ item:AdminSummary.Container)->some View {if let cpu=item.cpuPercent,let memory=item.memoryUsedBytes{Text(String(format:"CPU %.1f%% • Memory %.1f MB",cpu,Double(memory)/1_048_576)).font(.caption)}}
     private var lockedView:some View {Form{Section("Restricted administration"){pairingControls};if let message=model.message{Section{Text(message).foregroundStyle(.red)}}}}
-    @ViewBuilder private var pairingControls:some View {if model.token.isEmpty{TextField("One-time pairing code",text:$model.pairingCode).textInputAutocapitalization(.characters).autocorrectionDisabled();Button("Pair this device"){Task{await model.pairDevice()}}.disabled(model.pairingCode.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty || model.busy);Text("On a computer connected to your home network, open the server address followed by /api/v1/admin/pair. Enter the displayed code here; it expires after five minutes.").font(.caption).foregroundStyle(.secondary)}else{Button("Unlock with Face ID or passcode"){Task{await model.unlock()}};Button("Remove administrator access",role:.destructive){Task{await model.removeAccess()}};Text("This iPhone is paired. Its private credential is stored in the Keychain.").font(.caption).foregroundStyle(.secondary)}}
+    @ViewBuilder private var pairingControls:some View {if model.token.isEmpty{Button("Scan pairing QR code"){scanning=true};TextField("One-time pairing code",text:$model.pairingCode).textInputAutocapitalization(.characters).autocorrectionDisabled();Button("Pair this device"){Task{await model.pairDevice()}}.disabled(model.pairingCode.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty || model.busy);Text("On a computer connected to your home network, open the server address followed by /api/v1/admin/pair. Enter the displayed code here; it expires after five minutes.").font(.caption).foregroundStyle(.secondary)}else{Button("Unlock with Face ID or passcode"){Task{await model.unlock()}};Button("Remove administrator access",role:.destructive){Task{await model.removeAccess()}};Text("This iPhone is paired. Its private credential is stored in the Keychain.").font(.caption).foregroundStyle(.secondary)}}
     @ViewBuilder private var progressOverlay:some View {if model.busy{ProgressView().controlSize(.large)}}
+}
+
+
+private final class QRScannerController:UIViewController,AVCaptureMetadataOutputObjectsDelegate {
+    var onCode:((String)->Void)?
+    private let session=AVCaptureSession()
+    override func viewDidLoad(){
+        super.viewDidLoad();view.backgroundColor=.black
+        guard let device=AVCaptureDevice.default(for:.video),let input=try? AVCaptureDeviceInput(device:device),session.canAddInput(input) else{return}
+        session.addInput(input);let output=AVCaptureMetadataOutput();guard session.canAddOutput(output) else{return};session.addOutput(output)
+        output.setMetadataObjectsDelegate(self,queue:.main);output.metadataObjectTypes=[.qr]
+        let preview=AVCaptureVideoPreviewLayer(session:session);preview.videoGravity=.resizeAspectFill;preview.frame=view.bounds;view.layer.addSublayer(preview)
+        DispatchQueue.global(qos:.userInitiated).async{self.session.startRunning()}
+    }
+    override func viewDidLayoutSubviews(){super.viewDidLayoutSubviews();(view.layer.sublayers?.first as? AVCaptureVideoPreviewLayer)?.frame=view.bounds}
+    func metadataOutput(_ output:AVCaptureMetadataOutput,didOutput metadataObjects:[AVMetadataObject],from connection:AVCaptureConnection){
+        guard let code=(metadataObjects.first as? AVMetadataMachineReadableCodeObject)?.stringValue else{return}
+        session.stopRunning();onCode?(code)
+    }
+    deinit{if session.isRunning{session.stopRunning()}}
+}
+private struct QRCodeScannerView:UIViewControllerRepresentable {
+    let onCode:(String)->Void
+    func makeUIViewController(context:Context)->QRScannerController{let controller=QRScannerController();controller.onCode=onCode;return controller}
+    func updateUIViewController(_ uiViewController:QRScannerController,context:Context){}
 }

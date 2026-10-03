@@ -20,7 +20,7 @@ wait_count(){
 import json,sys
 d=json.load(open(sys.argv[2])); n=int(sys.argv[1]); r=d['apiReplicas']
 assert r['running']==n and r['healthy']==n
-for name in ('postgres','atom-lb','ogn-station-probe'):
+for name in ('postgres','atom-lb','ogn-station-probe','atom-admin-monitor','atom-admin-control'):
     assert d['services'][name]['running']==1
 PY
     then return 0; fi

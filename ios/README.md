@@ -118,3 +118,6 @@ chmod +x scripts/record-demo.sh
 ```
 
 The final MP4 is written under `artifacts/ATOMMonitor-Demo-<timestamp>.mp4`. See `../docs/DEMO-AUTOMATION.md`.
+
+
+The Simulator demo dataset contains 250 generated ATOM ground stations distributed across the UK, with all health states, several PilotAware versions, missing-report cases and varied telemetry. Relative timestamps preserve the intended status mix whenever the tour is run.

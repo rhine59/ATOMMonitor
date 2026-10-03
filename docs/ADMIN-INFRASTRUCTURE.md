@@ -190,3 +190,10 @@ Manual entry of the shared administrator token in phone applications has been re
 - The legacy `ATOM_ADMIN_TOKEN` remains accepted temporarily for migration and rollback, but is no longer entered in either phone UI. `ATOM_ADMIN_CONTROL_TOKEN` remains internal-only.
 
 Both clients provide **Scan pairing QR code** and exchange the scanned one-time payload immediately. Manual entry of the displayed short code remains available as a fallback. The QR contains no permanent credential.
+
+
+## Working device-pairing checkpoint — 3 October 2026
+
+The production flow is now QR/short-code pairing, not manual entry of the shared Admin token. Pairing challenges are stored persistently in `/data/admin-pairings.json` alongside the device registry volume. This removed the HTTP 401 caused when page generation and exchange reached different processes or a recreated process.
+
+A live physical-iPhone pairing test passed. The repeatable server check is `scripts/admin-pairing-acceptance.sh`; the complete rebuild/release procedure is `docs/ADMIN-PAIRING-AND-RELEASE.md`. Android source parity exists but remains build/device-runtime pending.

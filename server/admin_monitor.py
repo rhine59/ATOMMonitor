@@ -18,7 +18,7 @@ PAIR_FILE=Path(os.getenv("ATOM_ADMIN_PAIR_FILE","/data/admin-pairings.json"))
 PAIR_TTL_SECONDS=int(os.getenv("ATOM_ADMIN_PAIR_TTL_SECONDS","300"))
 PAIRING_NETWORKS=tuple(ipaddress.ip_network(x.strip()) for x in os.getenv("ATOM_ADMIN_PAIRING_NETWORKS","192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,127.0.0.0/8").split(",") if x.strip())
 PAIR_LOCK=threading.Lock()
-ALLOWED_SERVICES=("postgres","atom-api","atom-lb","ogn-station-probe")
+ALLOWED_SERVICES=("postgres","atom-api","atom-lb","ogn-station-probe","atom-admin-monitor","atom-admin-control")
 
 def token_hash(value):return hashlib.sha256(value.encode()).hexdigest()
 def load_devices():

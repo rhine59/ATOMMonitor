@@ -34,7 +34,7 @@ private enum AdminKeychain {
     private var baseURL:String{UserDefaults.standard.string(forKey:ServerConfiguration.key) ?? ATOMMonitorApp.defaultServerURL}
     private func request(_ path:String,method:String="GET",body:Data?=nil) async throws->Data {
         let base=baseURL.hasSuffix("/") ? baseURL:baseURL+"/"; guard let url=URL(string:base+path) else{throw URLError(.badURL)}
-        var req=URLRequest(url:url);req.httpMethod=method;req.timeoutInterval=75;req.httpBody=body
+        var req=URLRequest(url:url);req.httpMethod=method;req.timeoutInterval=120;req.httpBody=body
         if !token.isEmpty{req.setValue("Bearer \(token)",forHTTPHeaderField:"Authorization")}
         req.setValue("application/json",forHTTPHeaderField:"Content-Type");req.setValue("ios-admin",forHTTPHeaderField:"X-ATOM-Admin-Actor")
         let(data,response)=try await URLSession.shared.data(for:req);let code=(response as? HTTPURLResponse)?.statusCode ?? 0

@@ -132,3 +132,8 @@ If pairing returns HTTP 401:
 5. Create a fresh code after any rebuild.
 
 Deleting the admin data volume revokes every paired device and removes pending codes. Treat that as a deliberate recovery operation, not a routine rebuild step.
+
+
+## Scaling timeout policy
+
+Scaling waits for every requested API replica to become Docker-healthy. The controller allows 90 seconds, the Admin monitor waits 100 seconds, Nginx waits 105 seconds, and mobile clients wait 120 seconds. This ordering allows the server to return a real success or failure response instead of Nginx returning HTTP 504 while the scale operation is still running.

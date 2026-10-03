@@ -14,6 +14,7 @@ PROJECT=os.getenv("COMPOSE_PROJECT_NAME","server")
 CONTROL_URL=os.getenv("ATOM_ADMIN_CONTROL_URL","http://atom-admin-control:8091")
 CONTROL_TOKEN=os.getenv("ATOM_ADMIN_CONTROL_TOKEN","")
 DEVICE_FILE=Path(os.getenv("ATOM_ADMIN_DEVICE_FILE","/data/admin-devices.json"))
+PAIR_FILE=Path(os.getenv("ATOM_ADMIN_PAIR_FILE","/data/admin-pairings.json"))
 PAIR_TTL_SECONDS=int(os.getenv("ATOM_ADMIN_PAIR_TTL_SECONDS","300"))
 PAIRING_NETWORKS=tuple(ipaddress.ip_network(x.strip()) for x in os.getenv("ATOM_ADMIN_PAIRING_NETWORKS","192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,127.0.0.0/8").split(",") if x.strip())
 PAIRINGS={}; PAIR_LOCK=threading.Lock()
@@ -40,10 +41,17 @@ def client_ip():
 def pairing_allowed():
     try:return any(ipaddress.ip_address(client_ip()) in network for network in PAIRING_NETWORKS)
     except ValueError:return False
+def load_pairings():
+    try:return json.loads(PAIR_FILE.read_text())
+    except (FileNotFoundError,json.JSONDecodeError,OSError):return {}
+def save_pairings(pairings):
+    PAIR_FILE.parent.mkdir(parents=True,exist_ok=True)
+    tmp=PAIR_FILE.with_suffix(".tmp"); tmp.write_text(json.dumps(pairings,sort_keys=True)); os.replace(tmp,PAIR_FILE)
 def new_pairing():
-    code=secrets.token_hex(4).upper(); expires=int(time.time())+PAIR_TTL_SECONDS
+    code=secrets.token_hex(4).upper(); expires=int(time.time())+PAIR_TTL_SECONDS; now=int(time.time())
     with PAIR_LOCK:
-        PAIRINGS.clear(); PAIRINGS[code]=expires
+        pairings={key:value for key,value in load_pairings().items() if value>=now}
+        pairings[token_hash(code)]=expires; save_pairings(pairings)
     return code,expires
 
 def docker_get(path):
@@ -133,7 +141,8 @@ def pair_page():
 def pair_exchange():
     body=request.get_json(silent=True) or {}; code=str(body.get("code","")).strip().upper(); name=str(body.get("deviceName","Administrator device"))[:80]
     now=int(time.time())
-    with PAIR_LOCK:expires=PAIRINGS.pop(code,None)
+    with PAIR_LOCK:
+        pairings=load_pairings(); expires=pairings.pop(token_hash(code),None); save_pairings(pairings)
     if not expires or expires<now:return jsonify({"error":"invalid or expired pairing code"}),401
     token=secrets.token_urlsafe(32); devices=load_devices(); devices[token_hash(token)]={"name":name,"createdAt":now}; save_devices(devices)
     return jsonify({"deviceToken":token,"deviceName":name})

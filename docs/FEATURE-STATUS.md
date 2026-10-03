@@ -115,3 +115,7 @@ Server Phase 1 resilience remains Tested. The Synology stack is a development/te
 ### Admin build/acceptance automation — 20 September 2026
 
 **Implemented — execution pending.** `build-admin.sh` builds and health-checks the isolated monitor/control services and rejects an exposed control port. `admin-scaling-acceptance.sh` exercises 2→3→2, public-read continuity, healthy counts, singleton protection and audit evidence. Scripts are syntax-checked but remain unexecuted on Synology.
+
+### Report drill-down and optional back-level highlighting — 3 October 2026
+
+**Implemented — iOS/Android build and runtime verification pending.** Report totals, status rows and version rows now navigate to Stations with the corresponding shared filter, including Version not reported. Back-level software highlighting is persisted and Off by default on both platforms; enabling it affects only otherwise Healthy stations and never overrides operational status.

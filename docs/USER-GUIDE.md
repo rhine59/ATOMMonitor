@@ -68,3 +68,9 @@ Aircraft traffic remains outside project scope and must not be stored as tracks,
 ## Restricted Admin
 
 Admin is locked until the separate administrator token is accepted. iOS stores it in Keychain; Android encrypts it with an Android Keystore key. The screen shows only ATOM Monitor containers and API replica health/resources. To scale, select 1–4 API replicas, review the target and confirm. Only `atom-api` can change; PostgreSQL, Nginx and the collector remain singletons. Lock Admin removes the saved credential. Scaling is operational administration and does not provide automatic scaling or whole-host resilience.
+
+## Report drill-down and back-level highlighting
+
+Every total, status and PilotAware-version count in Report is selectable. Selecting a count opens Stations with the corresponding filter applied; Total stations clears filters, and Not reported selects stations without a reported PilotAware version. The Stations filter summary and Clear control remain available.
+
+Back-level software highlighting is **Off by default**. Settings → Station status can enable it. When enabled, an otherwise Healthy station whose reported PilotAware version compares older than the newest collected version may use the configured back-level colour. Missing versions are excluded, and Warning, No recent heartbeat, Inactive and Unknown always keep their operational-status presentation. Turning highlighting off does not remove version values, Report counts or exact-version filters.

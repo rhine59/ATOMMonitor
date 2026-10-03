@@ -77,7 +77,6 @@ data class Station(
 private fun JSONArray.stations(): List<Station> =
     (0 until length()).map { index ->
         val o = getJSONObject(index)
-
         fun doubleValue(key: String): Double? =
             if (o.isNull(key)) null else o.optDouble(key)
 
@@ -135,6 +134,9 @@ class StationVM(app: Application) : AndroidViewModel(app) {
         private set
     var selectedVersions by mutableStateOf<Set<String>>(emptySet())
         private set
+    var filterVersionNotReported by mutableStateOf(false)
+        private set
+    var stationSearch by mutableStateOf("")
 
     var server: String
         get() = prefs.getString("server", DEFAULT_SERVER) ?: DEFAULT_SERVER
@@ -147,6 +149,10 @@ class StationVM(app: Application) : AndroidViewModel(app) {
     var home: String
         get() = prefs.getString("home", "") ?: ""
         set(value) { prefs.edit().putString("home", value).apply() }
+
+    var highlightBackLevelSoftware: Boolean
+        get() = prefs.getBoolean("highlightBackLevelSoftware", false)
+        set(value) { prefs.edit().putBoolean("highlightBackLevelSoftware", value).apply() }
 
     var inactiveAfterDays: Int
         get() = prefs.getInt("inactiveDays", 2).coerceIn(1, 30)
@@ -192,10 +198,10 @@ class StationVM(app: Application) : AndroidViewModel(app) {
             .sorted()
 
     val hasFilters: Boolean
-        get() = selectedHealth.isNotEmpty() ||
-                selectedVersions.isNotEmpty()
+        get() = selectedHealth.isNotEmpty() || selectedVersions.isNotEmpty() || filterVersionNotReported
 
     fun isBackLevel(station: Station): Boolean {
+        if (!highlightBackLevelSoftware || displayHealth(station) != "healthy") return false
         val version = station.pilotAwareVersion
             ?.trim()?.takeIf { it.isNotEmpty() }
             ?: return false
@@ -218,6 +224,7 @@ class StationVM(app: Application) : AndroidViewModel(app) {
     }
 
     fun toggleVersion(value: String) {
+        filterVersionNotReported = false
         selectedVersions = selectedVersions.toMutableSet().apply {
             if (!add(value)) remove(value)
         }
@@ -226,6 +233,18 @@ class StationVM(app: Application) : AndroidViewModel(app) {
     fun clearFilters() {
         selectedHealth = emptySet()
         selectedVersions = emptySet()
+        filterVersionNotReported = false
+    }
+
+    fun showAllStations() { clearFilters(); stationSearch = "" }
+    fun showHealth(value: String) { clearFilters(); stationSearch = ""; selectedHealth = setOf(value) }
+    fun showVersion(value: String?) {
+        clearFilters(); stationSearch = ""
+        if (value == null) filterVersionNotReported = true else selectedVersions = setOf(value)
+    }
+    fun toggleVersionNotReported() {
+        selectedVersions = emptySet()
+        filterVersionNotReported = !filterVersionNotReported
     }
 
     fun thresholdChanged() {
@@ -246,11 +265,12 @@ class StationVM(app: Application) : AndroidViewModel(app) {
                 selectedHealth.isEmpty() ||
                 displayHealth(station) in selectedHealth
 
-            val matchesVersion =
-                selectedVersions.isEmpty() ||
-                station.pilotAwareVersion?.let {
-                    it in selectedVersions
-                } == true
+            val version = station.pilotAwareVersion?.trim()?.takeIf(String::isNotEmpty)
+            val matchesVersion = when {
+                filterVersionNotReported -> version == null
+                selectedVersions.isEmpty() -> true
+                else -> version in selectedVersions
+            }
 
             matchesQuery && matchesHealth && matchesVersion
         }
@@ -317,7 +337,6 @@ class StationVM(app: Application) : AndroidViewModel(app) {
                 Log.e("ATOMMonitor", "Station refresh failed", it)
                 error = "${it::class.simpleName}: ${it.message ?: "No message"}"
             }
-
             refreshing = false
         }
     }
@@ -420,7 +439,7 @@ fun App(vm: StationVM = viewModel()) {
                         },
                         vm
                     ) { detail = it }
-                Tab.Report -> ReportScreen(vm)
+                Tab.Report -> ReportScreen(vm) { tab = Tab.Stations }
                 Tab.Admin -> AdminScreen(vm)
                 Tab.Settings -> Settings(vm)
                 Tab.Help -> Help()
@@ -484,13 +503,9 @@ fun FilterButton(vm: StationVM) {
                     item { Text("PilotAware version") }
 
                     items(vm.availableVersions) { value ->
-                        FilterRow(
-                            value,
-                            value in vm.selectedVersions
-                        ) {
-                            vm.toggleVersion(value)
-                        }
+                        FilterRow(value, value in vm.selectedVersions) { vm.toggleVersion(value) }
                     }
+                    item { FilterRow("Not reported", vm.filterVersionNotReported) { vm.toggleVersionNotReported() } }
                 }
             }
         )
@@ -615,13 +630,11 @@ fun StationList(
     vm: StationVM,
     onStation: (Station) -> Unit
 ) {
-    var query by remember { mutableStateOf("") }
-
     Column {
         Row(Modifier.padding(12.dp)) {
             OutlinedTextField(
-                value = query,
-                onValueChange = { query = it },
+                value = vm.stationSearch,
+                onValueChange = { vm.stationSearch = it },
                 label = { Text("Find") },
                 modifier = Modifier.weight(1f)
             )
@@ -630,7 +643,7 @@ fun StationList(
 
         LazyColumn {
             items(
-                items = vm.filtered(list, query),
+                items = vm.filtered(list, vm.stationSearch),
                 key = { it.id }
             ) { station ->
                 ListItem(
@@ -654,20 +667,20 @@ fun StationList(
     }
 }
 
-@Composable fun ReportScreen(vm:StationVM){
+@Composable fun ReportScreen(vm:StationVM,onOpenStations:()->Unit){
  val context=LocalContext.current
  val statuses=listOf("healthy","warning","noRecentHeartbeat","inactive","unknown").map{it to vm.stations.count{s->vm.displayHealth(s)==it}}
  val versions=vm.stations.groupingBy{it.pilotAwareVersion?.trim()?.takeIf(String::isNotEmpty)?:"Not reported"}.eachCount().toList().sortedWith(compareByDescending<Pair<String,Int>>{it.first!="Not reported"}.thenByDescending{it.first})
  LazyColumn(Modifier.padding(16.dp)){
-  item{Text("Report",style=MaterialTheme.typography.headlineSmall);Spacer(Modifier.height(12.dp));ReportRow("Total stations",vm.stations.size);Text("Status",style=MaterialTheme.typography.titleMedium,modifier=Modifier.padding(top=18.dp))}
-  items(statuses){(name,count)->ReportRow(healthTitle(name),count)}
+  item{Text("Report",style=MaterialTheme.typography.headlineSmall);Spacer(Modifier.height(12.dp));ReportRow("Total stations",vm.stations.size){vm.showAllStations();onOpenStations()};Text("Status",style=MaterialTheme.typography.titleMedium,modifier=Modifier.padding(top=18.dp))}
+  items(statuses){(name,count)->ReportRow(healthTitle(name),count){vm.showHealth(name);onOpenStations()}}
   item{Text("PilotAware versions",style=MaterialTheme.typography.titleMedium,modifier=Modifier.padding(top=18.dp))}
-  items(versions){(version,count)->ReportRow(version,count)}
+  items(versions){(version,count)->ReportRow(version,count){vm.showVersion(version.takeUnless{it=="Not reported"});onOpenStations()}}
   item{Button(onClick={shareReport(context,vm)},enabled=vm.stations.isNotEmpty(),modifier=Modifier.padding(top=20.dp)){Icon(Icons.Default.Share,null);Spacer(Modifier.width(8.dp));Text("Share report")};Text("Creates a formatted HTML report with responsive bar graphs plus a CSV station-data attachment and opens the standard Android share chooser.",style=MaterialTheme.typography.bodySmall,modifier=Modifier.padding(top=8.dp))}
  }
 }
 
-@Composable private fun ReportRow(label:String,count:Int){Row(Modifier.fillMaxWidth().padding(vertical=5.dp)){Text(label,Modifier.weight(1f));Text(count.toString())}}
+@Composable private fun ReportRow(label:String,count:Int,open:()->Unit){Row(Modifier.fillMaxWidth().clickable(onClick=open).padding(vertical=10.dp),verticalAlignment=Alignment.CenterVertically){Text(label,Modifier.weight(1f));Text(count.toString());Spacer(Modifier.width(8.dp));Icon(Icons.Default.ChevronRight,null,Modifier.size(16.dp))}}
 
 private fun shareReport(context:Context,vm:StationVM){
  runCatching{
@@ -697,8 +710,8 @@ private fun shareReport(context:Context,vm:StationVM){
 }
 @Composable fun DetailRows(rows:List<Pair<String,String>>){rows.forEach{(a,b)->Row(Modifier.fillMaxWidth().padding(vertical=4.dp)){Text(a,Modifier.weight(1f));Text(b)}}}
 @Composable fun Section(title:String,rows:List<Pair<String,String>>){Text(title,style=MaterialTheme.typography.titleMedium,modifier=Modifier.padding(top=14.dp));DetailRows(rows)}
-@Composable fun Settings(vm:StationVM){var server by remember{mutableStateOf(vm.server)};var refresh by remember{mutableIntStateOf(vm.refreshMinutes)};var inactive by remember{mutableIntStateOf(vm.inactiveAfterDays)};Column(Modifier.padding(16.dp)){Text("Settings",style=MaterialTheme.typography.headlineSmall);OutlinedTextField(server,{server=it},label={Text("Server")});Button({vm.server=server;vm.refresh()}){Text("Save & Test")};Text("Refresh interval: $refresh min");Slider(refresh.toFloat(),{refresh=it.toInt().coerceIn(1,10);vm.refreshMinutes=refresh},valueRange=1f..10f,steps=8);Text("Inactive after: $inactive day${if(inactive==1)"" else "s"}");Slider(inactive.toFloat(),{inactive=it.toInt().coerceIn(1,30);vm.inactiveAfterDays=inactive;vm.thresholdChanged()},valueRange=1f..30f,steps=28);Text("Stations not seen for this many days are shown Inactive. Default 2 days.",style=MaterialTheme.typography.bodySmall)}}
-@Composable fun Help(){LazyColumn(Modifier.padding(16.dp)){item{Text("User Guide",style=MaterialTheme.typography.headlineSmall)};item{Text("ATOM Monitor reports PilotAware ATOM ground-station operational health only. It does not display or record aircraft movements. Map and Stations share Status and PilotAware version filters. Inactive after defaults to 2 days. Station Detail shows the effective status icon and explanation, useful live telemetry, and a Google Maps satellite link pinned to the reported station location. Report summarises status and PilotAware versions and shares formatted HTML with bar graphs plus CSV station data.")}}}
+@Composable fun Settings(vm:StationVM){var server by remember{mutableStateOf(vm.server)};var refresh by remember{mutableIntStateOf(vm.refreshMinutes)};var inactive by remember{mutableIntStateOf(vm.inactiveAfterDays)};Column(Modifier.padding(16.dp)){Text("Settings",style=MaterialTheme.typography.headlineSmall);OutlinedTextField(server,{server=it},label={Text("Server")});Button({vm.server=server;vm.refresh()}){Text("Save & Test")};Text("Refresh interval: $refresh min");Slider(refresh.toFloat(),{refresh=it.toInt().coerceIn(1,10);vm.refreshMinutes=refresh},valueRange=1f..10f,steps=8);Text("Inactive after: $inactive day${if(inactive==1)"" else "s"}");Slider(inactive.toFloat(),{inactive=it.toInt().coerceIn(1,30);vm.inactiveAfterDays=inactive;vm.thresholdChanged()},valueRange=1f..30f,steps=28);Text("Stations not seen for this many days are shown Inactive. Default 2 days.",style=MaterialTheme.typography.bodySmall);Row(verticalAlignment=Alignment.CenterVertically){Text("Highlight back-level software",Modifier.weight(1f));Switch(vm.highlightBackLevelSoftware,{vm.highlightBackLevelSoftware=it})};Text("Off by default. When enabled, only otherwise Healthy stations can use the back-level colour.",style=MaterialTheme.typography.bodySmall)}}
+@Composable fun Help(){LazyColumn(Modifier.padding(16.dp)){item{Text("User Guide",style=MaterialTheme.typography.headlineSmall)};item{Text("ATOM Monitor reports PilotAware ATOM ground-station operational health only. It does not display or record aircraft movements. Map and Stations share Status and PilotAware version filters. Inactive after defaults to 2 days. Station Detail shows the effective status icon and explanation, useful live telemetry, and a Google Maps satellite link pinned to the reported station location. Tap a Report count to open the matching filtered Stations list. Report also shares formatted HTML with bar graphs plus CSV station data. Back-level software highlighting is off by default and can be enabled in Settings; operational status always takes precedence.")}}}
 
 private fun setMarkerIcon(context:Context,health:String)=androidx.core.content.ContextCompat.getDrawable(context,when(health){"inactive","noRecentHeartbeat"->android.R.drawable.presence_busy;"healthy"->android.R.drawable.presence_online;"warning"->android.R.drawable.presence_away;else->android.R.drawable.presence_invisible})
 private fun healthIcon(health:String,backLevel:Boolean)=when{backLevel&&health=="healthy"->Icons.Default.Info;health=="healthy"->Icons.Default.CheckCircle;health=="warning"->Icons.Default.Warning;health=="noRecentHeartbeat"->Icons.Default.WifiOff;health=="inactive"->Icons.Default.Cancel;else->Icons.Default.Help}
@@ -717,7 +730,6 @@ private fun relative(v: Instant?): String {
     if (v == null) return "Not reported"
 
     val seconds = (Instant.now().epochSecond - v.epochSecond).coerceAtLeast(0)
-
     return if (seconds < 3600) {
         "${seconds / 60} min ago"
     } else if (seconds < 86400) {

@@ -3,6 +3,7 @@ import UIKit
 
 struct ReportView: View {
     @ObservedObject var store: StationStore
+    let onSelectFilter: (StationReportFilter) -> Void
     @State private var sharePayload: SharePayload?
     @State private var reportError: String?
 
@@ -38,18 +39,18 @@ struct ReportView: View {
     var body: some View {
         List {
             Section("Summary") {
-                reportRow("Total stations", value: store.stations.count)
+                reportRow("Total stations", value: store.stations.count) { onSelectFilter(.all) }
                 if let updated = store.lastSuccessfulRefresh {
                     LabeledContent("Data updated", value: updated.formatted(date: .abbreviated, time: .shortened))
                 }
             }
 
             Section("Status") {
-                ForEach(statusCounts) { row in reportRow(row.title, value: row.count) }
+                ForEach(statusCounts) { row in reportRow(row.title, value: row.count) { if let health = StationHealth(rawValue: row.id) { onSelectFilter(.health(health)) } } }
             }
 
             Section("PilotAware versions") {
-                ForEach(versionCounts) { row in reportRow(row.title, value: row.count) }
+                ForEach(versionCounts) { row in reportRow(row.title, value: row.count) { onSelectFilter(row.id == "Not reported" ? .versionNotReported : .version(row.id)) } }
             }
 
             Section {
@@ -69,8 +70,10 @@ struct ReportView: View {
         } message: { Text(reportError ?? "Unknown error") }
     }
 
-    private func reportRow(_ title: String, value: Int) -> some View {
-        HStack { Text(title); Spacer(); Text(String(value)).fontWeight(.semibold).monospacedDigit() }
+    private func reportRow(_ title: String, value: Int, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack { Text(title).foregroundStyle(.primary); Spacer(); Text(String(value)).fontWeight(.semibold).monospacedDigit(); Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary) }
+        }
     }
 
     private func prepareAndShare() {

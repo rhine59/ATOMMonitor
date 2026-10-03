@@ -1,5 +1,12 @@
 import Foundation
 
+enum StationReportFilter {
+    case all
+    case health(StationHealth)
+    case version(String)
+    case versionNotReported
+}
+
 @MainActor
 final class StationStore: ObservableObject {
     @Published private(set) var stations: [ATOMStation] = []
@@ -7,6 +14,7 @@ final class StationStore: ObservableObject {
     @Published var selectedStation: ATOMStation?
     @Published var selectedHealthFilters: Set<StationHealth> = []
     @Published var selectedPilotAwareVersions: Set<String> = []
+    @Published var filterPilotAwareVersionNotReported = false
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
     @Published private(set) var lastSuccessfulRefresh: Date?
@@ -41,8 +49,13 @@ final class StationStore: ObservableObject {
 
     var newestPilotAwareVersion: String? { availablePilotAwareVersions.last }
 
+    var highlightBackLevelSoftware: Bool {
+        UserDefaults.standard.bool(forKey: "highlightBackLevelSoftware")
+    }
+
     func isBackLevelSoftware(_ station: ATOMStation) -> Bool {
-        guard displayHealth(for: station) == .healthy,
+        guard highlightBackLevelSoftware,
+              displayHealth(for: station) == .healthy,
               let version = station.pilotAwareVersion?.trimmingCharacters(in: .whitespacesAndNewlines), !version.isEmpty,
               let newest = newestPilotAwareVersion else { return false }
         return compareVersions(version, newest) == .orderedAscending
@@ -52,7 +65,7 @@ final class StationStore: ObservableObject {
         lhs.compare(rhs, options: [.numeric, .caseInsensitive])
     }
 
-    var hasActiveFilters: Bool { !selectedHealthFilters.isEmpty || !selectedPilotAwareVersions.isEmpty }
+    var hasActiveFilters: Bool { !selectedHealthFilters.isEmpty || !selectedPilotAwareVersions.isEmpty || filterPilotAwareVersionNotReported }
 
     var filteredStations: [ATOMStation] {
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -60,7 +73,13 @@ final class StationStore: ObservableObject {
             let matchesSearch = query.isEmpty || station.name.localizedCaseInsensitiveContains(query)
             let matchesHealth = selectedHealthFilters.isEmpty || selectedHealthFilters.contains(displayHealth(for: station))
             let version = station.pilotAwareVersion?.trimmingCharacters(in: .whitespacesAndNewlines)
-            let matchesVersion = selectedPilotAwareVersions.isEmpty || (version.map { selectedPilotAwareVersions.contains($0) } ?? false)
+            let reportedVersion = version.flatMap { $0.isEmpty ? nil : $0 }
+            let matchesVersion: Bool
+            if filterPilotAwareVersionNotReported {
+                matchesVersion = reportedVersion == nil
+            } else {
+                matchesVersion = selectedPilotAwareVersions.isEmpty || (reportedVersion.map { selectedPilotAwareVersions.contains($0) } ?? false)
+            }
             return matchesSearch && matchesHealth && matchesVersion
         }
     }
@@ -68,6 +87,22 @@ final class StationStore: ObservableObject {
     func clearFilters() {
         selectedHealthFilters.removeAll()
         selectedPilotAwareVersions.removeAll()
+        filterPilotAwareVersionNotReported = false
+    }
+
+    func applyReportFilter(_ filter: StationReportFilter) {
+        clearFilters()
+        searchText = ""
+        switch filter {
+        case .all: break
+        case .health(let health): selectedHealthFilters = [health]
+        case .version(let version): selectedPilotAwareVersions = [version]
+        case .versionNotReported: filterPilotAwareVersionNotReported = true
+        }
+    }
+
+    func backLevelPreferenceChanged() {
+        objectWillChange.send()
     }
 
     func inactiveThresholdChanged() {

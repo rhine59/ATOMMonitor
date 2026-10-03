@@ -57,3 +57,11 @@
 - Removed a fixed Docker API-version assumption for Synology compatibility.
 - Added Admin container build/health/no-published-control-port validation.
 - Added deferred 2→3→2 live acceptance automation with public-read, singleton and audit checks.
+
+## 3 October 2026 — Report drill-down and software highlighting preference
+
+- Made Report total, status and PilotAware-version counts open the corresponding filtered Stations list on iOS and Android.
+- Added a first-class Not reported version filter.
+- Added persisted Highlight back-level software setting, Off by default.
+- Preserved operational-health precedence and retained version reporting/filtering when highlighting is disabled.
+- iOS and Android build/runtime verification remains pending.

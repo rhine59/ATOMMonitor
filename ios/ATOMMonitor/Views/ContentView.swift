@@ -1,41 +1,56 @@
 import SwiftUI
 
+private enum AppTab: Hashable { case map, stations, favourites, report, admin, settings, help, feedback, about }
+
 struct ContentView: View {
     @StateObject private var store: StationStore
     @AppStorage("homeStationID") private var homeStationID = ""
     @AppStorage("favouriteStationIDs") private var favouriteStationIDs = ""
+    @State private var selectedTab: AppTab = .map
 
     init(repository: any StationRepository) {
         _store = StateObject(wrappedValue: StationStore(repository: repository))
     }
 
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             NavigationStack { StationMapView(store: store, homeStationID: homeStationID, favouriteStationIDs: $favouriteStationIDs) }
+                .tag(AppTab.map)
                 .tabItem { Label("Map", systemImage: "map") }
 
             NavigationStack { StationListView(store: store, favouriteStationIDs: $favouriteStationIDs) }
+                .tag(AppTab.stations)
                 .tabItem { Label("Stations", systemImage: "list.bullet") }
 
             NavigationStack { FavouritesView(store: store, favouriteStationIDs: $favouriteStationIDs) }
+                .tag(AppTab.favourites)
                 .tabItem { Label("Favourites", systemImage: "star") }
 
-            NavigationStack { ReportView(store: store) }
+            NavigationStack { ReportView(store: store) { filter in
+                store.applyReportFilter(filter)
+                selectedTab = .stations
+            } }
+                .tag(AppTab.report)
                 .tabItem { Label("Report", systemImage: "chart.bar") }
 
             NavigationStack { AdminView() }
+                .tag(AppTab.admin)
                 .tabItem { Label("Admin", systemImage: "lock.shield") }
 
             NavigationStack { AppSettingsView(store: store) }
+                .tag(AppTab.settings)
                 .tabItem { Label("Settings", systemImage: "gearshape") }
 
             NavigationStack { HelpView() }
+                .tag(AppTab.help)
                 .tabItem { Label("Help", systemImage: "questionmark.circle") }
 
             NavigationStack { FeedbackView() }
+                .tag(AppTab.feedback)
                 .tabItem { Label("Feedback", systemImage: "star.bubble") }
 
             NavigationStack { AboutView() }
+                .tag(AppTab.about)
                 .tabItem { Label("About", systemImage: "info.circle") }
         }
         .task { await store.load() }
@@ -91,7 +106,7 @@ private struct HelpView: View {
             Section("Station status") {
                 Text("Healthy means a recent PilotAware heartbeat has been received with no current operational warning. Warning means the station is reporting but its heartbeat is becoming stale or telemetry indicates a warning. No recent heartbeat means the recent-heartbeat threshold has been exceeded. Unknown means there is insufficient recent information.")
                 Text("Inactive is derived on the phone when the latest station record is at least the configured Inactive-after age. The default is 2 days.")
-                Text("A Healthy station may also be shown as back-level software when its reported PilotAware version is older than the newest version currently seen. This does not change its operational health state.")
+                Text("Back-level software highlighting is off by default. It can be enabled in Settings; when enabled, an otherwise Healthy station may use the back-level colour if its reported PilotAware version is older than the newest version currently seen. Operational status always takes precedence.")
             }
 
             Section("Station details") {
@@ -105,7 +120,7 @@ private struct HelpView: View {
             }
 
             Section("Report") {
-                Text("Report summarises the current station dataset by operational status and PilotAware software version. Share creates a formatted HTML report with responsive bar graphs plus a station-level CSV attachment and opens the iPhone share sheet.")
+                Text("Report summarises the current station dataset by operational status and PilotAware software version. Tap any count to open Stations with that filter applied, including Version not reported. Share creates a formatted HTML report with responsive bar graphs plus a station-level CSV attachment and opens the iPhone share sheet.")
             }
 
             Section("Settings") {

@@ -96,7 +96,7 @@ private fun ResponsiveApp(vm: StationVM = viewModel()) {
                 Tab.Map -> ResponsiveMapScreen(vm) { detail = it }
                 Tab.Stations -> StationList(vm.stations, vm) { detail = it }
                 Tab.Favourites -> StationList(vm.stations.filter { vm.favourites().contains(it.id) }, vm) { detail = it }
-                Tab.Report -> ReportScreen(vm)
+                Tab.Report -> ReportScreen(vm) { tab = Tab.Stations }
                 Tab.Admin -> AdminScreen(vm)
                 Tab.Settings -> ResponsiveSettings(vm)
                 Tab.Help -> Help()
@@ -307,6 +307,8 @@ private fun ResponsiveSettings(vm: StationVM) {
         item { Text("Inactive after: $inactive day${if (inactive == 1) "" else "s"}") }
         item { Slider(inactive.toFloat(), { inactive = it.toInt().coerceIn(1, 30); vm.inactiveAfterDays = inactive; vm.thresholdChanged() }, valueRange = 1f..30f, steps = 28) }
         item { Text("Stations not seen for this many days are shown Inactive. Default 2 days.", style = MaterialTheme.typography.bodySmall) }
+        item { Row(verticalAlignment = Alignment.CenterVertically) { Text("Highlight back-level software", Modifier.weight(1f)); Switch(checked = vm.highlightBackLevelSoftware, onCheckedChange = { vm.highlightBackLevelSoftware = it }) } }
+        item { Text("Off by default. When enabled, only otherwise Healthy stations can use the configured back-level colour. Operational status always takes precedence.", style = MaterialTheme.typography.bodySmall) }
     }
 
     if (showHomePicker) {
@@ -397,7 +399,6 @@ private fun distanceKm(lat1: Double, lon1: Double, lat2: Double, lon2: Double): 
 private fun responsiveTime(value: Instant?): String = value?.let {
     DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault()).format(it)
 } ?: "—"
-
 private fun responsiveMarkerIcon(context: android.content.Context, health: String) =
     androidx.core.content.ContextCompat.getDrawable(
         context,

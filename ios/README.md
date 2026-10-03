@@ -88,7 +88,7 @@ The map remains the primary operational navigation surface. Stations remain avai
 
 ## Restricted Admin checkpoint — 20 September 2026
 
-The iPhone app now includes a locked Admin tab. The separate administrator token is held in iOS Keychain; current ATOM container/API health is displayed and deliberate 1–4 `atom-api` scaling requires a confirmation dialog. Xcode build/runtime verification remains pending.
+The iPhone app includes a locked Admin tab. A LAN-only one-time code creates a per-device credential held in iOS Keychain; current ATOM container/API health is displayed and deliberate 1–4 `atom-api` scaling requires a confirmation dialog. QR pairing passed on a physical iPhone on 3 October 2026.
 
 
 ## Administrator QR pairing and release test

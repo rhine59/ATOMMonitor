@@ -75,3 +75,12 @@
 - Added persisted Highlight back-level software setting, Off by default.
 - Preserved operational-health precedence and retained version reporting/filtering when highlighting is disabled.
 - iOS and Android build/runtime verification remains pending.
+
+
+## 3 October 2026 — station icon legend
+
+- Added **More → Legend** on iOS and Android for station icon colours and meanings.
+- The legend includes Healthy, Warning, No recent heartbeat, Inactive and Unknown.
+- Back-level software appears only when highlighting is enabled; operational status retains precedence.
+- Replaced Android's overcrowded nine-item bottom bar with Map, Stations, Favourites, Report and More.
+- Build/runtime verification remains pending on both platforms.

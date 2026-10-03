@@ -386,3 +386,8 @@ The immediate target is a well-engineered resilient Compose deployment on the ex
 ## Restricted in-app operations
 
 The resilience roadmap now includes a restricted iOS/Android Admin function for current infrastructure health/resource visibility and deliberate scale up/down of the stateless API tier. This is a control-plane feature, not autoscaling. PostgreSQL, Nginx and the collector remain singleton/non-scalable from the app. Docker-host control must be isolated from the public API and narrowly allow-listed. See `ADMIN-INFRASTRUCTURE.md`.
+
+
+## Admin control-plane implementation checkpoint — 3 October 2026
+
+The current Compose topology includes `atom-admin-monitor` and internal-only `atom-admin-control`. The monitor reports all ATOM Monitor service containers, including both Admin services. The control boundary can scale only the stateless API tier and cannot mutate PostgreSQL, Nginx, collector or either Admin service. Device pairing replaces shared-secret entry on phones. Scaling timeout layers are ordered so health convergence completes before a gateway/client timeout. This improves operational control but does not change the single-NAS failure domain.

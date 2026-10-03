@@ -1,7 +1,13 @@
-import unittest
-from ogn_station_probe import parse_receiver_packet
+import os,tempfile,unittest
+from ogn_station_probe import parse_receiver_packet,touch_health
 
 class ReceiverPacketTests(unittest.TestCase):
+    def test_health_heartbeat_file_is_written(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path=os.path.join(directory,"health")
+            touch_health(path)
+            self.assertTrue(os.path.isfile(path))
+            self.assertGreater(int(open(path,encoding="ascii").read()),0)
     def test_ognsdr_position(self):
         p=parse_receiver_packet("PWFirefly>OGNSDR,TCPIP*,qAC,GLIDERN1:/113515h5047.70NI00311.98W&/A=000525")
         self.assertEqual(p.kind,"position");self.assertAlmostEqual(p.latitude,50.795,places=4);self.assertAlmostEqual(p.longitude,-3.1996667,places=4);self.assertAlmostEqual(p.altitude_m,160.0,places=1)

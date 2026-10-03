@@ -80,6 +80,6 @@ Back-level software highlighting is **Off by default**. Settings → Station sta
 1. Connect the phone and a computer to the trusted home network.
 2. On the computer, open the configured ATOMMonitor server address followed by `/api/v1/admin/pair`.
 3. Open **Admin** in the phone application.
-4. Enter the displayed one-time code and select **Pair this device**. The code expires after five minutes and cannot be reused.
+4. Select **Scan pairing QR code** and point the phone at the displayed QR code. The app exchanges it immediately. Manual entry of the displayed one-time code remains available as a fallback. The code expires after five minutes and cannot be reused.
 5. On iPhone, approve Face ID or the device passcode. Later visits use **Unlock with Face ID or passcode**; the shared server token is never shown or entered.
 6. **Lock Admin** closes the administrative view but preserves pairing. **Remove administrator access** revokes that phone and deletes its stored credential.

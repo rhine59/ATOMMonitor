@@ -41,14 +41,15 @@ After `xcodegen generate`, this can be sanity-checked with:
 and the recorder's `xcodebuild test` command must no longer report `Scheme ATOMMonitor is not currently configured for the test action`.
 
 ## Automated tour
-The UI test demonstrates Map, Stations/search, adding a favourite, full station telemetry, Favourites, Settings, editable server address/Test Connection, Help, and return to Map. Major phases emit `ATOM_DEMO_STEP` activities into the log. Demo data never depends on the production Synology service.
+The UI test demonstrates Map refresh/layers/Home, Stations search/refresh/detail/favourite, Favourites, Report category drill-down and HTML/CSV share sheet, Settings and back-level highlighting, alphabetic More navigation, the complete colour legend, deterministic Admin container inventory and guarded scale 2→3, Help, Feedback controls, About/licensing, and return to Map. Major phases emit `ATOM_DEMO_STEP` activities into the log. Demo data and Admin scaling are simulated locally and never depend on or mutate the production Synology service.
 
 ## Outputs
 
-    artifacts/ATOMMonitor-Demo-raw.mp4
-    artifacts/ATOMMonitor-Demo.mp4
-    artifacts/ATOMMonitor-Demo-test.log
-    artifacts/DerivedData/
+    artifacts/ATOMMonitor-Demo-<timestamp>-raw.mp4
+    artifacts/ATOMMonitor-Demo-<timestamp>.mp4
+    artifacts/ATOMMonitor-Demo-<timestamp>-test.log
+    artifacts/ATOMMonitor-Demo-<timestamp>.xcresult
+    /tmp/ATOMMonitor-DerivedData/
 
 If FFmpeg has `drawtext`, the final H.264 MP4 receives a title overlay. Without it, a web-compatible H.264 MP4 is still generated. If post-processing fails, the raw recording is preserved/copied rather than discarded.
 
@@ -78,3 +79,7 @@ Demo/XCUITest complements server/parser tests, Synology live OGN/API integration
 ## Version control
 Commit fixtures, tests, scripts, annotation definitions, build/test instructions and meaningful failure diagnoses. Do not commit generated MP4s, DerivedData or disposable build products. `artifacts/` remains ignored.
 \n\n## Checkpoint synchronization — 18 September 2026\n\nThe current server acceptance mechanism is the committed Phase 1–4 plus service/API suite, which has passed on the Synology. Demo automation remains supplementary presentation/testing material and must not be treated as a substitute for the acceptance runners. See `CHECKPOINT-2026-09-18.md`.\n
+
+## Complete current-function tour — 3 October 2026
+
+The recorder now assigns a timestamp automatically, retains the Xcode result bundle, and covers the full current navigation/function set. Admin uses an explicit `--demo-mode` fixture containing PostgreSQL, Nginx, collector, two API replicas and both Admin services. The scale demonstration changes only this in-memory fixture. Camera QR capture, Face ID, external Maps links, live feedback delivery and real Docker mutation remain physical-device/live-service acceptance items rather than Simulator recording actions.

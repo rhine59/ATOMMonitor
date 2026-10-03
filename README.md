@@ -111,3 +111,8 @@ Both mobile apps consume the same generic Admin container contract and therefore
 
 
 The consolidated current Admin checkpoint is `docs/CHECKPOINT-2026-10-03-ADMIN.md`. Use `scripts/build-all-containers.sh` for a clean service rebuild plus pairing acceptance; use `scripts/all-phases-acceptance.sh` and `scripts/admin-scaling-acceptance.sh` for the complete regression.
+
+
+## Full checkpoint — 3 October 2026
+
+The authoritative current project snapshot is `docs/CHECKPOINT-2026-10-03.md`. It covers the complete Docker topology, meaningful collector health, administrator pairing/scaling/self-monitoring, iOS 1.0 (4), Android version code 4, rebuild commands and remaining release gates.

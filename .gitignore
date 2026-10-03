@@ -42,3 +42,6 @@ android/.gradle/
 android/build/
 android/app/build/
 android/local.properties
+
+# Generated from the live station service before an iOS demo recording
+ios/ATOMMonitor/Resources/demo-stations-live.json

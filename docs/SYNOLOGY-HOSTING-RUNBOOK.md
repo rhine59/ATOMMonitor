@@ -589,3 +589,15 @@ If `git pull` reports that `ios/ATOMMonitor.xcodeproj/project.pbxproj` would be 
 The public pairing page is `https://granvillehouse.synology.me:8445/api/v1/admin/pair`, but it is intentionally usable only when the source address is in `ATOM_ADMIN_PAIRING_NETWORKS`. The exchange endpoint is `POST /api/v1/admin/pair/exchange`. A 401 normally means an expired/already-used code, a disallowed source, or an obsolete deployment without persistent challenge storage.
 
 Back up the named Admin data volume with the other service data. Deliberately deleting it revokes all paired phones. Full instructions: `docs/ADMIN-PAIRING-AND-RELEASE.md`.
+
+
+## Complete synchronized rebuild checkpoint
+
+```bash
+cd /volume1/docker/ATOMMonitor
+git pull --ff-only
+sh scripts/build-all-containers.sh
+sh scripts/all-phases-acceptance.sh
+```
+
+The container build suite now finishes with a real one-time pairing/exchange/authentication/revocation test. Nginx is force-recreated so Admin routes and timeout changes are loaded. The Synology build/test runner includes both Admin containers in diagnostics and also runs pairing acceptance.

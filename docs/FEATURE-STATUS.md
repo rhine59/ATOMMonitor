@@ -157,3 +157,17 @@ Android now uses five primary bottom destinations—Map, Stations, Favourites, R
 | Permit either Admin service to be scaled from the app | Deliberately prohibited |
 
 The explicit Docker discovery allow-list now covers all ATOM Monitor service containers while the mutation allow-list remains restricted to `atom-api`.
+
+
+## Full checkpoint — 3 October 2026
+
+The authoritative consolidated status is `CHECKPOINT-2026-10-03.md`.
+
+| Item | Status |
+|---|---|
+| Persistent one-time Admin pairing | Implemented; live iPhone flow passed |
+| Admin scale timeout chain | Implemented; server redeploy/regression gate documented |
+| Admin monitor/control self-inventory | Implemented; server redeploy verification required |
+| OGN collector Docker activity health | Implemented; Synology deployment verification required |
+| iOS 1.0 (4) | Source complete; full build/device/TestFlight regression pending |
+| Android version code 4 | Source complete; build/device runtime pending |

@@ -102,3 +102,8 @@ The code expires after five minutes and works once. Create a new one if it expir
 ## Station icon legend
 
 Open **More → Legend** to see the current station icon colours and their meanings: Healthy, Warning, No recent heartbeat, Inactive and Unknown. When **Highlight back-level software** is enabled, Back-level software is also shown. On iOS the legend follows the configured map/status colours; operational health continues to take precedence over software-level highlighting.
+
+
+## Admin container inventory
+
+Admin shows the health and resource state of PostgreSQL, every `atom-api` replica, Nginx/load balancer, the OGN collector, `atom-admin-monitor` and `atom-admin-control`. The two Admin services are monitored as singletons but cannot be scaled from the app. Only `atom-api` has scaling controls.

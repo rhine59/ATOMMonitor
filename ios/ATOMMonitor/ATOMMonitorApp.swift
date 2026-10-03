@@ -6,7 +6,7 @@ struct ATOMMonitorApp: App {
 
     private var repository: any StationRepository {
         if ProcessInfo.processInfo.arguments.contains("--demo-mode") {
-            return DemoStationRepository()
+            return FixtureStationRepository(resourceName: "demo-stations")
         }
         return ConfigurableAPIStationRepository()
     }

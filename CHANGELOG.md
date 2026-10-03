@@ -2,7 +2,8 @@
 
 - Replaced phone entry of the shared administrator token with five-minute, one-time device pairing codes.
 - Added persistent, individually revocable device credentials, a LAN-restricted pairing page with QR/short-code display, iOS Keychain plus Face ID/passcode unlock, and Android Keystore storage.
-- Bumped the iOS TestFlight build to 1.0 (3) and Android version code to 2.
+- Added direct in-app QR scanning on iOS and Android, retaining manual short-code entry as fallback.
+- Bumped the iOS TestFlight build to 1.0 (3) and Android version code to 3.
 
 # Changelog
 

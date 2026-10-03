@@ -10,6 +10,14 @@
 
 # Changelog
 
+## 3 October 2026 — real 100-station iOS simulation
+
+- Replaced the artificial 250-node grid with a pre-recording snapshot of 100 real geolocated stations from the live service.
+- Preserves real station names, coordinates, status, versions, timestamps and technical telemetry.
+- Freezes the snapshot for the recording and excludes the generated JSON from Git.
+- Adapted UI automation to select real stations without assuming fixture names.
+
+
 ## 3 October 2026 — 250-station iOS simulation
 
 - Replaced the five-record dated demo dependency with a runtime-generated 250-station UK-wide dataset.

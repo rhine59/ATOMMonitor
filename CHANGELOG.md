@@ -10,6 +10,13 @@
 
 # Changelog
 
+## 3 October 2026 — full repository checkpoint
+
+- Added `docs/CHECKPOINT-2026-10-03.md` covering server, Docker, Admin, collector health, iOS, Android, rebuild and release gates.
+- Synchronized the feature register, runbooks and release documentation with the final checkpoint.
+- Preserved explicit pending status for the newest server deployment verification, iOS build 4 regression and Android build/device runtime.
+
+
 ## 3 October 2026 — meaningful OGN collector health
 
 - Added an APRS activity heartbeat and Docker healthcheck to `ogn-station-probe`.

@@ -219,3 +219,17 @@ From `server/`, run `python -m unittest -v test_admin_monitor.py test_admin_cont
 ### Admin build and deferred live acceptance
 
 Run `scripts/build-admin.sh` to validate configuration, build/start both restricted Admin services, wait for Docker health and prove the control service has no published host port. When ready for the deliberate live scale test, export `ATOM_ADMIN_TOKEN` and optionally `ATOM_ADMIN_BASE_URL`, then run `scripts/admin-scaling-acceptance.sh`. It performs 2→3→2 scaling, continuously checks public station reads, verifies API health/singletons and confirms audit evidence. Collector-write continuity must also be checked from the live collector logs/API evidence before marking the feature Tested.
+
+
+## Administrator pairing release gate
+
+Before releasing a build containing Admin functionality:
+
+1. Deploy the current Admin containers with `sh scripts/build-admin.sh`.
+2. Run `sh scripts/admin-pairing-acceptance.sh`.
+3. Run `sh scripts/admin-scaling-acceptance.sh`.
+4. On iOS, test QR scan, manual-code fallback, biometric/passcode unlock, persistence after relaunch, revocation, Report drill-down and default-Off back-level highlighting on a physical phone.
+5. On Android, run `./gradlew clean assembleDebug test`, then repeat the pairing and report checks on a Google Play-enabled emulator and physical phone.
+6. Record build success and runtime success separately. Android remains runtime-pending until these device checks pass.
+
+See `docs/ADMIN-PAIRING-AND-RELEASE.md` for the commands and recovery procedure.

@@ -101,3 +101,8 @@ The physical-iPhone QR pairing flow passed on 3 October 2026. Before the next Te
 ## Station icon legend
 
 **More → Legend** displays each effective station status using the current configured icon colour. Back-level software is included only when its Settings toggle is enabled. This change requires the next Xcode build and physical-device regression pass.
+
+
+## Admin service inventory synchronization
+
+iOS decodes and displays the server's generic container array, including `atom-admin-monitor` and `atom-admin-control`. Neither Admin service receives scaling controls; only `atom-api` can be changed. The 120-second client timeout exceeds the server's complete scaling readiness/proxy window.

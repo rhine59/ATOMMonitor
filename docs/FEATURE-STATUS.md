@@ -119,3 +119,18 @@ Server Phase 1 resilience remains Tested. The Synology stack is a development/te
 ### Report drill-down and optional back-level highlighting — 3 October 2026
 
 **Implemented — iOS/Android build and runtime verification pending.** Report totals, status rows and version rows now navigate to Stations with the corresponding shared filter, including Version not reported. Back-level software highlighting is persisted and Off by default on both platforms; enabling it affects only otherwise Healthy stations and never overrides operational status.
+
+
+## 3 October 2026 administrator pairing checkpoint
+
+| Capability | Server | iOS | Android |
+|---|---|---|---|
+| LAN-only one-time pairing page | Implemented; live-tested | Consumes QR/code | Consumes QR/code |
+| Five-minute, single-use exchange | Implemented; live-tested | Live-tested on physical iPhone | Source implemented; runtime pending |
+| Per-device credential storage | Hash persisted in Admin data volume | Keychain; live-tested | Keystore; runtime pending |
+| Direct QR scanning | QR payload generated | AVFoundation; live-tested | Google code scanner; runtime pending |
+| Device revocation | Implemented; live-tested through app flow | Live-tested | Source implemented; runtime pending |
+| Report category drill-down | API-independent | Source implemented; release verification required | Source implemented; runtime pending |
+| Back-level highlighting default Off | API-independent | Source implemented; release verification required | Source implemented; runtime pending |
+
+Server automation is `scripts/admin-pairing-acceptance.sh`. Full rebuild and release procedure: `docs/ADMIN-PAIRING-AND-RELEASE.md`.

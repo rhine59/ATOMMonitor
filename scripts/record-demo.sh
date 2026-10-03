@@ -6,6 +6,12 @@ SCHEME="ATOMMonitor"; STAMP="${ATOM_DEMO_STAMP:-$(date '+%Y-%m-%d-%H%M%S')}"; RA
 # .app bundles created under the repository's artifacts/DerivedData acquired FinderInfo
 # / File Provider metadata and failed simulator CodeSign. /tmp was verified clean.
 DERIVED_DATA="${ATOM_DERIVED_DATA:-/tmp/ATOMMonitor-DerivedData}"
+if [ "${ATOM_DEMO_USE_EXISTING_FIXTURE:-0}" != "1" ]; then
+  echo "Capturing ${ATOM_DEMO_STATION_COUNT:-100} real stations from the live service..."
+  python3 "$ROOT/scripts/prepare-ios-demo-fixture.py"
+else
+  echo "Using the existing committed demo station fixture."
+fi
 cd "$IOS"; command -v xcodegen >/dev/null || { echo "Install XcodeGen first: brew install xcodegen"; exit 1; }; xcodegen generate
 if [ -n "${DEVICE:-}" ]; then DEVICE_NAME="$DEVICE"; else AVAILABLE=$(xcrun simctl list devices available); for candidate in "iPhone 17 Pro" "iPhone 17" "iPhone 16e" "iPhone Air" "iPhone 17 Pro Max"; do if printf '%s\n' "$AVAILABLE" | grep -Fq "    $candidate ("; then DEVICE_NAME="$candidate"; break; fi; done; if [ -z "${DEVICE_NAME:-}" ]; then DEVICE_NAME=$(printf '%s\n' "$AVAILABLE" | sed -n 's/^    \(iPhone[^()] *\) (.*$/\1/p' | head -1 | sed 's/[[:space:]]*$//'); fi; fi
 [ -n "${DEVICE_NAME:-}" ] || { echo "No available iPhone Simulator was found."; exit 1; }

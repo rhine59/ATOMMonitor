@@ -63,10 +63,15 @@
 Build a minimal diagnostic OGN APRS collector whose only purpose is to find and print receiver/status messages for `PWMalham`, while explicitly discarding aircraft traffic. Use captured examples to define parser tests before designing the production schema around guessed packet formats.
 \n\n## Checkpoint synchronization — 18 September 2026\n\nPhase 3 PostgreSQL migration is Tested; Phase 4 replicated API/Nginx runtime acceptance has passed; and the cross-phase acceptance framework is Tested. The next server priority is PostgreSQL backup/restore and backup-policy coverage, followed by formal Phase 4 close-out. No Phase 5 acceptance contract has yet been defined. See `CHECKPOINT-2026-09-18.md`.\n
 
-## Planned restricted Admin function — 20 September 2026
+## Restricted Admin function
 
 Add a separately authenticated iOS/Android Admin area backed by a narrow server-side control service. Phase one provides current ATOM Monitor container/host health and resource monitoring; phase two permits deliberate scale up/down of `atom-api` only, with bounds, confirmation, serialization and audit events. This is not automatic scaling and does not change the single-Synology failure domain. See `ADMIN-INFRASTRUCTURE.md`.
 
 ## Admin implementation progress — 20 September 2026
 
-Server delivery steps 1–3 are implemented in source: separate authentication/control design, read-only infrastructure monitoring, and guarded `atom-api` scaling. Next is Synology acceptance (including 2→3→2 availability and audit evidence), followed by iOS Admin UI/secure storage and Android parity/runtime tests.
+Server control-plane delivery, device pairing, iOS Admin UI/secure storage, scaling timeout correction and Admin self-monitoring are implemented. The iOS pairing flow has live physical-device evidence. Remaining work is Android build/device runtime acceptance and repeatable release regression.
+
+
+## Admin next checkpoint — 3 October 2026
+
+Run the complete server pairing and 2→3→2 scaling acceptance after each Admin/Nginx change. Complete the Android physical-device QR, persistence, revocation and scaling pass. Continue treating multi-container operation on one NAS as process resilience rather than host high availability.

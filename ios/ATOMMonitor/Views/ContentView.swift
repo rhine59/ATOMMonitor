@@ -1,6 +1,6 @@
 import SwiftUI
 
-private enum AppTab: Hashable { case map, stations, favourites, report, admin, settings, help, feedback, about }
+private enum AppTab: Hashable { case map, stations, favourites, report, admin, settings, legend, help, feedback, about }
 
 struct ContentView: View {
     @StateObject private var store: StationStore

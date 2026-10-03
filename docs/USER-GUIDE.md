@@ -83,3 +83,17 @@ Back-level software highlighting is **Off by default**. Settings → Station sta
 4. Select **Scan pairing QR code** and point the phone at the displayed QR code. The app exchanges it immediately. Manual entry of the displayed one-time code remains available as a fallback. The code expires after five minutes and cannot be reused.
 5. On iPhone, approve Face ID or the device passcode. Later visits use **Unlock with Face ID or passcode**; the shared server token is never shown or entered.
 6. **Lock Admin** closes the administrative view but preserves pairing. **Remove administrator access** revokes that phone and deletes its stored credential.
+
+
+## Administrator access (current process)
+
+Do not enter or request a shared administrator token. While connected through an approved local network:
+
+1. Open `https://granvillehouse.synology.me:8445/api/v1/admin/pair` in a browser.
+2. In ATOM Monitor open **Admin** and select **Scan pairing QR code**.
+3. Scan the displayed QR code. If scanning is unavailable, type the displayed one-time code.
+4. Complete Face ID/device-passcode authentication where offered.
+5. Use **Lock Admin** to close the Admin view without removing the paired device.
+6. Use **Remove this device** when the phone should no longer have administrator access.
+
+The code expires after five minutes and works once. Create a new one if it expires. A 401 during pairing normally means the code expired, was already used, or the request did not originate from an approved network.

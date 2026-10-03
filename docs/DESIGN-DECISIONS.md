@@ -97,3 +97,15 @@ This file records decisions and the reasoning behind them. New material changes 
 
 **Consequence:** Release packaging must preserve required third-party notices and must not commit signing keys, passwords, SMTP secrets or other distribution credentials.
 \n\n## Checkpoint synchronization — 18 September 2026\n\nImplementation checkpoint: PostgreSQL is the live backend; two stateless API replicas run behind Nginx; the collector remains single-active and submits through Nginx. The complete Phase 1–4/service acceptance suite passed. This operational topology and the reproducible-rebuild/acceptance-test discipline are now established project decisions. See `CHECKPOINT-2026-09-18.md`.\n
+
+## Administrator authentication and control-plane decisions — 3 October 2026
+
+**Decision:** Use LAN-only, five-minute, one-time QR/short-code pairing rather than entering a shared administrator secret on a phone.
+
+**Decision:** Persist pending challenge hashes and device credential hashes in the Admin data volume so load balancing and container recreation do not invalidate an otherwise current code.
+
+**Decision:** Keep Docker observation in `atom-admin-monitor` and writable Docker control in an internal-only `atom-admin-control`. The phone may request only confirmed `atom-api` replica counts from 1–4.
+
+**Decision:** Include both Admin containers in their own allow-listed health/resource inventory. Self-monitoring does not grant self-scaling or generic container mutation.
+
+**Decision:** Use ordered timeouts: 90-second controller readiness, 100-second monitor request, 105-second Nginx proxy and 120-second mobile request.

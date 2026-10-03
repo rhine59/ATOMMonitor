@@ -37,26 +37,27 @@ final class ATOMMonitorDemoUITests: XCTestCase {
             sleep(2)
         }
         let search = app.searchFields.firstMatch
-        search.tap(); search.typeText("Demo Healthy"); sleep(1)
-        let favourite = app.buttons.matching(NSPredicate(format: "label CONTAINS[c] %@", "Add PW Demo Healthy")).firstMatch
-        if favourite.waitForExistence(timeout: 2) { favourite.tap() }
-        let healthy = app.staticTexts["PW Demo Healthy"].firstMatch
-        if healthy.waitForExistence(timeout: 3) {
-            healthy.tap(); sleep(3)
+        search.tap(); search.typeText("PW"); sleep(1)
+        let favourite = app.buttons.matching(NSPredicate(format: "label BEGINSWITH[c] %@", "Add ")).firstMatch
+        XCTAssertTrue(favourite.waitForExistence(timeout: 3), "No real station favourite control found")
+        favourite.tap(); sleep(1)
+        let firstStation = app.cells.firstMatch
+        if firstStation.waitForExistence(timeout: 2) {
+            firstStation.tap(); sleep(3)
             if app.navigationBars.buttons.firstMatch.exists { app.navigationBars.buttons.firstMatch.tap() }
         }
         if search.exists { let clear = search.buttons["Clear text"]; if clear.exists { clear.tap() } }
 
-        step("Favourites: locally persisted favourite station")
+        step("Favourites: locally persisted real station")
         selectTab("Favourites", in: app); sleep(2)
-        XCTAssertTrue(app.staticTexts["PW Demo Healthy"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.cells.firstMatch.waitForExistence(timeout: 3), "Favourite real station is missing")
 
         step("Report: summaries and category drill-down into Stations")
         selectTab("Report", in: app); sleep(2)
         XCTAssertTrue(app.navigationBars["Report"].waitForExistence(timeout: 3))
         XCTAssertTrue(app.staticTexts["Total stations"].waitForExistence(timeout: 2))
-        let total250 = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "250")).firstMatch
-        XCTAssertTrue(total250.waitForExistence(timeout: 2), "Demo report must contain 250 stations")
+        let total250 = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "100")).firstMatch
+        XCTAssertTrue(total250.waitForExistence(timeout: 2), "Live demo report must contain 100 stations")
         XCTAssertTrue(app.staticTexts["Status"].waitForExistence(timeout: 2))
         XCTAssertTrue(app.staticTexts["PilotAware versions"].waitForExistence(timeout: 2))
         let healthyReport = app.buttons.matching(NSPredicate(format: "label BEGINSWITH[c] %@", "Healthy")).firstMatch

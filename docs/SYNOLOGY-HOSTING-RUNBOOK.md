@@ -567,3 +567,25 @@ Add a third unique secret, `ATOM_ADMIN_CONTROL_TOKEN`, to `server/.env`, then re
 ### Admin build/test commands
 
 Use `scripts/build-admin.sh` for the two Admin containers. The control code uses Docker's unversioned local-socket API by default for compatibility with the Synology engine; `DOCKER_API_PREFIX` is available only if an explicit engine API prefix is later required. Run `scripts/admin-scaling-acceptance.sh` only in a planned test window because it deliberately changes the API tier 2→3→2. It does not alter PostgreSQL, Nginx or the collector.
+
+
+## Admin pairing rebuild and verification
+
+Administrator pairing state is held in the named `atommonitor-admin-devices` volume mounted at `/data`. It contains hashed device credentials and pending one-time challenges. Normal image/container rebuilds must preserve this volume.
+
+```bash
+cd /volume1/docker/ATOMMonitor
+git status --short
+git pull --ff-only
+cd server
+sudo docker compose config --quiet
+cd ..
+sh scripts/build-admin.sh
+sh scripts/admin-pairing-acceptance.sh
+```
+
+If `git pull` reports that `ios/ATOMMonitor.xcodeproj/project.pbxproj` would be overwritten, inspect and commit the intentional change or stash that exact file before pulling. Do not reset the whole working tree.
+
+The public pairing page is `https://granvillehouse.synology.me:8445/api/v1/admin/pair`, but it is intentionally usable only when the source address is in `ATOM_ADMIN_PAIRING_NETWORKS`. The exchange endpoint is `POST /api/v1/admin/pair/exchange`. A 401 normally means an expired/already-used code, a disallowed source, or an obsolete deployment without persistent challenge storage.
+
+Back up the named Admin data volume with the other service data. Deliberately deleting it revokes all paired phones. Full instructions: `docs/ADMIN-PAIRING-AND-RELEASE.md`.

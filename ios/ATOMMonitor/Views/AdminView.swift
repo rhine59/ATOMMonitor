@@ -74,26 +74,70 @@ struct AdminView:View {
 }
 
 
-private final class QRScannerController:UIViewController,AVCaptureMetadataOutputObjectsDelegate {
-    var onCode:((String)->Void)?
-    private let session=AVCaptureSession()
-    override func viewDidLoad(){
-        super.viewDidLoad();view.backgroundColor=.black
-        guard let device=AVCaptureDevice.default(for:.video),let input=try? AVCaptureDeviceInput(device:device),session.canAddInput(input) else{return}
-        session.addInput(input);let output=AVCaptureMetadataOutput();guard session.canAddOutput(output) else{return};session.addOutput(output)
-        output.setMetadataObjectsDelegate(self,queue:.main);output.metadataObjectTypes=[.qr]
-        let preview=AVCaptureVideoPreviewLayer(session:session);preview.videoGravity=.resizeAspectFill;preview.frame=view.bounds;view.layer.addSublayer(preview)
-        DispatchQueue.global(qos:.userInitiated).async{self.session.startRunning()}
+private final class QRScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
+    var onCode: ((String) -> Void)?
+    private let session = AVCaptureSession()
+    private var previewLayer: AVCaptureVideoPreviewLayer?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .black
+
+        guard
+            let device = AVCaptureDevice.default(for: .video),
+            let input = try? AVCaptureDeviceInput(device: device),
+            session.canAddInput(input)
+        else { return }
+
+        session.addInput(input)
+
+        let output = AVCaptureMetadataOutput()
+        guard session.canAddOutput(output) else { return }
+        session.addOutput(output)
+        output.setMetadataObjectsDelegate(self, queue: .main)
+        output.metadataObjectTypes = [.qr]
+
+        let preview = AVCaptureVideoPreviewLayer(session: session)
+        preview.videoGravity = .resizeAspectFill
+        preview.frame = view.bounds
+        view.layer.addSublayer(preview)
+        previewLayer = preview
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.session.startRunning()
+        }
     }
-    override func viewDidLayoutSubviews(){super.viewDidLayoutSubviews();(view.layer.sublayers?.first as? AVCaptureVideoPreviewLayer)?.frame=view.bounds}
-    func metadataOutput(_ output:AVCaptureMetadataOutput,didOutput metadataObjects:[AVMetadataObject],from connection:AVCaptureConnection){
-        guard let code=(metadataObjects.first as? AVMetadataMachineReadableCodeObject)?.stringValue else{return}
-        session.stopRunning();onCode?(code)
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        previewLayer?.frame = view.bounds
     }
-    deinit{if session.isRunning{session.stopRunning()}}
+
+    func metadataOutput(
+        _ output: AVCaptureMetadataOutput,
+        didOutput metadataObjects: [AVMetadataObject],
+        from connection: AVCaptureConnection
+    ) {
+        guard let code = (metadataObjects.first as? AVMetadataMachineReadableCodeObject)?.stringValue else { return }
+        session.stopRunning()
+        onCode?(code)
+    }
+
+    deinit {
+        if session.isRunning {
+            session.stopRunning()
+        }
+    }
 }
-private struct QRCodeScannerView:UIViewControllerRepresentable {
-    let onCode:(String)->Void
-    func makeUIViewController(context:Context)->QRScannerController{let controller=QRScannerController();controller.onCode=onCode;return controller}
-    func updateUIViewController(_ uiViewController:QRScannerController,context:Context){}
+
+private struct QRCodeScannerView: UIViewControllerRepresentable {
+    let onCode: (String) -> Void
+
+    func makeUIViewController(context: Context) -> QRScannerController {
+        let controller = QRScannerController()
+        controller.onCode = onCode
+        return controller
+    }
+
+    func updateUIViewController(_ uiViewController: QRScannerController, context: Context) {}
 }

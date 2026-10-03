@@ -8,6 +8,8 @@ for script in build-postgres.sh build-api.sh build-nginx.sh build-collector.sh b
   printf '\n===== %s =====\n' "$script"
   sh "$ROOT/scripts/$script"
 done
+printf '\n--- Admin pairing route/exchange/revocation acceptance ---\n'
+sh "$ROOT/scripts/admin-pairing-acceptance.sh"
 printf '\n--- final Compose state ---\n'
 cd "$ROOT/server"
 sudo docker compose ps

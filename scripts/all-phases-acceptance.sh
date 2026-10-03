@@ -7,4 +7,6 @@ for phase in 1 2 3 4; do
 done
 printf '\n===== RUNNING CURRENT SERVICE/API MATRIX =====\n'
 sh "$ROOT/scripts/service-api-acceptance.sh"
-printf '\nALL IMPLEMENTED PHASE AND SERVICE/API ACCEPTANCE TESTS: PASS\n'
+printf '\n===== RUNNING ADMIN DEVICE-PAIRING ACCEPTANCE =====\n'
+sh "$ROOT/scripts/admin-pairing-acceptance.sh"
+printf '\nALL IMPLEMENTED PHASE, SERVICE/API AND ADMIN PAIRING ACCEPTANCE TESTS: PASS\n'

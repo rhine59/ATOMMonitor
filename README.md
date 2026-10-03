@@ -95,7 +95,7 @@ Phase 2 SQLite backup/recovery tooling is retained and regression-tested against
 
 ## Restricted infrastructure administration checkpoint — 20 September 2026
 
-The server source now contains a separate authenticated Admin control plane. Read-only monitoring is handled by `atom-admin-monitor`; confirmed manual scaling is delegated to an internal-only `atom-admin-control` service that can change only the `atom-api` replica count from 1–4. Operations are serialized, rate-limited, audited and reported successful only after all requested replicas are Docker-healthy. Unit tests pass; Synology runtime acceptance and iOS/Android Admin UI remain pending.
+The server source now contains a separate authenticated Admin control plane. Read-only monitoring is handled by `atom-admin-monitor`; confirmed manual scaling is delegated to an internal-only `atom-admin-control` service that can change only the `atom-api` replica count from 1–4. Operations are serialized, rate-limited, audited and reported successful only after all requested replicas are Docker-healthy. The inventory includes both Admin containers as healthy singleton services. iOS pairing has live physical-device evidence; Android build/device runtime acceptance remains pending.
 
 
 ## Administrator device pairing — tested 3 October 2026
@@ -103,3 +103,8 @@ The server source now contains a separate authenticated Admin control plane. Rea
 Administrator access now uses a LAN-restricted, five-minute one-time QR/short code. The apps exchange it for an individually revocable device credential; shared administrator secrets are never entered on a phone. Pairing challenges and device registrations persist in the Admin Docker data volume, including across container recreation and load-balanced requests. The complete rebuild, release, acceptance and recovery procedure is in `docs/ADMIN-PAIRING-AND-RELEASE.md`.
 
 The iOS QR → exchange → stored credential flow passed on a physical iPhone. Android includes the corresponding Google code-scanner and Keystore implementation; its current build and device-runtime verification remain pending.
+
+
+## Admin service synchronization — 3 October 2026
+
+Both mobile apps consume the same generic Admin container contract and therefore display `atom-admin-monitor` and `atom-admin-control` without platform-specific service lists. Only `atom-api` exposes scaling controls. Clean Admin rebuilds recreate Nginx, validate pairing/summary/scale routes and use timeout layers long enough for Docker health convergence.

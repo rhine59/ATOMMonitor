@@ -94,15 +94,20 @@ Collector HA is a separate later problem and must not be implemented by simply s
 Two replicas on the same Synology would protect only against an individual process/container failure; they would not protect against NAS, router, broadband, power or site failure.
 \n\n## Checkpoint synchronization — 18 September 2026\n\nThe current Synology development/test topology is PostgreSQL plus two stateless API replicas behind Nginx with one single-active collector. The full Phase 1–4 and service/API acceptance suite passed, including both replica-loss/rejoin paths, API and Nginx recreation, direct checks of both replicas, PostgreSQL/API count agreement and new live collector HTTP 202 traffic through Nginx. Multiple replicas on one NAS do not provide host/site HA. See `CHECKPOINT-2026-09-18.md`.\n
 
-## Restricted administration boundary — planned 20 September 2026
+## Restricted administration boundary
 
-The planned Admin function adds a separate authenticated control plane for ATOM Monitor container health/resource monitoring and API-replica scaling. Docker control must not be added to the existing public API container by mounting the Docker socket. A separate narrowly scoped admin-control component will expose only allow-listed ATOM Monitor monitoring and `atom-api` scaling. See `ADMIN-INFRASTRUCTURE.md`.
+The implemented Admin function uses a separate authenticated control plane for ATOM Monitor container health/resource monitoring and API-replica scaling. Docker control is not present in the public API container. The narrowly scoped Admin services expose only allow-listed ATOM Monitor monitoring and `atom-api` scaling. See `ADMIN-INFRASTRUCTURE.md`.
 
 
 ## Read-only admin monitoring component
 
-A separate `atom-admin-monitor` container now owns the initial infrastructure-monitoring boundary. Nginx sends `/api/v1/admin/` to this service while all ordinary paths continue to the replicated public API. The public API therefore has no Docker socket mount. The monitor currently performs GET-only Docker inspection/stats and exposes no mutation route. Scaling remains deliberately unimplemented pending a stronger control boundary and runtime validation.
+A separate `atom-admin-monitor` container now owns the initial infrastructure-monitoring boundary. Nginx sends `/api/v1/admin/` to this service while all ordinary paths continue to the replicated public API. The public API therefore has no Docker socket mount. The monitor performs GET-only Docker inspection/stats and forwards only authenticated, confirmed scale requests to the internal control service. The inventory includes PostgreSQL, API replicas, Nginx, collector, Admin monitor and Admin control. Mutation remains restricted to `atom-api`.
 
 ## Admin control-plane checkpoint — 20 September 2026
 
 Infrastructure administration is split between `atom-admin-monitor` (authenticated external API and read-only current metrics) and the internal-only `atom-admin-control` boundary. The control container alone has writable Docker-socket access. It can scale only the Compose project’s `atom-api` containers from 1–4, waits for Docker health, serializes/rate-limits changes, and writes a bounded operational audit trail to a dedicated named volume. The public station API never receives Docker access.
+
+
+## Current Admin architecture checkpoint — 3 October 2026
+
+LAN-only five-minute pairing codes produce individually revocable device credentials. Pairing challenges and credential hashes persist in the Admin data volume. The external `atom-admin-monitor` has read-only Docker access and reports every allow-listed service, including itself and `atom-admin-control`. The internal-only control service has writable Docker access but can mutate only `atom-api` replicas from 1–4. Scaling waits up to 90 seconds; enclosing monitor, proxy and mobile timeouts are progressively longer to prevent premature HTTP 504 responses.

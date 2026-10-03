@@ -10,6 +10,13 @@
 
 # Changelog
 
+## 3 October 2026 — Admin self-monitoring
+
+- Added `atom-admin-monitor` and `atom-admin-control` to the restricted Admin container inventory.
+- Kept mobile scaling restricted to `atom-api`; the Admin services remain read-only inventory entries.
+- Added unit coverage for both required Admin service names.
+
+
 ## 2026-09-17 — Reporting, sharing and cross-platform checkpoint
 
 - Added iPhone Report with station totals, counts by displayed operational status and PilotAware version.

@@ -134,3 +134,15 @@ Server Phase 1 resilience remains Tested. The Synology stack is a development/te
 | Back-level highlighting default Off | API-independent | Source implemented; release verification required | Source implemented; runtime pending |
 
 Server automation is `scripts/admin-pairing-acceptance.sh`. Full rebuild and release procedure: `docs/ADMIN-PAIRING-AND-RELEASE.md`.
+
+
+## Station icon legend checkpoint — 3 October 2026
+
+| Capability | iOS | Android |
+|---|---|---|
+| Legend available under More | Implemented; build/runtime verification pending | Implemented; build/runtime verification pending |
+| Operational statuses shown | Healthy, Warning, No recent heartbeat, Inactive, Unknown | Healthy, Warning, No recent heartbeat, Inactive, Unknown |
+| Back-level entry | Shown only when highlighting is enabled | Shown only when highlighting is enabled |
+| Colour source | Current configured map/status colours | Current Android effective-status colours |
+
+Android now uses five primary bottom destinations—Map, Stations, Favourites, Report and More—rather than squeezing every utility destination into the bottom bar.

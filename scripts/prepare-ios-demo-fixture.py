@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Capture a deterministic, station-only demo fixture from the live ATOM service."""
 from __future__ import annotations
-import argparse, json, os, pathlib, tempfile, urllib.request
+import argparse, hashlib, json, os, pathlib, tempfile, urllib.request
 from collections import Counter
 
 DEFAULT_URL = "https://granvillehouse.synology.me:8445/api/v1/stations"
@@ -26,17 +26,13 @@ def select_geographic(stations: list[dict], count: int) -> list[dict]:
         and station.get("id")
         and station.get("name")
     ]
-    eligible.sort(key=lambda station: (
-        float(station["latitude"]),
-        float(station["longitude"]),
-        str(station["id"]),
-    ))
     if len(eligible) < count:
         raise RuntimeError(f"live service supplied only {len(eligible)} geolocated stations; {count} requested")
-    if count == 1:
-        return [eligible[len(eligible) // 2]]
-    indexes = [round(index * (len(eligible) - 1) / (count - 1)) for index in range(count)]
-    return [eligible[index] for index in indexes]
+    # A stable hash sample preserves the live network's natural geographic density
+    # instead of laying stations out or forcing equal numbers into artificial bands.
+    eligible.sort(key=lambda station: hashlib.sha256(str(station["id"]).encode("utf-8")).digest())
+    selected = eligible[:count]
+    return sorted(selected, key=lambda station: str(station["name"]).casefold())
 
 def write_atomic(path: pathlib.Path, stations: list[dict]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)

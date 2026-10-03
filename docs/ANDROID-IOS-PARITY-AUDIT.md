@@ -95,3 +95,17 @@ Android parity is reached when every user-visible iPhone feature above either:
 
 A source implementation or successful compile alone is not sufficient to mark parity Tested.
 \n\n## Checkpoint synchronization — 18 September 2026\n\nServer work has advanced independently to the tested PostgreSQL/two-API/Nginx checkpoint. iOS simulation is complete for the current phone checkpoint; Android remains paused with the Home-station picker scrolling defect open. Phone functional parity remains mandatory when phone work resumes. See `CHECKPOINT-2026-09-18.md`.\n
+
+## Admin and navigation parity checkpoint — 3 October 2026
+
+| Area | iOS | Android |
+|---|---|---|
+| LAN QR/short-code pairing | Implemented; physical-phone flow tested | Implemented; device runtime pending |
+| Secure device credential | Keychain + device authentication | Android Keystore |
+| Generic container inventory | Renders every server container row, including both Admin services | Renders every server container row, including both Admin services |
+| API scaling | Confirmed 1–4 `atom-api` only | Confirmed 1–4 `atom-api` only |
+| Request timeout | 120 seconds | 120 seconds |
+| More navigation | System More list, alphabetic | Explicit More list, alphabetic |
+| Station icon legend | More → Legend | More → Legend |
+
+No client schema change is required when an additional allow-listed Docker service is returned because both clients iterate the shared container array.

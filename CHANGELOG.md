@@ -77,6 +77,12 @@
 - iOS and Android build/runtime verification remains pending.
 
 
+## 3 October 2026 — Admin scaling timeout correction
+
+- Increased the scale readiness window to 90 seconds.
+- Ordered the Admin monitor, Nginx and mobile-client timeouts above that controller window.
+- Prevents premature HTTP 504 responses while new API replicas are still becoming Docker-healthy.
+
 ## 3 October 2026 — station icon legend
 
 - Added **More → Legend** on iOS and Android for station icon colours and meanings.

@@ -67,7 +67,7 @@ Aircraft traffic remains outside project scope and must not be stored as tracks,
 
 ## Restricted Admin
 
-Admin is locked until the separate administrator token is accepted. iOS stores it in Keychain; Android encrypts it with an Android Keystore key. The screen shows only ATOM Monitor containers and API replica health/resources. To scale, select 1–4 API replicas, review the target and confirm. Only `atom-api` can change; PostgreSQL, Nginx and the collector remain singletons. Lock Admin removes the saved credential. Scaling is operational administration and does not provide automatic scaling or whole-host resilience.
+Admin is locked until this phone is paired from an approved local network. iOS stores its per-device credential in Keychain; Android protects it with Android Keystore. The screen shows only ATOM Monitor containers and API replica health/resources. To scale, select 1–4 API replicas, review the target and confirm. Only `atom-api` can change; PostgreSQL, Nginx and the collector remain singletons. Lock Admin keeps the pairing; Remove this device revokes it. Scaling is operational administration and does not provide automatic scaling or whole-host resilience.
 
 ## Report drill-down and back-level highlighting
 

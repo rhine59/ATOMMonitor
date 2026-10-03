@@ -28,10 +28,31 @@ private enum AdminKeychain {
 }
 
 @MainActor private final class AdminModel:ObservableObject {
-    @Published var token = AdminKeychain.load()
+    @Published var token: String
     @Published var pairingCode = ""
     @Published var summary:AdminSummary?; @Published var busy=false; @Published var message:String?; @Published var target=2
+    private let demoMode: Bool
     private var baseURL:String{UserDefaults.standard.string(forKey:ServerConfiguration.key) ?? ATOMMonitorApp.defaultServerURL}
+
+    init() {
+        demoMode = ProcessInfo.processInfo.arguments.contains("--demo-mode")
+        token = demoMode ? "demo-device-credential" : AdminKeychain.load()
+        summary = demoMode ? Self.demoSummary(replicas: 2) : nil
+    }
+
+    private static func demoSummary(replicas: Int) -> AdminSummary {
+        let fixed = [
+            AdminSummary.Container(service:"postgres",name:"atommonitor-postgres",state:"running",health:"healthy",cpuPercent:0.4,memoryUsedBytes:98_566_144),
+            AdminSummary.Container(service:"atom-lb",name:"atommonitor-lb",state:"running",health:"healthy",cpuPercent:0.2,memoryUsedBytes:12_582_912),
+            AdminSummary.Container(service:"ogn-station-probe",name:"atommonitor-ogn-probe",state:"running",health:"healthy",cpuPercent:0.3,memoryUsedBytes:24_117_248),
+            AdminSummary.Container(service:"atom-admin-monitor",name:"atommonitor-admin-monitor",state:"running",health:"healthy",cpuPercent:0.2,memoryUsedBytes:31_457_280),
+            AdminSummary.Container(service:"atom-admin-control",name:"atommonitor-admin-control",state:"running",health:"healthy",cpuPercent:0.1,memoryUsedBytes:22_020_096)
+        ]
+        let api = (1...replicas).map { index in
+            AdminSummary.Container(service:"atom-api",name:"server-atom-api-\(index)",state:"running",health:"healthy",cpuPercent:0.6,memoryUsedBytes:52_428_800)
+        }
+        return AdminSummary(status:"ok",apiReplicas:.init(running:replicas,healthy:replicas),containers:(fixed+api).sorted{$0.service==$1.service ? $0.name<$1.name : $0.service<$1.service})
+    }
     private func request(_ path:String,method:String="GET",body:Data?=nil) async throws->Data {
         let base=baseURL.hasSuffix("/") ? baseURL:baseURL+"/"; guard let url=URL(string:base+path) else{throw URLError(.badURL)}
         var req=URLRequest(url:url);req.httpMethod=method;req.timeoutInterval=120;req.httpBody=body
@@ -42,9 +63,9 @@ private enum AdminKeychain {
         return data
     }
     func pairDevice() async {busy=true;defer{busy=false};do{let body=try JSONSerialization.data(withJSONObject:["code":pairingCode,"deviceName":"iPhone"]);let result=try JSONDecoder().decode(PairResult.self,from:try await request("api/v1/admin/pair/exchange",method:"POST",body:body));token=result.deviceToken;AdminKeychain.save(token);pairingCode="";message=nil;await unlock()}catch{message=error.localizedDescription}}
-    func unlock() async {guard !token.isEmpty else{return};let context=LAContext();var error:NSError?;guard context.canEvaluatePolicy(.deviceOwnerAuthentication,error:&error) else{message="Device authentication is unavailable.";return};do{if try await context.evaluatePolicy(.deviceOwnerAuthentication,localizedReason:"Unlock ATOMMonitor administration"){await refresh()}}catch{message=error.localizedDescription}}
+    func unlock() async {guard !token.isEmpty else{return};if demoMode{summary=Self.demoSummary(replicas:target);message=nil;return};let context=LAContext();var error:NSError?;guard context.canEvaluatePolicy(.deviceOwnerAuthentication,error:&error) else{message="Device authentication is unavailable.";return};do{if try await context.evaluatePolicy(.deviceOwnerAuthentication,localizedReason:"Unlock ATOMMonitor administration"){await refresh()}}catch{message=error.localizedDescription}}
     func refresh() async {guard !token.isEmpty else{return};busy=true;defer{busy=false};do{summary=try JSONDecoder().decode(AdminSummary.self,from:try await request("api/v1/admin/summary"));target=summary?.apiReplicas.running ?? 2;message=nil}catch{summary=nil;message=error.localizedDescription}}
-    func scale() async {busy=true;defer{busy=false};do{let body=try JSONSerialization.data(withJSONObject:["replicas":target,"confirmed":true]);let result=try JSONDecoder().decode(ScaleResult.self,from:try await request("api/v1/admin/api-scale",method:"POST",body:body));await refresh();message="Scaled \(result.previousReplicas) → \(result.runningReplicas); \(result.healthyReplicas) healthy"}catch{message=error.localizedDescription}}
+    func scale() async {if demoMode{busy=true;try? await Task.sleep(for:.milliseconds(700));summary=Self.demoSummary(replicas:target);message="Demo scale complete: \(target) healthy replicas";busy=false;return};busy=true;defer{busy=false};do{let body=try JSONSerialization.data(withJSONObject:["replicas":target,"confirmed":true]);let result=try JSONDecoder().decode(ScaleResult.self,from:try await request("api/v1/admin/api-scale",method:"POST",body:body));await refresh();message="Scaled \(result.previousReplicas) → \(result.runningReplicas); \(result.healthyReplicas) healthy"}catch{message=error.localizedDescription}}
     func lock(){summary=nil;message=nil}
     func removeAccess() async {if !token.isEmpty{_=try? await request("api/v1/admin/device",method:"DELETE")};AdminKeychain.delete();token="";summary=nil;message=nil}
 }

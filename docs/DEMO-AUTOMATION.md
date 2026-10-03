@@ -7,7 +7,8 @@ ATOM Monitor includes a repeatable XCUITest-driven Simulator demonstration that 
 The recording contains ATOM ground-station health/status only: no aircraft identities, positions, tracks, speeds or movements.
 
 ## Components
-- `DemoStationRepository` in `ios/ATOMMonitor/Services/StationRepository.swift` — generates 250 deterministic station examples at runtime.
+- `scripts/prepare-ios-demo-fixture.py` — downloads and selects 100 real geolocated stations immediately before recording.
+- `ios/ATOMMonitor/Resources/demo-stations-live.json` — generated ignored snapshot bundled into that recording build.
 - `--demo-mode` — selects fixture data instead of the production API.
 - `ios/ATOMMonitorUITests/ATOMMonitorDemoUITests.swift` — XCUITest feature tour.
 - `ios/project.yml` — defines both app/UI-test targets **and the shared ATOMMonitor scheme test action**.
@@ -85,6 +86,11 @@ Commit fixtures, tests, scripts, annotation definitions, build/test instructions
 The recorder now assigns a timestamp automatically, retains the Xcode result bundle, and covers the full current navigation/function set. Admin uses an explicit `--demo-mode` fixture containing PostgreSQL, Nginx, collector, two API replicas and both Admin services. The scale demonstration changes only this in-memory fixture. Camera QR capture, Face ID, external Maps links, live feedback delivery and real Docker mutation remain physical-device/live-service acceptance items rather than Simulator recording actions.
 
 
-## 250-station dataset
+## 100-station live snapshot
 
-Demo mode generates exactly 250 ground stations. Five stable named records support UI automation; the remainder form a deterministic UK-wide grid. The mix includes every operational health state, several PilotAware versions, version-not-reported records, occasional missing positions and varied technical telemetry. Timestamps are generated relative to launch so Healthy/Warning/No recent heartbeat/Inactive examples do not become stale as the fixture ages.
+By default the recorder downloads the current public station endpoint and selects exactly 100 real geolocated stations, evenly sampled after geographic sorting. Their real names, coordinates, health, software versions, timestamps and telemetry are retained. The generated JSON is ignored by Git and frozen for the duration of the build/recording, so the dataset cannot change midway through the tour.
+
+Use a different count or endpoint with `ATOM_DEMO_STATION_COUNT` and `ATOM_DEMO_STATIONS_URL`. Set `ATOM_DEMO_USE_EXISTING_FIXTURE=1` only when intentionally reusing an already generated snapshot.
+
+
+The live endpoint contains ground-station operational data only. The snapshot generator rejects non-array responses and requires the requested number of geolocated station records.

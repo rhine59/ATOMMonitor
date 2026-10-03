@@ -75,3 +75,17 @@ Also verify the pairing page is rejected from outside the configured trusted net
 ## Admin self-monitoring acceptance
 
 After rebuilding the Admin services, unlock Admin and confirm the container list includes exactly one running/healthy `atom-admin-monitor` and one running/healthy `atom-admin-control`. Run `scripts/admin-scaling-acceptance.sh`; both Admin services must remain healthy singletons throughout the 2→3→2 API replica test.
+
+
+## OGN collector health acceptance
+
+After `scripts/build-collector.sh`, `atommonitor-ogn-probe` must show both `running` and `healthy`. The build script waits for APRS activity rather than accepting process state alone. To diagnose failure:
+
+```bash
+cd server
+sudo docker compose ps ogn-station-probe
+sudo docker inspect atommonitor-ogn-probe --format '{{json .State.Health}}'
+sudo docker compose logs --tail=100 ogn-station-probe
+```
+
+An initial `starting` state is normal for up to the 45-second healthcheck start period. Continued unhealthy state means no APRS activity heartbeat has been received within 120 seconds.

@@ -33,29 +33,29 @@ struct ContentView: View {
                 .tag(AppTab.report)
                 .tabItem { Label("Report", systemImage: "chart.bar") }
 
+            NavigationStack { AboutView() }
+                .tag(AppTab.about)
+                .tabItem { Label("About", systemImage: "info.circle") }
+
             NavigationStack { AdminView() }
                 .tag(AppTab.admin)
                 .tabItem { Label("Admin", systemImage: "lock.shield") }
-
-            NavigationStack { AppSettingsView(store: store) }
-                .tag(AppTab.settings)
-                .tabItem { Label("Settings", systemImage: "gearshape") }
-
-            NavigationStack { StationIconLegendView() }
-                .tag(AppTab.legend)
-                .tabItem { Label("Legend", systemImage: "paintpalette") }
-
-            NavigationStack { HelpView() }
-                .tag(AppTab.help)
-                .tabItem { Label("Help", systemImage: "questionmark.circle") }
 
             NavigationStack { FeedbackView() }
                 .tag(AppTab.feedback)
                 .tabItem { Label("Feedback", systemImage: "star.bubble") }
 
-            NavigationStack { AboutView() }
-                .tag(AppTab.about)
-                .tabItem { Label("About", systemImage: "info.circle") }
+            NavigationStack { HelpView() }
+                .tag(AppTab.help)
+                .tabItem { Label("Help", systemImage: "questionmark.circle") }
+
+            NavigationStack { StationIconLegendView() }
+                .tag(AppTab.legend)
+                .tabItem { Label("Legend", systemImage: "paintpalette") }
+
+            NavigationStack { AppSettingsView(store: store) }
+                .tag(AppTab.settings)
+                .tabItem { Label("Settings", systemImage: "gearshape") }
         }
         .task { await store.load() }
     }

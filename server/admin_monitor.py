@@ -117,7 +117,7 @@ def control_request(path,payload=None):
     req=urllib.request.Request(CONTROL_URL+path,data=data,method="GET" if data is None else "POST",
         headers={"Authorization":f"Bearer {CONTROL_TOKEN}","Content-Type":"application/json"})
     try:
-        with urllib.request.urlopen(req,timeout=70) as r:return r.status,json.loads(r.read())
+        with urllib.request.urlopen(req,timeout=100) as r:return r.status,json.loads(r.read())
     except urllib.error.HTTPError as e:
         try:body=json.loads(e.read())
         except Exception:body={"error":"control request failed"}

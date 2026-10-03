@@ -6,6 +6,10 @@ import admin_monitor as m
 class AdminMonitorTests(unittest.TestCase):
     def setUp(self):self.client=m.app.test_client(); self.headers={"Authorization":"Bearer test-admin-token"}
     def test_health_is_public(self):self.assertEqual(self.client.get("/health").status_code,200)
+    def test_inventory_includes_both_admin_services(self):
+        self.assertIn("atom-admin-monitor",m.ALLOWED_SERVICES)
+        self.assertIn("atom-admin-control",m.ALLOWED_SERVICES)
+        self.assertEqual(len(m.ALLOWED_SERVICES),len(set(m.ALLOWED_SERVICES)))
     def test_local_pairing_issues_one_time_device_credential(self):
         page=self.client.get("/api/v1/admin/pair")
         self.assertEqual(page.status_code,200)

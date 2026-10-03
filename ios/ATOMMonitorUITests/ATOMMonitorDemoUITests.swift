@@ -55,6 +55,8 @@ final class ATOMMonitorDemoUITests: XCTestCase {
         selectTab("Report", in: app); sleep(2)
         XCTAssertTrue(app.navigationBars["Report"].waitForExistence(timeout: 3))
         XCTAssertTrue(app.staticTexts["Total stations"].waitForExistence(timeout: 2))
+        let total250 = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "250")).firstMatch
+        XCTAssertTrue(total250.waitForExistence(timeout: 2), "Demo report must contain 250 stations")
         XCTAssertTrue(app.staticTexts["Status"].waitForExistence(timeout: 2))
         XCTAssertTrue(app.staticTexts["PilotAware versions"].waitForExistence(timeout: 2))
         let healthyReport = app.buttons.matching(NSPredicate(format: "label BEGINSWITH[c] %@", "Healthy")).firstMatch

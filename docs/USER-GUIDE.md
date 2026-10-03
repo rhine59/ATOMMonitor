@@ -97,3 +97,8 @@ Do not enter or request a shared administrator token. While connected through an
 6. Use **Remove this device** when the phone should no longer have administrator access.
 
 The code expires after five minutes and works once. Create a new one if it expires. A 401 during pairing normally means the code expired, was already used, or the request did not originate from an approved network.
+
+
+## Station icon legend
+
+Open **More → Legend** to see the current station icon colours and their meanings: Healthy, Warning, No recent heartbeat, Inactive and Unknown. When **Highlight back-level software** is enabled, Back-level software is also shown. On iOS the legend follows the configured map/status colours; operational health continues to take precedence over software-level highlighting.

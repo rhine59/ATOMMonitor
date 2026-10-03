@@ -83,4 +83,5 @@
 - The legend includes Healthy, Warning, No recent heartbeat, Inactive and Unknown.
 - Back-level software appears only when highlighting is enabled; operational status retains precedence.
 - Replaced Android's overcrowded nine-item bottom bar with Map, Stations, Favourites, Report and More.
+- Bumped iOS to version 1.0 build 4 and Android to version code 4.
 - Build/runtime verification remains pending on both platforms.

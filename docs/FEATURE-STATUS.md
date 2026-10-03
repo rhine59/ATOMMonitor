@@ -171,3 +171,14 @@ The authoritative consolidated status is `CHECKPOINT-2026-10-03.md`.
 | OGN collector Docker activity health | Implemented; Synology deployment verification required |
 | iOS 1.0 (4) | Source complete; full build/device/TestFlight regression pending |
 | Android version code 4 | Source complete; build/device runtime pending |
+
+
+## Complete iOS recorded tour — 3 October 2026
+
+| Capability | Status |
+|---|---|
+| Timestamped Simulator MP4 recorder | Implemented — Mac execution pending |
+| Current-function XCUITest tour | Implemented — Mac execution pending |
+| Deterministic Admin inventory/scaling demo | Implemented — no live mutation |
+| Test log and `.xcresult` evidence | Implemented — generation pending |
+| Physical QR/Face ID/live scaling validation | Separate physical-device/server acceptance |

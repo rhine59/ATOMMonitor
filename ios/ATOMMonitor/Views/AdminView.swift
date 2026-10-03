@@ -69,35 +69,152 @@ private enum AdminKeychain {
 }
 
 struct AdminView: View {
-    @StateObject private var model=AdminModel(); @State private var confirming=false
+    @StateObject private var model = AdminModel()
+    @State private var confirming = false
+
     var body: some View {
-        Group {
-            if let summary=model.summary { List {
-                Section("API service") {
-                    LabeledContent("Running",value:"\(summary.apiReplicas.running)")
-                    LabeledContent("Healthy",value:"\(summary.apiReplicas.healthy)")
-                    Stepper("Target replicas: \(model.target)",value:$model.target,in:1...4)
-                    Button("Apply change",role:.destructive){confirming=true}.disabled(model.busy || model.target==summary.apiReplicas.running)
+        content
+            .navigationTitle("Admin")
+            .overlay { progressOverlay }
+            .task {
+                if !model.token.isEmpty {
+                    await model.refresh()
                 }
-                Section("ATOM Monitor containers") { ForEach(summary.containers) { item in
-                    VStack(alignment:.leading,spacing:4) { HStack { Text(item.name).font(.headline); Spacer(); Text(item.health).foregroundStyle(item.health=="healthy" ? .green:.orange) }
-                        Text("\(item.service) • \(item.state)").font(.caption).foregroundStyle(.secondary)
-                        if let cpu=item.cpuPercent,let memory=item.memoryUsedBytes { Text(String(format:"CPU %.1f%% • Memory %.1f MB",cpu,Double(memory)/1_048_576)).font(.caption) }
-                    }
-                }}
-                if let message=model.message { Section { Text(message) } }
-                Section { Button("Refresh"){Task{await model.refresh()}}; Button("Lock Admin",role:.destructive){model.logout()} }
-            } refreshable:{await model.refresh()} }
-            else { Form { Section("Restricted administration") {
-                SecureField("Administrator token",text:$model.token).textContentType(.password)
-                Button("Unlock"){Task{await model.authenticate()}}.disabled(model.token.isEmpty || model.busy)
-                Text("The administrator token is stored in the iPhone Keychain and is separate from the collector token.").font(.caption).foregroundStyle(.secondary)
-            }; if let message=model.message { Section { Text(message).foregroundStyle(.red) } } } }
+            }
+            .confirmationDialog(
+                "Scale API to \(model.target) replicas?",
+                isPresented: $confirming,
+                titleVisibility: .visible
+            ) {
+                Button("Apply \(model.target) replicas", role: .destructive) {
+                    Task { await model.scale() }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Only atom-api will change. The server waits for all requested replicas to become healthy.")
+            }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if let summary = model.summary {
+            summaryView(summary)
+        } else {
+            lockedView
         }
-        .navigationTitle("Admin").overlay { if model.busy { ProgressView().controlSize(.large) } }
-        .task { if !model.token.isEmpty { await model.refresh() } }
-        .confirmationDialog("Scale API to \(model.target) replicas?",isPresented:$confirming,titleVisibility:.visible) {
-            Button("Apply \(model.target) replicas",role:.destructive){Task{await model.scale()}}; Button("Cancel",role:.cancel){}
-        } message:{Text("Only atom-api will change. The server waits for all requested replicas to become healthy.")}
+    }
+
+    private func summaryView(_ summary: AdminSummary) -> some View {
+        List {
+            apiSection(summary)
+            containersSection(summary.containers)
+
+            if let message = model.message {
+                Section {
+                    Text(message)
+                }
+            }
+
+            Section {
+                Button("Refresh") {
+                    Task { await model.refresh() }
+                }
+                Button("Lock Admin", role: .destructive) {
+                    model.logout()
+                }
+            }
+        }
+        .refreshable {
+            await model.refresh()
+        }
+    }
+
+    private func apiSection(_ summary: AdminSummary) -> some View {
+        Section("API service") {
+            LabeledContent("Running", value: "\(summary.apiReplicas.running)")
+            LabeledContent("Healthy", value: "\(summary.apiReplicas.healthy)")
+            Stepper(
+                "Target replicas: \(model.target)",
+                value: $model.target,
+                in: 1...4
+            )
+            Button("Apply change", role: .destructive) {
+                confirming = true
+            }
+            .disabled(model.busy || model.target == summary.apiReplicas.running)
+        }
+    }
+
+    private func containersSection(_ containers: [AdminSummary.Container]) -> some View {
+        Section("ATOM Monitor containers") {
+            ForEach(containers) { item in
+                containerRow(item)
+            }
+        }
+    }
+
+    private func containerRow(_ item: AdminSummary.Container) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(item.name)
+                    .font(.headline)
+                Spacer()
+                Text(item.health)
+                    .foregroundStyle(item.health == "healthy" ? Color.green : Color.orange)
+            }
+
+            Text("\(item.service) • \(item.state)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            resourceUsage(item)
+        }
+    }
+
+    @ViewBuilder
+    private func resourceUsage(_ item: AdminSummary.Container) -> some View {
+        if let cpu = item.cpuPercent, let memory = item.memoryUsedBytes {
+            Text(
+                String(
+                    format: "CPU %.1f%% • Memory %.1f MB",
+                    cpu,
+                    Double(memory) / 1_048_576
+                )
+            )
+            .font(.caption)
+        }
+    }
+
+    private var lockedView: some View {
+        Form {
+            Section("Restricted administration") {
+                SecureField("Administrator token", text: $model.token)
+                    .textContentType(.password)
+
+                Button("Unlock") {
+                    Task { await model.authenticate() }
+                }
+                .disabled(model.token.isEmpty || model.busy)
+
+                Text("The administrator token is stored in the iPhone Keychain and is separate from the collector token.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            if let message = model.message {
+                Section {
+                    Text(message)
+                        .foregroundStyle(.red)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var progressOverlay: some View {
+        if model.busy {
+            ProgressView()
+                .controlSize(.large)
+        }
     }
 }

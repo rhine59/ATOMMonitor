@@ -75,3 +75,8 @@ Acceptance requires 2→3→2 healthy API replicas, uninterrupted public station
 - Admin timeout and self-monitoring changes: deployed behaviour reported good; repeatable Synology acceptance remains the release gate.
 - iOS build 1.0 (4): source checkpoint; rebuild/regression required before TestFlight upload.
 - Android version code 4: source parity; build and device-runtime verification pending.
+
+
+## Final synchronization note
+
+This Admin-specific checkpoint is retained for control-plane detail. The repository-wide checkpoint, including collector health, mobile navigation/legend, current build numbers and final release gates, is `CHECKPOINT-2026-10-03.md`.

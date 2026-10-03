@@ -5,7 +5,7 @@ import argparse, json, os, pathlib, tempfile, urllib.request
 from collections import Counter
 
 DEFAULT_URL = "https://granvillehouse.synology.me:8445/api/v1/stations"
-DEFAULT_OUTPUT = pathlib.Path(__file__).resolve().parents[1] / "ios/ATOMMonitor/Resources/demo-stations.json"
+DEFAULT_OUTPUT = pathlib.Path(__file__).resolve().parents[1] / "ios/ATOMMonitor/Resources/demo-stations-live.json"
 
 def fetch(url: str) -> list[dict]:
     request = urllib.request.Request(url, headers={"User-Agent": "ATOMMonitor-DemoFixture/1.0"})

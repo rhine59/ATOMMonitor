@@ -41,6 +41,10 @@ struct ContentView: View {
                 .tag(AppTab.settings)
                 .tabItem { Label("Settings", systemImage: "gearshape") }
 
+            NavigationStack { StationIconLegendView() }
+                .tag(AppTab.legend)
+                .tabItem { Label("Legend", systemImage: "paintpalette") }
+
             NavigationStack { HelpView() }
                 .tag(AppTab.help)
                 .tabItem { Label("Help", systemImage: "questionmark.circle") }
@@ -87,6 +91,68 @@ private struct FavouritesView: View {
             }
         }
         .navigationTitle("Favourites")
+    }
+}
+
+
+private struct StationIconLegendView: View {
+    @AppStorage(MapIconColourPreferences.healthyKey) private var healthyColour = MapIconColour.green.rawValue
+    @AppStorage(MapIconColourPreferences.backLevelKey) private var backLevelColour = MapIconColour.purple.rawValue
+    @AppStorage(MapIconColourPreferences.noRecentHeartbeatKey) private var noRecentHeartbeatColour = MapIconColour.blue.rawValue
+    @AppStorage(MapIconColourPreferences.inactiveKey) private var inactiveColour = MapIconColour.red.rawValue
+    @AppStorage(MapIconColourPreferences.warningKey) private var warningColour = MapIconColour.orange.rawValue
+    @AppStorage(MapIconColourPreferences.unknownKey) private var unknownColour = MapIconColour.gray.rawValue
+    @AppStorage("highlightBackLevelSoftware") private var highlightBackLevelSoftware = false
+
+    private struct Entry: Identifiable {
+        let id: String
+        let title: String
+        let detail: String
+        let symbol: String
+        let colour: Color
+    }
+
+    private func selected(_ raw: String, _ fallback: MapIconColour) -> Color {
+        (MapIconColour(rawValue: raw) ?? fallback).color
+    }
+
+    private var entries: [Entry] {
+        var values = [
+            Entry(id: "healthy", title: "Healthy", detail: "Recent heartbeat with no current operational warning.", symbol: StationHealth.healthy.symbol, colour: selected(healthyColour, .green)),
+            Entry(id: "warning", title: "Warning", detail: "Heartbeat is becoming stale or telemetry indicates a warning.", symbol: StationHealth.warning.symbol, colour: selected(warningColour, .orange)),
+            Entry(id: "no-heartbeat", title: "No recent heartbeat", detail: "No heartbeat within the recent-heartbeat threshold.", symbol: StationHealth.noRecentHeartbeat.symbol, colour: selected(noRecentHeartbeatColour, .blue)),
+            Entry(id: "inactive", title: "Inactive", detail: "Latest station record is older than the configured Inactive-after period.", symbol: StationHealth.inactive.symbol, colour: selected(inactiveColour, .red)),
+            Entry(id: "unknown", title: "Unknown", detail: "Insufficient recent information to determine health.", symbol: StationHealth.unknown.symbol, colour: selected(unknownColour, .gray))
+        ]
+        if highlightBackLevelSoftware {
+            values.append(Entry(id: "back-level", title: "Back-level software", detail: "Otherwise Healthy, but reporting an older PilotAware version. Operational status takes precedence.", symbol: StationHealth.healthy.symbol, colour: selected(backLevelColour, .purple)))
+        }
+        return values
+    }
+
+    var body: some View {
+        List {
+            Section {
+                ForEach(entries) { entry in
+                    HStack(alignment: .top, spacing: 14) {
+                        Image(systemName: entry.symbol)
+                            .font(.title2.weight(.bold))
+                            .foregroundStyle(.white)
+                            .frame(width: 42, height: 42)
+                            .background(entry.colour, in: Circle())
+                            .overlay(Circle().stroke(.white, lineWidth: 3))
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(entry.title).font(.headline)
+                            Text(entry.detail).font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+            } footer: {
+                Text("These colours follow the current map/status colour settings. Back-level software appears only when highlighting is enabled.")
+            }
+        }
+        .navigationTitle("Station Icon Legend")
     }
 }
 

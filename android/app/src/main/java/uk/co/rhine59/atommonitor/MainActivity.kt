@@ -386,7 +386,7 @@ fun App(vm: StationVM = viewModel()) {
                 ) {
                     val primaryTabs = listOf(Tab.Map, Tab.Stations, Tab.Favourites, Tab.Report, Tab.More)
                     primaryTabs.forEach { item ->
-                        val selected = tab == item
+                        val selected = tab == item || (item == Tab.More && tab in listOf(Tab.Admin, Tab.Settings, Tab.Legend, Tab.Help, Tab.Feedback, Tab.About))
 
                         Column(
                             modifier = Modifier

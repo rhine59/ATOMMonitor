@@ -74,3 +74,12 @@ Admin is locked until the separate administrator token is accepted. iOS stores i
 Every total, status and PilotAware-version count in Report is selectable. Selecting a count opens Stations with the corresponding filter applied; Total stations clears filters, and Not reported selects stations without a reported PilotAware version. The Stations filter summary and Clear control remain available.
 
 Back-level software highlighting is **Off by default**. Settings → Station status can enable it. When enabled, an otherwise Healthy station whose reported PilotAware version compares older than the newest collected version may use the configured back-level colour. Missing versions are excluded, and Warning, No recent heartbeat, Inactive and Unknown always keep their operational-status presentation. Turning highlighting off does not remove version values, Report counts or exact-version filters.
+
+## Pairing administrator access
+
+1. Connect the phone and a computer to the trusted home network.
+2. On the computer, open the configured ATOMMonitor server address followed by `/api/v1/admin/pair`.
+3. Open **Admin** in the phone application.
+4. Enter the displayed one-time code and select **Pair this device**. The code expires after five minutes and cannot be reused.
+5. On iPhone, approve Face ID or the device passcode. Later visits use **Unlock with Face ID or passcode**; the shared server token is never shown or entered.
+6. **Lock Admin** closes the administrative view but preserves pairing. **Remove administrator access** revokes that phone and deletes its stored credential.

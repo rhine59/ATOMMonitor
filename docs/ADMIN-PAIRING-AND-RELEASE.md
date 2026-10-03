@@ -62,7 +62,7 @@ A direct browser visit is a GET. Posting to that URL is not the pairing exchange
 
 ## iOS rebuild and test
 
-Current release checkpoint: version 1.0, build 3.
+Current release checkpoint: version 1.0, build 4.
 
 ```bash
 cd ios
@@ -87,7 +87,7 @@ For an existing install, test both upgrade and clean-install paths. Increment `C
 
 ## Android rebuild and test
 
-Current source checkpoint: version code 3.
+Current source checkpoint: version code 4.
 
 ```bash
 cd android

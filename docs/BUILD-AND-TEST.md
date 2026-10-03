@@ -243,3 +243,8 @@ The Admin container inventory must include `atom-admin-monitor` and `atom-admin-
 ## 3 October full checkpoint release gate
 
 Use `CHECKPOINT-2026-10-03.md` as the release baseline. Server acceptance must include meaningful OGN collector health, pairing, revocation and 2→3→2 scaling with both Admin services remaining healthy. Mobile completion must be recorded separately for iOS build 4 and Android version code 4.
+
+
+## Complete iOS MP4 regression tour
+
+Run `./scripts/record-demo.sh` from the repository root. A pass requires the XCUITest to complete all current areas and produces a timestamped final MP4, raw MP4, test log and Xcode result bundle under `artifacts/`. The tour is deterministic and must not contact or mutate the live Admin service. Retain final evidence deliberately; generated artifacts remain ignored by default.

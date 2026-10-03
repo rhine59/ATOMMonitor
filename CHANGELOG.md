@@ -10,6 +10,13 @@
 
 # Changelog
 
+## 3 October 2026 — meaningful OGN collector health
+
+- Added an APRS activity heartbeat and Docker healthcheck to `ogn-station-probe`.
+- Collector health now distinguishes a running process from an active upstream APRS connection.
+- Updated the collector rebuild to wait for Docker healthy rather than accepting running alone.
+
+
 ## 3 October 2026 — synchronized Admin checkpoint
 
 - Synchronized architecture, requirements, design decisions, roadmaps, parity audit, platform guides and public/Synology deployment documentation.

@@ -15,6 +15,11 @@
 		6420C9511292894C131D04FA /* StationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B035EFFFAC5B806B55340289 /* StationStore.swift */; };
 		6EEA4C97A69E72783ED709AA /* stations.json in Resources */ = {isa = PBXBuildFile; fileRef = A0970C976C086A2A5F6E0D85 /* stations.json */; };
 		A439CAE7434B9889D310D8C1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7142494431906585573DBB26 /* ContentView.swift */; };
+		A10000000000000000000001 /* AdminView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000001 /* AdminView.swift */; };
+		A10000000000000000000002 /* AppSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000002 /* AppSettingsView.swift */; };
+		A10000000000000000000003 /* FeedbackAboutViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000003 /* FeedbackAboutViews.swift */; };
+		A10000000000000000000004 /* ReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000004 /* ReportView.swift */; };
+		A10000000000000000000005 /* MapIconColours.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000005 /* MapIconColours.swift */; };
 		B6AA95EF0AF011D0DE25F6F2 /* StationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C751216009317AF14EBEA163 /* StationDetailView.swift */; };
 		C22BCA391C0221A73594297B /* ATOMStation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F5B30B432A417C920C561C /* ATOMStation.swift */; };
 		CCD9EC815421A99D843A9C35 /* StationMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9006BDD5E2600681DE897495 /* StationMapView.swift */; };
@@ -37,6 +42,11 @@
 		49D06232DE02CA985A829FF4 /* StationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationListView.swift; sourceTree = "<group>"; };
 		4FF11F3EFED65E6F71511112 /* StationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationRepository.swift; sourceTree = "<group>"; };
 		7142494431906585573DBB26 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		B10000000000000000000001 /* AdminView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminView.swift; sourceTree = "<group>"; };
+		B10000000000000000000002 /* AppSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsView.swift; sourceTree = "<group>"; };
+		B10000000000000000000003 /* FeedbackAboutViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackAboutViews.swift; sourceTree = "<group>"; };
+		B10000000000000000000004 /* ReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportView.swift; sourceTree = "<group>"; };
+		B10000000000000000000005 /* MapIconColours.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapIconColours.swift; sourceTree = "<group>"; };
 		9006BDD5E2600681DE897495 /* StationMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationMapView.swift; sourceTree = "<group>"; };
 		A0970C976C086A2A5F6E0D85 /* stations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = stations.json; sourceTree = "<group>"; };
 		AE41B1045B1FA1CA63A9BA94 /* ATOMMonitor.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ATOMMonitor.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -110,6 +120,7 @@
 			isa = PBXGroup;
 			children = (
 				34F5B30B432A417C920C561C /* ATOMStation.swift */,
+				B10000000000000000000005 /* MapIconColours.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -126,6 +137,10 @@
 			isa = PBXGroup;
 			children = (
 				7142494431906585573DBB26 /* ContentView.swift */,
+				B10000000000000000000001 /* AdminView.swift */,
+				B10000000000000000000002 /* AppSettingsView.swift */,
+				B10000000000000000000003 /* FeedbackAboutViews.swift */,
+				B10000000000000000000004 /* ReportView.swift */,
 				C751216009317AF14EBEA163 /* StationDetailView.swift */,
 				49D06232DE02CA985A829FF4 /* StationListView.swift */,
 				9006BDD5E2600681DE897495 /* StationMapView.swift */,
@@ -235,6 +250,11 @@
 				5250504757F20F6F96EFBCE8 /* ATOMMonitorApp.swift in Sources */,
 				C22BCA391C0221A73594297B /* ATOMStation.swift in Sources */,
 				A439CAE7434B9889D310D8C1 /* ContentView.swift in Sources */,
+				A10000000000000000000001 /* AdminView.swift in Sources */,
+				A10000000000000000000002 /* AppSettingsView.swift in Sources */,
+				A10000000000000000000003 /* FeedbackAboutViews.swift in Sources */,
+				A10000000000000000000004 /* ReportView.swift in Sources */,
+				A10000000000000000000005 /* MapIconColours.swift in Sources */,
 				B6AA95EF0AF011D0DE25F6F2 /* StationDetailView.swift in Sources */,
 				3A405A3D2151FB33A4BDBDE3 /* StationListView.swift in Sources */,
 				CCD9EC815421A99D843A9C35 /* StationMapView.swift in Sources */,

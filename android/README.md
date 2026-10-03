@@ -484,3 +484,10 @@ These latest Android changes are **build/runtime test pending**. The earlier Pix
 ## Restricted Admin checkpoint — 20 September 2026
 
 The responsive app now includes a locked Admin tab using Android Keystore-backed token encryption. It displays the shared admin summary/container contract and supports explicitly confirmed 1–4 `atom-api` scaling only. Android build/runtime verification remains pending.
+
+
+## Administrator QR pairing checkpoint — 3 October 2026
+
+Android Admin uses the Google Play services code scanner and exchanges the same five-minute one-time code as iOS. The per-device credential is protected with Android Keystore; the shared server Admin tokens must never be entered into the app.
+
+Source parity is implemented, but the current scanner/pairing build and device-runtime checkpoint remains pending. Run `./gradlew clean assembleDebug test`, install on a Google Play-enabled emulator and a physical phone, then verify QR scan, manual-code fallback, relaunch persistence, revocation, report drill-down and default-Off back-level highlighting. See `../docs/ADMIN-PAIRING-AND-RELEASE.md`.

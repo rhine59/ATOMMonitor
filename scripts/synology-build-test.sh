@@ -64,7 +64,12 @@ while :; do
 done
 echo "accepted_observation_posts=$accepted"
 
-echo '\n--- Recent container logs ---'
-sudo docker compose logs --tail=50 atom-lb atom-api ogn-station-probe postgres
+echo '\n--- Admin pairing route/exchange/revocation acceptance ---'
+cd "$ROOT"
+sh scripts/admin-pairing-acceptance.sh
+cd "$ROOT/server"
 
-echo '\nPASS: unit tests, Compose validation, PostgreSQL-backed rebuild/start, two API replicas, Nginx REST path and live HTTP 202 ingestion completed.'
+echo '\n--- Recent container logs ---'
+sudo docker compose logs --tail=50 atom-lb atom-api ogn-station-probe postgres atom-admin-monitor atom-admin-control
+
+echo '\nPASS: unit tests, Compose validation, PostgreSQL-backed rebuild/start, two API replicas, Nginx REST path, Admin pairing acceptance and live HTTP 202 ingestion completed.'

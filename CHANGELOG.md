@@ -10,6 +10,14 @@
 
 # Changelog
 
+## 3 October 2026 — 250-station iOS simulation
+
+- Replaced the five-record dated demo dependency with a runtime-generated 250-station UK-wide dataset.
+- Preserved stable named records for UI automation while adding all health states, software-version groups, missing-data cases and varied telemetry.
+- Generated timestamps relative to launch so the intended status mix does not decay as a static fixture ages.
+- Added a UI-test assertion that the Report total is 250.
+
+
 ## 3 October 2026 — complete iOS MP4 feature tour
 
 - Expanded the XCUITest recording through all current navigation/function areas.

@@ -10,6 +10,15 @@
 
 # Changelog
 
+## 3 October 2026 — synchronized Admin checkpoint
+
+- Synchronized architecture, requirements, design decisions, roadmaps, parity audit, platform guides and public/Synology deployment documentation.
+- Updated complete rebuild scripts to recreate Nginx and run Admin pairing acceptance.
+- Updated the Synology test runner to include Admin container logs and pairing verification.
+- Added `docs/CHECKPOINT-2026-10-03-ADMIN.md` as the authoritative current checkpoint.
+- Confirmed both apps consume the same generic container inventory while scaling remains restricted to `atom-api`.
+
+
 ## 3 October 2026 — Admin self-monitoring
 
 - Added `atom-admin-monitor` and `atom-admin-control` to the restricted Admin container inventory.

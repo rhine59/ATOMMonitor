@@ -108,3 +108,6 @@ The iOS QR → exchange → stored credential flow passed on a physical iPhone. 
 ## Admin service synchronization — 3 October 2026
 
 Both mobile apps consume the same generic Admin container contract and therefore display `atom-admin-monitor` and `atom-admin-control` without platform-specific service lists. Only `atom-api` exposes scaling controls. Clean Admin rebuilds recreate Nginx, validate pairing/summary/scale routes and use timeout layers long enough for Docker health convergence.
+
+
+The consolidated current Admin checkpoint is `docs/CHECKPOINT-2026-10-03-ADMIN.md`. Use `scripts/build-all-containers.sh` for a clean service rebuild plus pairing acceptance; use `scripts/all-phases-acceptance.sh` and `scripts/admin-scaling-acceptance.sh` for the complete regression.

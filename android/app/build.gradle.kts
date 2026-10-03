@@ -11,7 +11,7 @@ android {
         applicationId = "uk.co.rhine59.atommonitor"
         minSdk = 26
         targetSdk = 37
-        versionCode = 2
+        versionCode = 3
         versionName = "1.0"
     }
 
@@ -38,6 +38,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
 
     implementation("org.osmdroid:osmdroid-android:6.1.20")
+    implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 }

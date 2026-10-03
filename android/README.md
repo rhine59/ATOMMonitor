@@ -483,7 +483,7 @@ These latest Android changes are **build/runtime test pending**. The earlier Pix
 
 ## Restricted Admin checkpoint — 20 September 2026
 
-The responsive app now includes a locked Admin tab using Android Keystore-backed token encryption. It displays the shared admin summary/container contract and supports explicitly confirmed 1–4 `atom-api` scaling only. Android build/runtime verification remains pending.
+The responsive app includes a locked Admin tab using a LAN-only one-time code and an Android Keystore-protected per-device credential. It displays the shared admin summary/container contract and supports explicitly confirmed 1–4 `atom-api` scaling only. Android build/runtime verification remains pending.
 
 
 ## Administrator QR pairing checkpoint — 3 October 2026

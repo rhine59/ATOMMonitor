@@ -87,12 +87,19 @@ struct DemoStationRepository: StationRepository {
 
     private func makeStation(index: Int, now: Date) -> ATOMStation {
         let health: StationHealth
-        switch index % 10 {
-        case 0: health = .unknown
-        case 1, 2, 3, 4, 5: health = .healthy
-        case 6, 7: health = .warning
-        case 8: health = .noRecentHeartbeat
-        default: health = .inactive
+        switch index {
+        case 1, 5: health = .healthy
+        case 2: health = .warning
+        case 3: health = .noRecentHeartbeat
+        case 4: health = .unknown
+        default:
+            switch index % 10 {
+            case 0: health = .unknown
+            case 1, 2, 3, 4, 5: health = .healthy
+            case 6, 7: health = .warning
+            case 8: health = .noRecentHeartbeat
+            default: health = .inactive
+            }
         }
 
         let names = [

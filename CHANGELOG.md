@@ -10,6 +10,14 @@
 
 # Changelog
 
+## 3 October 2026 — complete iOS MP4 feature tour
+
+- Expanded the XCUITest recording through all current navigation/function areas.
+- Added safe deterministic Admin inventory and simulated 2→3 scaling for the Simulator.
+- Added Report drill-down/share, back-level setting, More ordering and complete Legend coverage.
+- Made recording filenames timestamped and retained an Xcode result bundle beside the MP4 and log.
+
+
 ## 3 October 2026 — full repository checkpoint
 
 - Added `docs/CHECKPOINT-2026-10-03.md` covering server, Docker, Admin, collector health, iOS, Android, rebuild and release gates.

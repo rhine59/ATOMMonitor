@@ -176,3 +176,17 @@ The second server-side slice is implemented in source. The public-facing `atom-a
 The scale contract is `POST /api/v1/admin/api-scale` with `{"replicas":3,"confirmed":true}`. Counts are restricted to 1–4, Boolean/string counts are rejected, operations are serialized and rate-limited, and success is returned only after the requested number of replicas are running and Docker-healthy within the configured timeout. Scale activity is written to the persistent `atommonitor-admin-audit` volume without secrets. `ATOM_ADMIN_CONTROL_TOKEN` is a third, internal-only secret and must differ from both the external admin and ingest tokens.
 
 Source unit tests pass. Status remains **Implemented — Synology build/runtime acceptance pending**. It must not be marked Tested until the documented 2→3→2 live test proves public reads and collector writes continue, singleton services remain single, audit events are recorded, and both phone clients have been exercised.
+
+## Device pairing authentication — 3 October 2026
+
+Manual entry of the shared administrator token in phone applications has been replaced by one-time device pairing.
+
+- From an allowed local network, open `<server>/api/v1/admin/pair`.
+- The server creates one eight-character, single-use code that expires after five minutes and displays both a QR representation and the short code.
+- Enter the short code in the iOS or Android Admin screen. The exchange returns a separate random credential for that device.
+- Only a SHA-256 hash and device metadata are stored server-side in the persistent `atommonitor-admin-devices` volume. iOS stores the credential in Keychain; Android stores it encrypted using Android Keystore.
+- iOS requires Face ID or the device passcode before an existing paired credential is used. Lock keeps pairing; Remove administrator access revokes the server credential and deletes the local copy.
+- The pairing page is restricted by `ATOM_ADMIN_PAIRING_NETWORKS`, defaulting to RFC1918 and loopback networks. Add the actual trusted client subnet when the Synology reverse-proxy topology presents another address.
+- The legacy `ATOM_ADMIN_TOKEN` remains accepted temporarily for migration and rollback, but is no longer entered in either phone UI. `ATOM_ADMIN_CONTROL_TOKEN` remains internal-only.
+
+Initial client delivery uses the displayed short code. Direct in-app QR scanning is a follow-up convenience; the QR contains no permanent credential.

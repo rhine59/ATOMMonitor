@@ -14,8 +14,7 @@ python3 - "$TMP_DIR/pair.html" "$TMP_DIR/code" <<'PY'
 import re, sys
 html = open(sys.argv[1], encoding="utf-8").read()
 patterns = [
-    r'id=["\x27]pairing-code["\x27][^>]*>\s*([A-Z0-9-]{8,16})',
-    r'\b([A-Z0-9]{4}-?[A-Z0-9]{4})\b',
+    r'<code>\s*([A-F0-9]{8})\s*</code>',
 ]
 for pattern in patterns:
     match = re.search(pattern, html, re.I | re.S)

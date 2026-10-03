@@ -495,4 +495,9 @@ Source parity is implemented, but the current scanner/pairing build and device-r
 
 ## More and station icon legend
 
-The primary Android bottom navigation is now Map, Stations, Favourites, Report and More. More contains Admin, Settings, Legend, Help, Feedback and About. Legend displays the effective station icon colours; Back-level software appears only while its Settings toggle is enabled. Build/runtime verification remains pending.
+The primary Android bottom navigation is now Map, Stations, Favourites, Report and More. More contains About, Admin, Feedback, Help, Legend and Settings. Legend displays the effective station icon colours; Back-level software appears only while its Settings toggle is enabled. Build/runtime verification remains pending.
+
+
+## Admin service inventory synchronization
+
+Android iterates the server-provided container array and therefore shows `atom-admin-monitor` and `atom-admin-control` without a client service-name update. Both remain read-only singleton entries; scaling controls continue to target only `atom-api`.

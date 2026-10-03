@@ -111,3 +111,8 @@ Infrastructure administration is split between `atom-admin-monitor` (authenticat
 ## Current Admin architecture checkpoint — 3 October 2026
 
 LAN-only five-minute pairing codes produce individually revocable device credentials. Pairing challenges and credential hashes persist in the Admin data volume. The external `atom-admin-monitor` has read-only Docker access and reports every allow-listed service, including itself and `atom-admin-control`. The internal-only control service has writable Docker access but can mutate only `atom-api` replicas from 1–4. Scaling waits up to 90 seconds; enclosing monitor, proxy and mobile timeouts are progressively longer to prevent premature HTTP 504 responses.
+
+
+## Collector health semantics — 3 October 2026
+
+`ogn-station-probe` is healthy only while its process is running and its APRS connection is receiving traffic. The collector touches an internal heartbeat file on connection and for every received APRS line, including server keepalives. Docker checks that the file is newer than 120 seconds. This detects a live process with a stale/silent upstream connection; API and database health remain independently monitored.

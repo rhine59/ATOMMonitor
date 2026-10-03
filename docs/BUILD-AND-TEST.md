@@ -233,3 +233,8 @@ Before releasing a build containing Admin functionality:
 6. Record build success and runtime success separately. Android remains runtime-pending until these device checks pass.
 
 See `docs/ADMIN-PAIRING-AND-RELEASE.md` for the commands and recovery procedure.
+
+
+## Admin inventory regression
+
+The Admin container inventory must include `atom-admin-monitor` and `atom-admin-control`. Validate with `scripts/admin-scaling-acceptance.sh`, which now asserts that PostgreSQL, Nginx, the collector and both Admin services remain single healthy instances while API replicas scale 2→3→2.

@@ -146,3 +146,14 @@ Server automation is `scripts/admin-pairing-acceptance.sh`. Full rebuild and rel
 | Colour source | Current configured map/status colours | Current Android effective-status colours |
 
 Android now uses five primary bottom destinations—Map, Stations, Favourites, Report and More—rather than squeezing every utility destination into the bottom bar.
+
+
+## Admin self-monitoring checkpoint — 3 October 2026
+
+| Capability | Status |
+|---|---|
+| Show `atom-admin-monitor` in Admin container inventory | Implemented — Synology runtime verification pending |
+| Show `atom-admin-control` in Admin container inventory | Implemented — Synology runtime verification pending |
+| Permit either Admin service to be scaled from the app | Deliberately prohibited |
+
+The explicit Docker discovery allow-list now covers all ATOM Monitor service containers while the mutation allow-list remains restricted to `atom-api`.

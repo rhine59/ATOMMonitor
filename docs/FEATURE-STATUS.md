@@ -187,3 +187,8 @@ The authoritative consolidated status is `CHECKPOINT-2026-10-03.md`.
 ## Expanded Simulator dataset — 3 October 2026
 
 The deterministic iOS demo repository now generates exactly 250 UK-wide station records with all effective health states, multiple software versions, missing-version/position cases and varied telemetry. The recorded UI test asserts the 250-station report total. Mac build/runtime execution remains pending.
+
+
+## Real-station Simulator snapshot — 3 October 2026
+
+The synthetic 250-node grid has been withdrawn. The recorder now captures 100 real geolocated station records from the live public service before XcodeGen/build, freezes them in an ignored generated resource, and asserts a 100-station Report total. Mac execution/live capture remains pending.

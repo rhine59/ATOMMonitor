@@ -491,3 +491,8 @@ The responsive app includes a locked Admin tab using a LAN-only one-time code an
 Android Admin uses the Google Play services code scanner and exchanges the same five-minute one-time code as iOS. The per-device credential is protected with Android Keystore; the shared server Admin tokens must never be entered into the app.
 
 Source parity is implemented, but the current scanner/pairing build and device-runtime checkpoint remains pending. Run `./gradlew clean assembleDebug test`, install on a Google Play-enabled emulator and a physical phone, then verify QR scan, manual-code fallback, relaunch persistence, revocation, report drill-down and default-Off back-level highlighting. See `../docs/ADMIN-PAIRING-AND-RELEASE.md`.
+
+
+## More and station icon legend
+
+The primary Android bottom navigation is now Map, Stations, Favourites, Report and More. More contains Admin, Settings, Legend, Help, Feedback and About. Legend displays the effective station icon colours; Back-level software appears only while its Settings toggle is enabled. Build/runtime verification remains pending.

@@ -89,3 +89,24 @@ A separately authenticated `/api/v1/admin` contract is planned for infrastructur
 ## Restricted infrastructure administration — implemented contract
 
 Authenticated admin routes are `GET /api/v1/admin/summary`, `GET /api/v1/admin/containers`, `GET /api/v1/admin/events`, and `POST /api/v1/admin/api-scale`. The scale body is `{"replicas": <1..4>, "confirmed": true}`; missing confirmation or invalid counts return 400, a concurrent operation returns 409, rate limiting returns 429, control unavailability/failed readiness returns 503, and success reports previous, requested, running and healthy replica counts. No route accepts a service name or arbitrary Docker operation.
+
+
+## Administrator device-pairing API
+
+### `GET /api/v1/admin/pair`
+
+Allowed only from `ATOM_ADMIN_PAIRING_NETWORKS`. Returns a human pairing page containing a QR payload and short code. The challenge expires after five minutes. Pending challenge hashes persist in `/data/admin-pairings.json`.
+
+### `POST /api/v1/admin/pair/exchange`
+
+Accepts JSON containing `code` and an optional `deviceName`. A valid unused code is atomically consumed and returns a random per-device bearer credential. Reuse, expiry or an invalid code returns HTTP 401. Only the credential hash is persisted.
+
+### Existing `/api/v1/admin/*` routes
+
+Accept `Authorization: Bearer <device credential>`. The legacy `ATOM_ADMIN_TOKEN` remains a server-side migration path and must not be distributed to clients.
+
+### `DELETE /api/v1/admin/device`
+
+Revokes the calling device credential. Later use returns HTTP 401.
+
+Device hashes and audit metadata are stored in `/data/admin-devices.json`. The Admin Docker volume must be shared by all monitor processes and preserved across normal rebuilds.

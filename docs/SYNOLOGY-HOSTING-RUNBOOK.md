@@ -601,3 +601,8 @@ sh scripts/all-phases-acceptance.sh
 ```
 
 The container build suite now finishes with a real one-time pairing/exchange/authentication/revocation test. Nginx is force-recreated so Admin routes and timeout changes are loaded. The Synology build/test runner includes both Admin containers in diagnostics and also runs pairing acceptance.
+
+
+## 3 October checkpoint verification
+
+After the complete rebuild, confirm `ogn-station-probe`, `atom-admin-monitor` and `atom-admin-control` each show running and healthy. The complete source/status boundary is recorded in `CHECKPOINT-2026-10-03.md`.

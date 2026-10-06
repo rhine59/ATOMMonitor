@@ -145,7 +145,10 @@ services:
 volumes:
   atommonitor-postgres-data:
     name: server_atommonitor-postgres-data
+    external: true
   atommonitor-admin-audit:
     name: server_atommonitor-admin-audit
+    external: true
   atommonitor-admin-devices:
     name: server_atommonitor-admin-devices
+    external: true

@@ -106,7 +106,7 @@ cd /volume1/docker/ATOMMonitor
 sh scripts/migrate-container-names.sh
 ```
 
-The script validates configuration, stops/removes the legacy `server` project containers, rebuilds the stack, starts two API replicas and checks that all seven containers are healthy and named `atommonitor-*`. It deliberately does not delete volumes. The Compose file pins the existing Docker volume names `server_atommonitor-postgres-data`, `server_atommonitor-admin-audit`, and `server_atommonitor-admin-devices`, preserving PostgreSQL data, audit history and paired devices across the project rename. Do not run `docker compose down -v` during this migration.
+The script validates configuration, stops/removes the legacy `server` project containers, rebuilds the stack, starts two API replicas and checks that all seven containers are healthy and named `atommonitor-*`. It deliberately does not delete volumes. The Compose file declares the existing Docker volumes `server_atommonitor-postgres-data`, `server_atommonitor-admin-audit`, and `server_atommonitor-admin-devices` as external, preserving PostgreSQL data, audit history and paired devices across the project rename without Compose ownership warnings. Do not run `docker compose down -v` during this migration.
 
 Afterwards, use the repository rebuild scripts; each explicitly supplies `-p atommonitor`, so a stale `COMPOSE_PROJECT_NAME` value cannot restore the old prefix. For manual commands, use `sudo docker compose -p atommonitor ...`. Verify the convention at any time with `sh scripts/check-container-names.sh`.
 

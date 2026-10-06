@@ -10,7 +10,7 @@ import qrcode
 app=Flask(__name__)
 ADMIN_TOKEN=os.getenv("ATOM_ADMIN_TOKEN","")
 DOCKER_SOCKET=os.getenv("DOCKER_SOCKET","/var/run/docker.sock")
-PROJECT=os.getenv("COMPOSE_PROJECT_NAME","server")
+PROJECT=os.getenv("COMPOSE_PROJECT_NAME","atommonitor")
 CONTROL_URL=os.getenv("ATOM_ADMIN_CONTROL_URL","http://atom-admin-control:8091")
 CONTROL_TOKEN=os.getenv("ATOM_ADMIN_CONTROL_TOKEN","")
 DEVICE_FILE=Path(os.getenv("ATOM_ADMIN_DEVICE_FILE","/data/admin-devices.json"))

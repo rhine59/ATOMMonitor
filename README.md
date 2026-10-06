@@ -12,6 +12,8 @@ The project has a working Synology Docker server, a native SwiftUI iPhone applic
 
 The Synology Docker deployment maintains a persistent ground-station registry from OGN/APRS receiver/status traffic and exposes station data through a REST API. The internal/LAN service is host port `8088`; runtime station state is stored in PostgreSQL in a persistent named Docker volume. Two stateless API replicas run behind Nginx; the preserved SQLite database is rollback/historical data, not the live backend. Aircraft messages are discarded and aircraft movement data is not part of the database or API.
 
+The Compose project is explicitly named `atommonitor`. Every runtime container therefore starts with the lowercase repository-name prefix `atommonitor-`, matching the ESP32-EFIS deployment convention. Existing Synology volume names are pinned independently so this naming migration does not create an empty replacement database or lose Admin pairing/audit state.
+
 Public access is through DSM Reverse Proxy at `https://granvillehouse.synology.me:8445/`, terminating valid HTTPS and forwarding internally to `http://localhost:8088`. Port 8088 is diagnostic/internal and must not be directly Internet-forwarded. The complete rebuild/deployment procedure is in `docs/SYNOLOGY-HOSTING-RUNBOOK.md`.
 
 ### iPhone application
@@ -111,6 +113,8 @@ Both mobile apps consume the same generic Admin container contract and therefore
 
 
 The consolidated current Admin checkpoint is `docs/CHECKPOINT-2026-10-03-ADMIN.md`. Use `scripts/build-all-containers.sh` for a clean service rebuild plus pairing acceptance; use `scripts/all-phases-acceptance.sh` and `scripts/admin-scaling-acceptance.sh` for the complete regression.
+
+For the one-time migration of an existing Synology checkout from the legacy `server` Compose project, run `scripts/migrate-container-names.sh`. It stops the legacy containers without deleting volumes, starts the renamed stack with two API replicas, waits for all seven containers to become healthy, and verifies the prefix rule. Never add `-v` to the legacy `docker compose down` command.
 
 
 ## Full checkpoint — 3 October 2026

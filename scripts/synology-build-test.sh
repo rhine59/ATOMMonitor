@@ -15,7 +15,7 @@ echo "API load-balancer host port: $HOST_PORT"
 [ -f .env ] || { echo 'ERROR: server/.env is missing; copy .env.example and set local secrets first.'; exit 1; }
 
 echo '\n--- Compose validation ---'
-sudo docker compose config --quiet
+sudo docker compose -p atommonitor config --quiet
 
 echo '\n--- Python collector unit tests ---'
 cd diagnostic
@@ -23,12 +23,12 @@ python3 -m unittest -v
 cd ..
 
 echo '\n--- Docker rebuild ---'
-sudo docker compose down
-sudo docker compose build --no-cache
-sudo docker compose up -d --scale atom-api=2
+sudo docker compose -p atommonitor down
+sudo docker compose -p atommonitor build --no-cache
+sudo docker compose -p atommonitor up -d --scale atom-api=2
 
 echo '\n--- Container state ---'
-sudo docker compose ps
+sudo docker compose -p atommonitor ps
 
 echo '\n--- PostgreSQL-backed readiness through Nginx ---'
 i=0
@@ -40,7 +40,7 @@ printf '%s\n' "$READY"
 printf '%s' "$READY" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d.get('status')=='ready'; assert d.get('database')=='ok'; assert d.get('databaseBackend')=='postgresql'; print('readiness_backend=postgresql')"
 
 echo '\n--- Replicated API state ---'
-replica_count="$(sudo docker compose ps -q atom-api | wc -l | tr -d ' ')"
+replica_count="$(sudo docker compose -p atommonitor ps -q atom-api | wc -l | tr -d ' ')"
 echo "api_replicas=$replica_count"
 [ "$replica_count" -eq 2 ] || { echo 'ERROR: expected two API replicas'; exit 1; }
 
@@ -57,7 +57,7 @@ PY
 echo '\n--- Live collector ingestion ---'
 i=0
 while :; do
-  accepted="$(sudo docker compose logs --since=90s atom-api 2>/dev/null | grep -c 'POST /api/v1/observations HTTP/1.1\" 202' || true)"
+  accepted="$(sudo docker compose -p atommonitor logs --since=90s atom-api 2>/dev/null | grep -c 'POST /api/v1/observations HTTP/1.1\" 202' || true)"
   [ "$accepted" -gt 0 ] && break
   i=$((i+1)); [ "$i" -ge 12 ] && { echo 'ERROR: no HTTP 202 collector observation seen within test window'; exit 1; }
   sleep 5
@@ -70,6 +70,6 @@ sh scripts/admin-pairing-acceptance.sh
 cd "$ROOT/server"
 
 echo '\n--- Recent container logs ---'
-sudo docker compose logs --tail=50 atom-lb atom-api ogn-station-probe postgres atom-admin-monitor atom-admin-control
+sudo docker compose -p atommonitor logs --tail=50 atom-lb atom-api ogn-station-probe postgres atom-admin-monitor atom-admin-control
 
 echo '\nPASS: unit tests, Compose validation, PostgreSQL-backed rebuild/start, two API replicas, Nginx REST path, Admin pairing acceptance and live HTTP 202 ingestion completed.'

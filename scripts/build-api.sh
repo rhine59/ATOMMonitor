@@ -4,14 +4,14 @@ ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 cd "$ROOT/server"
 echo '=== Build/start API replicas ==='
 [ -f .env ] || { echo 'FAIL: server/.env missing'; exit 1; }
-sudo docker compose config --quiet
+sudo docker compose -p atommonitor config --quiet
 echo 'PASS: Compose validates'
-sudo docker compose build atom-api
+sudo docker compose -p atommonitor build atom-api
 echo 'PASS: API image built'
-sudo docker compose up -d --scale atom-api=2 atom-api
+sudo docker compose -p atommonitor up -d --scale atom-api=2 atom-api
 i=0
 while [ "$i" -lt 90 ]; do
-  ids="$(sudo docker compose ps -q atom-api)"
+  ids="$(sudo docker compose -p atommonitor ps -q atom-api)"
   count="$(printf '%s\n' "$ids" | sed '/^$/d' | wc -l | tr -d ' ')"
   healthy=0
   for id in $ids; do

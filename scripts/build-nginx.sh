@@ -4,11 +4,11 @@ ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 cd "$ROOT/server"
 echo '=== Pull/start Nginx load balancer ==='
 [ -f .env ] || { echo 'FAIL: server/.env missing'; exit 1; }
-sudo docker compose config --quiet
+sudo docker compose -p atommonitor config --quiet
 echo 'PASS: Compose validates'
-sudo docker compose pull atom-lb
+sudo docker compose -p atommonitor pull atom-lb
 echo 'PASS: Nginx image pulled'
-sudo docker compose up -d --force-recreate --scale atom-api=2 atom-lb
+sudo docker compose -p atommonitor up -d --force-recreate --scale atom-api=2 atom-lb
 i=0
 while [ "$i" -lt 90 ]; do
   state="$(sudo docker inspect atommonitor-lb --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' 2>/dev/null || true)"

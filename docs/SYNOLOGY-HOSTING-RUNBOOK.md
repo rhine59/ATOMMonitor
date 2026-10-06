@@ -95,7 +95,20 @@ sudo docker compose up -d --build --scale atom-api=2
 sudo docker compose ps
 ```
 
-For a clean image rebuild, add `--no-cache` to the build step if required, then start with `--scale atom-api=2`. Expected runtime containers are `atommonitor-postgres`, `atommonitor-lb`, `atommonitor-ogn-probe`, and two Compose-managed API replicas such as `server-atom-api-1` and `server-atom-api-2`. PostgreSQL, Nginx and both API replicas should become healthy; the collector should be running.
+For a clean image rebuild, add `--no-cache` to the build step if required, then start with `--scale atom-api=2`. Expected runtime containers are `atommonitor-postgres`, `atommonitor-lb`, `atommonitor-ogn-probe`, and two Compose-managed API replicas `atommonitor-atom-api-1` and `atommonitor-atom-api-2`. PostgreSQL, Nginx and both API replicas should become healthy; the collector should be running.
+
+### One-time container-name migration
+
+Compose is explicitly named `atommonitor`, so every container starts with the lowercase Git repository name. Existing deployments were labelled as Compose project `server`, which caused scaled API replicas to be named `server-atom-api-*`. After pulling the commit that introduces the new project name, run:
+
+```bash
+cd /volume1/docker/ATOMMonitor
+sh scripts/migrate-container-names.sh
+```
+
+The script validates configuration, stops/removes the legacy `server` project containers, rebuilds the stack, starts two API replicas and checks that all seven containers are healthy and named `atommonitor-*`. It deliberately does not delete volumes. The Compose file pins the existing Docker volume names `server_atommonitor-postgres-data`, `server_atommonitor-admin-audit`, and `server_atommonitor-admin-devices`, preserving PostgreSQL data, audit history and paired devices across the project rename. Do not run `docker compose down -v` during this migration.
+
+Afterwards, use the repository rebuild scripts; each explicitly supplies `-p atommonitor`, so a stale `COMPOSE_PROJECT_NAME` value cannot restore the old prefix. For manual commands, use `sudo docker compose -p atommonitor ...`. Verify the convention at any time with `sh scripts/check-container-names.sh`.
 
 ## 7. Repeatable build/test runner
 
@@ -466,7 +479,7 @@ sudo docker compose up -d --build --scale atom-api=2
 sudo docker compose ps
 ```
 
-Expected services are `atommonitor-postgres`, `atommonitor-lb`, `atommonitor-ogn-probe`, and two Compose-managed `atom-api` containers such as `server-atom-api-1` and `server-atom-api-2`. Both APIs, PostgreSQL and Nginx should become healthy; the collector should be running. The API service deliberately has no fixed `container_name`, because a fixed name prevents Compose scaling.
+Expected services are `atommonitor-postgres`, `atommonitor-lb`, `atommonitor-ogn-probe`, and two Compose-managed `atom-api` containers `atommonitor-atom-api-1` and `atommonitor-atom-api-2`. Both APIs, PostgreSQL and Nginx should become healthy; the collector should be running. The API service deliberately has no fixed `container_name`, because a fixed name prevents Compose scaling; the explicit Compose project name supplies its repository prefix.
 
 ### Step 6 — understand the current routing
 

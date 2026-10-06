@@ -93,6 +93,12 @@ health endpoints + Docker healthchecks + structured logs + external availability
 
 The API should become stateless. PostgreSQL becomes the authoritative persistent station registry. The collector remains a separate process and should communicate only over a private Docker network or an authenticated ingestion route.
 
+### 4.1 Runtime naming invariant
+
+The Compose project name is `atommonitor`, the lowercase Git repository name. Every runtime container must therefore begin with `atommonitor-`. Singleton services retain concise explicit names, while scalable API replicas use Compose-generated names such as `atommonitor-atom-api-1` and `atommonitor-atom-api-2`; assigning a fixed `container_name` to the API would prevent scaling.
+
+The Compose project name is independent of persistent storage identity. The existing Docker volume names remain explicitly pinned as `server_atommonitor-postgres-data`, `server_atommonitor-admin-audit`, and `server_atommonitor-admin-devices`, so renaming/recreating containers cannot silently select empty replacement storage. Admin monitoring and scaling filter Docker resources by the new `atommonitor` Compose project label.
+
 ## 5. Phase 1 — harden the existing Compose deployment
 
 Do this before database migration or replication.

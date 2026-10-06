@@ -16,8 +16,8 @@ check_get(){
 cleanup(){ rm -f /tmp/atommonitor-http-$$; }
 trap cleanup EXIT INT TERM
 
-sudo docker compose config --quiet && pass "Compose validates" || fail "Compose validation"
-sudo docker compose up -d --scale atom-api=2 >/dev/null
+sudo docker compose -p atommonitor config --quiet && pass "Compose validates" || fail "Compose validation"
+sudo docker compose -p atommonitor up -d --scale atom-api=2 >/dev/null
 
 check_get "LB /health" "http://localhost:$HOST_PORT/health" 200
 ready="$(curl -fsS "http://localhost:$HOST_PORT/ready" 2>/dev/null || true)"
@@ -38,21 +38,21 @@ feedback_code="$(http_code -X POST -H 'Content-Type: application/json' -d '{"rat
 unauth_code="$(http_code -X POST -H 'Content-Type: application/json' -d '{}' "http://localhost:$HOST_PORT/api/v1/observations")"
 [ "$unauth_code" = 401 ] && pass "LB unauthenticated observation -> HTTP 401" || fail "Unauthenticated observation expected HTTP 401, got $unauth_code"
 
-pg_count="$(sudo docker compose exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT count(*) FROM stations WHERE isPilotAware=1;"' | tr -d '[:space:]')"
+pg_count="$(sudo docker compose -p atommonitor exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT count(*) FROM stations WHERE isPilotAware=1;"' | tr -d '[:space:]')"
 api_count="$(curl -fsS "http://localhost:$HOST_PORT/api/v1/stations" | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))')"
 [ "$pg_count" = "$api_count" ] && pass "PostgreSQL confirmed count matches station API ($api_count)" || fail "PostgreSQL/API count mismatch: $pg_count vs $api_count"
 
-for id in $(sudo docker compose ps -q atom-api); do
+for id in $(sudo docker compose -p atommonitor ps -q atom-api); do
   name="$(sudo docker inspect "$id" --format '{{.Name}}' | sed 's#^/##')"
   sudo docker exec "$id" python -c "import urllib.request; assert urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=5).status==200" >/dev/null 2>&1 && pass "$name direct /health -> HTTP 200" || fail "$name direct /health"
   sudo docker exec "$id" python -c "import json,urllib.request; r=urllib.request.urlopen('http://127.0.0.1:8080/ready',timeout=5); d=json.load(r); assert r.status==200 and d.get('databaseBackend')=='postgresql' and d.get('database')=='ok'" >/dev/null 2>&1 && pass "$name direct /ready -> PostgreSQL ready" || fail "$name direct /ready"
   sudo docker exec "$id" python -c "import urllib.request; assert urllib.request.urlopen('http://127.0.0.1:8080/api/v1/stations',timeout=5).status==200" >/dev/null 2>&1 && pass "$name direct station API -> HTTP 200" || fail "$name direct station API"
 done
 
-baseline="$(sudo docker compose logs atom-lb 2>/dev/null | grep -c 'POST /api/v1/observations HTTP/1.1" 202' || true)"
+baseline="$(sudo docker compose -p atommonitor logs atom-lb 2>/dev/null | grep -c 'POST /api/v1/observations HTTP/1.1" 202' || true)"
 i=0
 while [ "$i" -lt 90 ]; do
-  now="$(sudo docker compose logs atom-lb 2>/dev/null | grep -c 'POST /api/v1/observations HTTP/1.1" 202' || true)"
+  now="$(sudo docker compose -p atommonitor logs atom-lb 2>/dev/null | grep -c 'POST /api/v1/observations HTTP/1.1" 202' || true)"
   [ "$now" -gt "$baseline" ] && break
   i=$((i+5)); sleep 5
 done

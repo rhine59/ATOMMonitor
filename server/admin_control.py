@@ -8,7 +8,7 @@ from flask import Flask, jsonify, request
 app=Flask(__name__)
 TOKEN=os.getenv("ATOM_ADMIN_CONTROL_TOKEN","")
 SOCKET=os.getenv("DOCKER_SOCKET","/var/run/docker.sock")
-PROJECT=os.getenv("COMPOSE_PROJECT_NAME","server")
+PROJECT=os.getenv("COMPOSE_PROJECT_NAME","atommonitor")
 MIN_REPLICAS=int(os.getenv("ATOM_API_MIN_REPLICAS","1")); MAX_REPLICAS=int(os.getenv("ATOM_API_MAX_REPLICAS","4"))
 TIMEOUT=int(os.getenv("ATOM_SCALE_TIMEOUT_SECONDS","90")); AUDIT=os.getenv("ATOM_ADMIN_AUDIT_FILE","/audit/admin-events.jsonl")
 AUDIT_MAX_EVENTS=int(os.getenv("ATOM_ADMIN_AUDIT_MAX_EVENTS","500"))

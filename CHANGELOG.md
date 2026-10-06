@@ -1,3 +1,11 @@
+## 6 October 2026 — repository-prefixed Docker container names
+
+- Set the Compose project name to `atommonitor`, matching the established lowercase ESP32-EFIS repository-prefix convention.
+- Scaled API replicas are now named `atommonitor-atom-api-*`; every service container starts with `atommonitor-`.
+- Pinned the existing Synology PostgreSQL, Admin audit and Admin device Docker volume names so the project rename preserves live data and pairing state.
+- Added a one-time migration script and a reusable naming acceptance check; every rebuild and acceptance script now explicitly selects Compose project `atommonitor`.
+- Removed generated container-name assumptions from resilience testing and synchronized iOS demo inventory, architecture and Synology rebuild documentation.
+
 ## 3 October 2026 — device pairing authentication
 
 - Replaced phone entry of the shared administrator token with five-minute, one-time device pairing codes.

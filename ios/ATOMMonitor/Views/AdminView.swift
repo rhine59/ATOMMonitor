@@ -49,7 +49,7 @@ private enum AdminKeychain {
             AdminSummary.Container(service:"atom-admin-control",name:"atommonitor-admin-control",state:"running",health:"healthy",cpuPercent:0.1,memoryUsedBytes:22_020_096)
         ]
         let api = (1...replicas).map { index in
-            AdminSummary.Container(service:"atom-api",name:"server-atom-api-\(index)",state:"running",health:"healthy",cpuPercent:0.6,memoryUsedBytes:52_428_800)
+            AdminSummary.Container(service:"atom-api",name:"atommonitor-atom-api-\(index)",state:"running",health:"healthy",cpuPercent:0.6,memoryUsedBytes:52_428_800)
         }
         return AdminSummary(status:"ok",apiReplicas:.init(running:replicas,healthy:replicas),containers:(fixed+api).sorted{$0.service==$1.service ? $0.name<$1.name : $0.service<$1.service})
     }

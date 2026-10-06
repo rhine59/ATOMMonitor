@@ -1,3 +1,5 @@
+name: atommonitor
+
 services:
   postgres:
     image: postgres:17-alpine
@@ -80,7 +82,7 @@ services:
       ATOM_ADMIN_DEVICE_FILE: /data/admin-devices.json
       ATOM_ADMIN_PAIR_FILE: /data/admin-pairings.json
       ATOM_ADMIN_PAIRING_NETWORKS: ${ATOM_ADMIN_PAIRING_NETWORKS:-192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,127.0.0.0/8}
-      COMPOSE_PROJECT_NAME: ${COMPOSE_PROJECT_NAME:-server}
+      COMPOSE_PROJECT_NAME: atommonitor
       PORT: "8090"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -101,7 +103,7 @@ services:
     restart: unless-stopped
     environment:
       ATOM_ADMIN_CONTROL_TOKEN: ${ATOM_ADMIN_CONTROL_TOKEN:?Set ATOM_ADMIN_CONTROL_TOKEN in server/.env}
-      COMPOSE_PROJECT_NAME: ${COMPOSE_PROJECT_NAME:-server}
+      COMPOSE_PROJECT_NAME: atommonitor
       ATOM_API_MIN_REPLICAS: "1"
       ATOM_API_MAX_REPLICAS: "4"
       ATOM_SCALE_TIMEOUT_SECONDS: "60"
@@ -142,5 +144,8 @@ services:
 
 volumes:
   atommonitor-postgres-data:
+    name: server_atommonitor-postgres-data
   atommonitor-admin-audit:
+    name: server_atommonitor-admin-audit
   atommonitor-admin-devices:
+    name: server_atommonitor-admin-devices
